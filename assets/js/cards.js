@@ -8,7 +8,7 @@
   var uid = 0;
   // Prefijo distinto en build.js y en el navegador para que los ids de los SVG nunca se repitan.
   var PREFIX = typeof document === "undefined" ? "b" : "c" + Math.random().toString(36).slice(2, 6);
-  var SANS = "Inter, 'Helvetica Neue', Arial, sans-serif";
+  var SANS = "Outfit, Inter, 'Helvetica Neue', Arial, sans-serif";
   var STAR = "M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6 5.6 21.1 7 14l-5.3-5 7.2-.9z";
   var TIKTOK = "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z";
 
@@ -184,20 +184,63 @@
     return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-family="' + SANS + '" font-size="' + (size || 20) + '" font-weight="700" letter-spacing="6" fill="' + color + '" opacity=".7">NFC</text>';
   }
 
-  function horizontalFront(p, v, id) {
+  // Parte un texto de hasta 60 caracteres en renglones cortos.
+  function wrap(text, max) {
+    var lines = [], cur = "";
+    String(text).split(/\s+/).forEach(function (w) {
+      if (!w) return;
+      if ((cur + " " + w).trim().length > max && cur) { lines.push(cur); cur = w; }
+      else cur = (cur + " " + w).trim();
+    });
+    if (cur) lines.push(cur);
+    return lines.slice(0, 3);
+  }
+
+  // Texto y logo del cliente dentro del área (x, y, w, h).
+  function customArea(o, x, y, w, h, ink, align) {
+    var out = "", lines = [], hasLogo = !!o.logo, size = 46;
+    // Busca el tamaño de letra más grande con el que el texto quepa en el área.
+    if (o.text) {
+      for (; size >= 22; size -= 2) {
+        lines = wrap(o.text, Math.floor(w / (size * 0.56)));
+        if (lines.join(" ").length >= String(o.text).trim().replace(/\s+/g, " ").length && lines.length * size * 1.2 <= h * (hasLogo ? 0.5 : 1)) break;
+      }
+    }
+    var lineH = size * 1.2;
+    var logoH = hasLogo ? (lines.length ? h * 0.42 : h * 0.7) : 0;
+    var blockH = logoH + (lines.length ? lines.length * lineH + (hasLogo ? 20 : 0) : 0);
+    var top = y + (h - blockH) / 2;
+    var cx = align === "start" ? x : x + w / 2, anchor = align === "start" ? "start" : "middle";
+    if (hasLogo) {
+      out += '<image href="' + esc(o.logo) + '" x="' + (align === "start" ? x : x + (w - w * 0.6) / 2) + '" y="' + top + '" width="' + w * 0.6 + '" height="' + logoH + '" preserveAspectRatio="' + (align === "start" ? "xMinYMid" : "xMidYMid") + ' meet"/>';
+      top += logoH + 20;
+    }
+    lines.forEach(function (l, i) {
+      out += '<text x="' + cx + '" y="' + (top + size + i * lineH) + '" text-anchor="' + anchor + '" font-family="' + SANS + '" font-size="' + size + '" font-weight="700" letter-spacing="-.5" fill="' + ink + '">' + esc(l) + "</text>";
+    });
+    return out;
+  }
+
+  function horizontalFront(p, v, id, o) {
     var W = 856, H = 540, st;
+    o = o || {};
+    var custom = o.text || o.logo;
     if (p.id === "lisa") {
       st = LISA[v.id] || LISA.negra;
-      return svg(W, H, p.name + " " + v.name, base(id, W, H, 34, st.bg, "pvc", st.light) + contactless(776, 452, 38, st.ink) + nfcLabel(776, 518, st.ink, 16));
+      return svg(W, H, p.name + " " + v.name, base(id, W, H, 34, st.bg, "pvc", st.light) + contactless(776, 452, 38, st.ink) + nfcLabel(776, 518, st.ink, 16) +
+        (custom ? customArea(o, 80, 70, 696, 330, st.ink) : ""));
     }
     if (p.id === "metal") {
       st = METAL[v.id] || METAL.negra;
       var shade = st.light ? "#000" : "#fff";
       return svg(W, H, p.name + " " + v.name, base(id, W, H, 30, st.bg, "brushed", st.light) +
         '<rect x="26" y="26" width="330" height="488" rx="20" fill="' + shade + '" fill-opacity=".07" stroke="' + shade + '" stroke-opacity=".14" stroke-width="2"/>' +
-        contactless(191, 250, 58, st.ink) + nfcLabel(191, 372, st.ink));
+        contactless(191, 250, 58, st.ink) + nfcLabel(191, 372, st.ink) +
+        (custom ? customArea(o, 396, 60, 420, 420, st.ink, "start") : ""));
     }
-    return svg(W, H, p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) + contactless(428, 250, 44, "#d9d3c7") + nfcLabel(428, 340, "#d9d3c7", 18));
+    return svg(W, H, p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) +
+      (custom ? customArea(o, 80, 50, 696, 360, "#ece7dc") + contactless(428, 462, 28, "#d9d3c7")
+              : contactless(428, 250, 44, "#d9d3c7") + nfcLabel(428, 340, "#d9d3c7", 18)));
   }
 
   function horizontalBack(p, v, id) {
@@ -218,9 +261,10 @@
     return { p: p, v: C.getVariant(p, variantId) || p.variants[0] };
   }
 
-  function card(productId, variantId) {
+  // opts: { text, logo } para las tarjetas personalizables.
+  function card(productId, variantId, opts) {
     var x = parts(productId, variantId);
-    return (x.p.shape === "v" ? verticalFront : horizontalFront)(x.p, x.v, PREFIX + ++uid);
+    return (x.p.shape === "v" ? verticalFront : horizontalFront)(x.p, x.v, PREFIX + ++uid, opts);
   }
 
   function back(productId, variantId) {

@@ -14,12 +14,13 @@ Sin dependencias: HTML, CSS y JavaScript, más una función de servidor (`api/ch
 Página corta pensada para vender y para aparecer en Google:
 
 1. **Portada que explica NFC**: un iPhone se acerca a la tarjeta, lee el chip NFC (aparece el aviso "Etiqueta NFC") y abre Google, Instagram, WhatsApp, Facebook o TikTok, con 3 pasos que se iluminan al ritmo de la animación.
-2. **Productos** (todos con chip NFC), cada uno con **dos precios que se pueden elegir** (menudeo o mayoreo desde 20 piezas) y tarjetas que giran en 3D:
-   - Reseñas de Google (plástico, negra o blanca) · en stock
-   - Redes sociales: Instagram, WhatsApp, Facebook y TikTok (plástico) · en stock
-   - Lisa de plástico (negra o blanca) · en stock
-   - Metálica (negra, plata o dorada) · bajo pedido
-   - Papel negro · bajo pedido
+2. **Productos** (todos con chip NFC). Al pasar el mouse dan vuelta y muestran la **foto real** (`assets/img/productos/`). Dos precios, menudeo primero:
+   - Reseñas de Google (plástico, negra o blanca): $345 · mayoreo $175 desde 20
+   - Redes sociales (Instagram, WhatsApp, Facebook, TikTok): $345 · mayoreo $175 desde 20
+   - Lisa de plástico (negra o blanca): $68 · paquete de 10 por $399 · personalizable
+   - Metálica (negra, plata, dorada), programada a web, app, tienda, menú o redes: $450 · mayoreo $320 desde 20 · personalizable
+   - Papel negro: $199 · mayoreo $89 desde 20 · personalizable
+   - **Personalizables:** el cliente escribe hasta 60 caracteres o sube/arrastra su logo y lo ve en la tarjeta. El texto llega en el pedido; el logo se pide por WhatsApp después de pagar.
 3. Cómo funciona NFC, qué te llevas, para quién, preguntas frecuentes y ciudades.
 
 Reglas: mayoreo desde 20 piezas de un mismo producto (se pueden mezclar diseños o colores) y envío gratis desde 3 piezas.
@@ -58,6 +59,7 @@ Las tarjetas se dibujan con código (`assets/js/cards.js`), así que cambian sol
 - `post-*.jpg` (1080 × 1350, formato Instagram): uno por tarjeta y `post-productos.jpg` con toda la línea
 - `tarjeta-*.png` con fondo transparente, una por producto y color (también las usa Google en los datos de producto)
 - `reel-que-es-nfc.mp4` (1080 × 1920, 36 s) para Reels, TikTok y estados de WhatsApp
+- `promo-revende-nfc.mp4` (1080 × 1350, 18 s) para grupos de Facebook: "gana dinero vendiendo tarjetas NFC"
 - `og.jpg` para cuando se comparte el enlace
 
 Las fotos y el video de TAKTO Pay están en `assets/img/pay/`.

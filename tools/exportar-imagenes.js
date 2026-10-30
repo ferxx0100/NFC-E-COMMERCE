@@ -34,19 +34,21 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
     await p.close();
     console.log("✓", s.file);
   }
-  await reel(browser);
+  await video(browser, "art=reel", 1080, 1920, 36, "reel-que-es-nfc.mp4");
+  await video(browser, "art=promo", 1080, 1350, 18, "promo-revende-nfc.mp4");
   await browser.close();
 })();
 
-// Video vertical (Reels, TikTok, estados): una vuelta de la animación por plataforma.
-async function reel(browser) {
+// Videos cuadro por cuadro: el reel "¿Qué es NFC?" (Reels, TikTok, estados)
+// y la promo para grupos de Facebook "gana dinero vendiendo tarjetas NFC".
+async function video(browser, query, w, h, seconds, file) {
   const { execFileSync } = require("child_process");
   const fs = require("fs");
   const os = require("os");
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "reel-"));
-  const fps = 30, seconds = 36;
-  const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
-  await p.goto(page("art=reel"));
+  const fps = 30;
+  const p = await browser.newPage({ viewport: { width: w, height: h } });
+  await p.goto(page(query));
   await p.evaluate(() => document.fonts.ready);
   for (let i = 0; i < fps * seconds; i++) {
     await p.evaluate((ms) => window.seek(ms), (i * 1000) / fps);
@@ -55,7 +57,7 @@ async function reel(browser) {
   await p.close();
   execFileSync("ffmpeg", ["-v", "error", "-y", "-framerate", String(fps), "-i", path.join(tmp, "%04d.jpg"),
     "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-    path.join(OUT, "reel-que-es-nfc.mp4")]);
+    path.join(OUT, file)]);
   fs.rmSync(tmp, { recursive: true, force: true });
-  console.log("✓ reel-que-es-nfc.mp4");
+  console.log("✓ " + file);
 }

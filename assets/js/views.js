@@ -73,25 +73,45 @@
     return p.stock ? C.leadTime.stock : C.leadTime.order;
   }
 
-  // Tarjeta de producto: imagen girando, colores, dos precios, cantidad y botón.
-  function product(p, variantId, pick) {
+  function photoFor(p, v) {
+    return p.photos && p.photos[v.id] ? "/assets/img/productos/" + p.photos[v.id] : null;
+  }
+
+  // Reverso de la ficha: la foto real del producto (o el reverso dibujado si no hay foto).
+  function backFace(p, v) {
+    var src = photoFor(p, v);
+    return src ? '<img src="' + src + '" alt="Foto real: ' + esc(p.name + " " + v.name) + '" loading="lazy"><span>Foto real</span>' : root.CARDS.back(p.id, v.id);
+  }
+
+  // Tarjeta de producto: da vuelta al pasar el mouse, colores, dos precios, cantidad y botón.
+  function product(p, variantId, pick, custom) {
     var CARDS = root.CARDS;
     var v = C.getVariant(p, variantId) || p.variants[0];
-    var n = pick || 1, ws = n >= C.wholesaleFrom;
+    var n = pick || 1, min = C.minWholesale(p), ws = n >= min;
+    custom = custom || {};
+    var wsPrice = p.pack ? money(p.wholesale * p.pack) : money(p.wholesale);
+    var wsLabel = p.pack ? "Paquete de " + p.pack : "Mayoreo " + min + "+";
     return '<article class="product shape-' + p.shape + '" id="' + p.id + '" data-product="' + p.id + '">' +
-      '<div class="product-media"><div class="tilt"><div class="flip" style="animation-delay:-' + C.products.indexOf(p) * 2.3 + 's">' +
-      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id) + "</div>" +
-      '<div class="face back" data-face="back">' + CARDS.back(p.id, v.id) + "</div></div></div>" +
-      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + "</div>" +
+      '<div class="product-media"' + (p.custom ? ' data-drop="' + p.id + '"' : "") + '><div class="tilt"><div class="flip">' +
+      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id, custom) + "</div>" +
+      '<div class="face back' + (photoFor(p, v) ? " photo" : "") + '" data-face="back">' + backFace(p, v) + "</div></div></div>" +
+      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + (p.custom ? '<span class="drop-hint">Suelta tu logo aquí</span>' : "") + "</div>" +
       '<div class="product-body">' +
       '<p class="kicker">NFC · ' + esc(p.materialShort) + "</p>" +
       "<h3>" + esc(p.name.replace("Tarjeta NFC ", "Tarjeta ").replace("Tarjetas NFC ", "Tarjetas ")) + "</h3>" +
+      '<p class="short">' + esc(p.short) + "</p>" +
       '<div class="variants" role="group" aria-label="' + esc(p.variantLabel) + '">' + p.variants.map(function (x) {
         return '<button type="button" class="variant" data-variant="' + p.id + ":" + x.id + '" aria-pressed="' + (x.id === v.id) + '" title="' + esc(x.name) + '">' + CARDS.swatch(p.id, x.id) + "<span>" + esc(x.name) + "</span></button>";
       }).join("") + "</div>" +
+      (p.custom
+        ? '<div class="customize"><input type="text" maxlength="60" data-text="' + p.id + '" value="' + esc(custom.text || "") + '" placeholder="Escribe tu nombre, empresa o frase" aria-label="Texto de la tarjeta">' +
+          '<span class="count" data-count-for="' + p.id + '">' + (custom.text || "").length + "/60</span>" +
+          '<div class="logo-row"><label class="logo-btn">' + (custom.logo ? "Cambiar logo" : "Subir logo") + '<input type="file" accept="image/*" data-logo="' + p.id + '" hidden></label>' +
+          (custom.logo ? '<button type="button" class="logo-clear" data-logo-clear="' + p.id + '">Quitar logo</button>' : '<small>o arrástralo a la tarjeta</small>') + "</div></div>"
+        : "") +
       '<div class="two-prices" role="radiogroup" aria-label="Precio">' +
-      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo</small></button>" +
-      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><strong>' + money(p.wholesale) + "</strong><small>Mayoreo " + C.wholesaleFrom + "+</small></button></div>" +
+      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo · pieza</small></button>" +
+      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><strong>' + wsPrice + "</strong><small>" + wsLabel + "</small></button></div>" +
       '<div class="buy"><div class="stepper"><button type="button" data-pick-dec="' + p.id + '" aria-label="Menos">−</button>' +
       '<input type="number" min="1" max="999" inputmode="numeric" data-pick="' + p.id + '" value="' + n + '" aria-label="Cantidad"><button type="button" data-pick-inc="' + p.id + '" aria-label="Más">+</button></div>' +
       '<button type="button" class="btn btn-primary" data-add="' + p.id + '">Agregar al carrito</button></div>' +
@@ -100,8 +120,8 @@
   }
 
   function pickNote(p, n) {
-    var unit = n >= C.wholesaleFrom ? p.wholesale : p.retail;
-    return n + (n === 1 ? " pieza" : " piezas") + " · " + money(unit * n) + (n >= C.wholesaleFrom ? " (mayoreo)" : "");
+    var ws = n >= C.minWholesale(p), unit = ws ? p.wholesale : p.retail;
+    return n + (n === 1 ? " pieza" : " piezas") + " · " + money(Math.round(unit * n * 100) / 100) + (ws ? " (mayoreo)" : "");
   }
 
   function products(sel, picks) {
@@ -132,7 +152,7 @@
     }).join("");
   }
 
-  var views = { FAQ: FAQ, SECTORS: SECTORS, CITIES: CITIES, product: product, products: products, pickNote: pickNote, faq: faq, sectors: sectors, cityLinks: cityLinks, esc: esc };
+  var views = { backFace: backFace, photoFor: photoFor, FAQ: FAQ, SECTORS: SECTORS, CITIES: CITIES, product: product, products: products, pickNote: pickNote, faq: faq, sectors: sectors, cityLinks: cityLinks, esc: esc };
   if (typeof module !== "undefined" && module.exports) module.exports = views;
   else root.VIEWS = views;
 })(typeof window !== "undefined" ? window : this);

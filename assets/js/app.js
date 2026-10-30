@@ -25,12 +25,13 @@
   }
 
   // ---------- Estado (se recuerda en este navegador) ----------
-  var state = { sel: {}, pick: {}, cart: [], delivery: C.delivery[0].id, customer: {} };
+  var state = { sel: {}, pick: {}, custom: {}, cart: [], delivery: C.delivery[0].id, customer: {} };
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || "null");
     if (saved && typeof saved === "object") Object.assign(state, saved);
   } catch (e) {}
   if (!Array.isArray(state.cart)) state.cart = [];
+  if (!state.custom || typeof state.custom !== "object") state.custom = {};
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
   }
@@ -42,11 +43,52 @@
   }
 
   // ---------- Productos ----------
+  function custom(p) {
+    return p.custom ? state.custom[p.id] || {} : {};
+  }
+
+  function renderFront(p) {
+    var box = $('[data-product="' + p.id + '"]');
+    $('[data-face="front"]', box).innerHTML = CARDS.card(p.id, selected(p).id, custom(p));
+  }
+
   function renderVariant(p) {
-    var v = selected(p), box = $('[data-product="' + p.id + '"]');
-    $('[data-face="front"]', box).innerHTML = CARDS.card(p.id, v.id);
-    $('[data-face="back"]', box).innerHTML = CARDS.back(p.id, v.id);
+    var v = selected(p), box = $('[data-product="' + p.id + '"]'), back = $('[data-face="back"]', box);
+    renderFront(p);
+    back.innerHTML = VIEWS.backFace(p, v);
+    back.classList.toggle("photo", !!VIEWS.photoFor(p, v));
     $$("[data-variant]", box).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.variant === p.id + ":" + v.id); });
+  }
+
+  // Vuelve a armar toda la ficha (cuando cambia el logo).
+  function renderProduct(p) {
+    var box = $('[data-product="' + p.id + '"]');
+    box.outerHTML = VIEWS.product(p, selected(p).id, state.pick[p.id], custom(p));
+    if (finePointer && !reduceMotion) {
+      var m = $('[data-product="' + p.id + '"] .product-media');
+      tilt(m, $(".tilt", m), 10);
+    }
+  }
+
+  // Reduce el logo a 400 px para guardarlo en el navegador sin ocupar mucho.
+  function readLogo(file, pid) {
+    if (!file || !/^image\//.test(file.type)) return toast("El logo debe ser una imagen");
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var k = Math.min(1, 400 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+        c.width = Math.round(img.width * k);
+        c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        state.custom[pid] = Object.assign({}, state.custom[pid], { logo: c.toDataURL("image/png") });
+        save();
+        renderProduct(C.getProduct(pid));
+        toast("Logo listo ✓");
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   function renderPick(p) {
@@ -54,7 +96,7 @@
     if (document.activeElement !== input) input.value = n;
     $('[data-pick-note="' + p.id + '"]').textContent = VIEWS.pickNote(p, n);
     $$('[data-tier][data-pid="' + p.id + '"]').forEach(function (b) {
-      b.setAttribute("aria-checked", (b.dataset.tier === "wholesale") === n >= C.wholesaleFrom);
+      b.setAttribute("aria-checked", (b.dataset.tier === "wholesale") === n >= C.minWholesale(p));
     });
   }
 
@@ -76,10 +118,11 @@
 
   // ---------- Carrito ----------
   function addToCart(pid) {
-    var p = C.getProduct(pid), v = selected(p), n = state.pick[pid] || 1;
-    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id; })[0];
+    var p = C.getProduct(pid), v = selected(p), n = state.pick[pid] || 1, cu = custom(p);
+    var text = (cu.text || "").trim(), logo = cu.logo || "";
+    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id && (l.text || "") === text && (l.logo || "") === logo; })[0];
     if (line) line.qty = Math.min(999, line.qty + n);
-    else state.cart.push({ product: pid, variant: v.id, qty: n });
+    else state.cart.push({ product: pid, variant: v.id, qty: n, text: text, logo: logo });
     state.pick[pid] = 1;
     save();
     renderPick(p);
@@ -127,9 +170,11 @@
     }
     var html = q.groups.map(function (g) {
       return '<div class="d-group">' + g.lines.map(function (l) {
-          var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id; });
-          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id) + "</div>" +
-            '<span class="d-name">' + esc(l.product.cartName) + "<small>" + esc(l.variant.name) + " · " + money(g.unit) + " c/u</small></span>" +
+          var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text && !!c.logo === l.logo; });
+          var item = state.cart[i] || {};
+          var extra = (item.text ? "“" + item.text + "”" : "") + (item.logo ? (item.text ? " · " : "") + "con logo" : "");
+          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id, { text: item.text, logo: item.logo }) + "</div>" +
+            '<span class="d-name">' + esc(l.product.cartName) + "<small>" + esc(l.variant.name) + " · " + money(g.unit) + " c/u</small>" + (extra ? "<small>" + esc(extra) + "</small>" : "") + "</span>" +
             '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="1" max="999" inputmode="numeric" data-line="' + i + '" value="' + l.qty + '" aria-label="Cantidad"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div>' +
             '<button type="button" class="remove" data-remove="' + i + '" aria-label="Quitar del carrito">×</button></div>';
         }).join("") +
@@ -169,7 +214,9 @@
   function orderText(q, c) {
     var lines = q.groups.map(function (g) {
       return g.product.name + " (" + (g.wholesale ? "mayoreo" : "menudeo") + ", " + money(g.unit) + " c/u):\n" +
-        g.lines.map(function (l) { return "  • " + l.qty + " × " + l.variant.name; }).join("\n");
+        g.lines.map(function (l) {
+          return "  • " + l.qty + " × " + l.variant.name + (l.text ? " · texto: " + l.text : "") + (l.logo ? " · con logo (te lo envío por aquí)" : "");
+        }).join("\n");
     }).join("\n");
     var where = c.street + ", CP " + c.zip + ", " + c.city + ", " + c.state;
     return "Hola, quiero hacer este pedido de " + C.brand.name + ":\n\n" + lines +
@@ -201,7 +248,11 @@
     fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: state.cart, delivery: state.delivery, customer: c }),
+      body: JSON.stringify({
+        items: state.cart.map(function (l) { return { product: l.product, variant: l.variant, qty: l.qty, text: l.text, logo: !!l.logo }; }),
+        delivery: state.delivery,
+        customer: c,
+      }),
     })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.init_point) throw new Error(j.error || "Error " + r.status); return j; });
@@ -228,13 +279,19 @@
     } else if (d.tier) {
       // Menudeo regresa a 1 pieza; mayoreo sube al mínimo de mayoreo.
       var cur = state.pick[d.pid] || 1;
-      state.pick[d.pid] = d.tier === "wholesale" ? Math.max(cur, C.wholesaleFrom) : cur >= C.wholesaleFrom ? 1 : cur;
+      var minWs = C.minWholesale(C.getProduct(d.pid));
+      state.pick[d.pid] = d.tier === "wholesale" ? Math.max(cur, minWs) : cur >= minWs ? 1 : cur;
       renderPick(C.getProduct(d.pid));
     } else if (d.pickInc || d.pickDec) {
       var id = d.pickInc || d.pickDec;
       state.pick[id] = Math.max(1, Math.min(999, (state.pick[id] || 1) + (d.pickInc ? 1 : -1)));
       renderPick(C.getProduct(id));
     } else if (d.add) addToCart(d.add);
+    else if (d.logoClear) {
+      state.custom[d.logoClear] = Object.assign({}, state.custom[d.logoClear], { logo: "" });
+      save();
+      renderProduct(C.getProduct(d.logoClear));
+    }
     else if (d.remove !== undefined) {
       readCustomer();
       setLine(+d.remove, 0);
@@ -253,7 +310,42 @@
   overlay.addEventListener("click", closeOrder);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOrder(); });
 
-  $("#products").addEventListener("input", function (e) {
+  var products = $("#products");
+  products.addEventListener("change", function (e) {
+    if (e.target.dataset.logo) readLogo(e.target.files[0], e.target.dataset.logo);
+  });
+  // Arrastrar un logo sobre la tarjeta.
+  products.addEventListener("dragover", function (e) {
+    var zone = e.target.closest("[data-drop]");
+    if (!zone) return;
+    e.preventDefault();
+    zone.classList.add("dragging");
+  });
+  products.addEventListener("dragleave", function (e) {
+    var zone = e.target.closest("[data-drop]");
+    if (zone && !zone.contains(e.relatedTarget)) zone.classList.remove("dragging");
+  });
+  products.addEventListener("drop", function (e) {
+    var zone = e.target.closest("[data-drop]");
+    if (!zone) return;
+    e.preventDefault();
+    zone.classList.remove("dragging");
+    readLogo(e.dataTransfer.files[0], zone.dataset.drop);
+  });
+  // En celular, tocar la tarjeta la voltea.
+  products.addEventListener("click", function (e) {
+    var media = e.target.closest(".product-media");
+    if (media && !finePointer) media.classList.toggle("flipped");
+  });
+  products.addEventListener("input", function (e) {
+    if (e.target.dataset.text) {
+      var tid = e.target.dataset.text, tp = C.getProduct(tid);
+      state.custom[tid] = Object.assign({}, state.custom[tid], { text: e.target.value.slice(0, 60) });
+      save();
+      renderFront(tp);
+      $('[data-count-for="' + tid + '"]').textContent = e.target.value.length + "/60";
+      return;
+    }
     var id = e.target.dataset.pick;
     if (!id) return;
     state.pick[id] = Math.max(1, Math.min(999, parseInt(e.target.value, 10) || 1));
@@ -300,7 +392,8 @@
   $$("[data-wa]").forEach(function (el) { el.href = wa("Hola, quiero información de las tarjetas NFC " + C.brand.name); el.target = "_blank"; el.rel = "noopener"; });
 
   C.products.forEach(function (p) {
-    if (state.sel[p.id]) renderVariant(p);
+    if (p.custom && (custom(p).text || custom(p).logo)) renderProduct(p);
+    else if (state.sel[p.id]) renderVariant(p);
     renderPick(p);
   });
   renderCount();

@@ -34,12 +34,13 @@
       cartName: "Reseñas Google",
       name: "Tarjeta NFC de reseñas de Google",
       short: "Tus clientes te califican con 5 estrellas en segundos.",
+      photos: { negra: "google-negra.jpg", blanca: "google-blanca.jpg" },
       material: "Plástico rígido",
       materialShort: "Plástico",
       stock: true,
       shape: "v",
-      retail: 349,
-      wholesale: 169,
+      retail: 345,
+      wholesale: 175,
       variantLabel: "Color",
       variants: [
         { id: "negra", name: "Negra", screen: "google", color: "#4285F4" },
@@ -51,12 +52,13 @@
       cartName: "Redes sociales",
       name: "Tarjetas NFC para redes sociales",
       short: "Más seguidores y mensajes sin que te busquen por nombre.",
+      photos: { instagram: "redes.jpg", whatsapp: "whatsapp.jpg", facebook: "facebook.jpg", tiktok: "redes.jpg" },
       material: "Plástico rígido",
       materialShort: "Plástico",
       stock: true,
       shape: "v",
-      retail: 349,
-      wholesale: 169,
+      retail: 345,
+      wholesale: 175,
       variantLabel: "Red social",
       variants: [
         { id: "instagram", name: "Instagram", screen: "instagram", color: "#E1306C" },
@@ -69,13 +71,18 @@
       id: "lisa",
       cartName: "Lisa de plástico",
       name: "Tarjeta NFC lisa de plástico",
-      short: "Negra o blanca, lista para abrir cualquier enlace.",
+      short: "Negra o blanca. Ponle tu texto o tu logo.",
+      photos: { negra: "lisa.jpg", blanca: "lisa.jpg" },
+      custom: true,
       material: "Plástico mate",
       materialShort: "Plástico",
       stock: true,
       shape: "h",
-      retail: 299,
-      wholesale: 139,
+      retail: 68,
+      // Paquete de 10 por $399.
+      wholesale: 39.9,
+      wholesaleFrom: 10,
+      pack: 10,
       variantLabel: "Color",
       variants: [
         { id: "negra", name: "Negra" },
@@ -86,13 +93,15 @@
       id: "metal",
       cartName: "Metálica",
       name: "Tarjeta NFC metálica",
-      short: "Acero con acabado cepillado. La más elegante para presentarte.",
+      short: "Programada a tu web, app, tienda, menú o redes. Ponle tu nombre o logo.",
+      photos: { negra: "metal.jpg", plata: "metal.jpg", dorada: "metal.jpg" },
+      custom: true,
       material: "Metal (acero inoxidable)",
       materialShort: "Metal",
       stock: false,
       shape: "h",
-      retail: 899,
-      wholesale: 549,
+      retail: 450,
+      wholesale: 320,
       variantLabel: "Color",
       variants: [
         { id: "negra", name: "Negra" },
@@ -104,7 +113,9 @@
       id: "papel",
       cartName: "Papel negro",
       name: "Tarjeta NFC de papel negro",
-      short: "Ligera y mate. Ideal para eventos y para repartir.",
+      short: "Ligera y mate. Ponle tu texto o tu logo.",
+      photos: { negra: "papel.jpg" },
+      custom: true,
       material: "Papel negro grueso",
       materialShort: "Papel",
       stock: false,
@@ -137,9 +148,18 @@
     return delivery[0];
   }
 
+  // Desde cuántas piezas aplica el mayoreo en un producto.
+  function minWholesale(product) {
+    return product.wholesaleFrom || wholesaleFrom;
+  }
+
   // Precio por pieza según cuántas piezas de ese producto lleva el pedido.
   function unitPrice(product, qty) {
-    return qty >= wholesaleFrom ? product.wholesale : product.retail;
+    return qty >= minWholesale(product) ? product.wholesale : product.retail;
+  }
+
+  function cents(n) {
+    return Math.round(n * 100) / 100;
   }
 
   /*
@@ -154,7 +174,7 @@
       var v = p && getVariant(p, it.variant);
       var n = Math.max(0, Math.min(999, parseInt(it.qty, 10) || 0));
       if (!p || !v || !n) return;
-      lines.push({ product: p, variant: v, qty: n });
+      lines.push({ product: p, variant: v, qty: n, text: String(it.text || "").slice(0, 60), logo: !!it.logo });
       byProduct[p.id] = (byProduct[p.id] || 0) + n;
     });
 
@@ -164,18 +184,18 @@
     products.forEach(function (p) {
       var n = byProduct[p.id];
       if (!n) return;
-      var unit = unitPrice(p, n);
+      var unit = unitPrice(p, n), min = minWholesale(p);
       groups.push({
         product: p,
         qty: n,
         unit: unit,
-        total: unit * n,
-        wholesale: n >= wholesaleFrom,
-        saving: (p.retail - unit) * n,
-        missing: n < wholesaleFrom ? wholesaleFrom - n : 0,
+        total: cents(unit * n),
+        wholesale: n >= min,
+        saving: cents((p.retail - unit) * n),
+        missing: n < min ? min - n : 0,
         lines: lines.filter(function (l) { return l.product === p; }),
       });
-      subtotal += unit * n;
+      subtotal = cents(subtotal + unit * n);
       qty += n;
     });
 
@@ -185,12 +205,13 @@
   }
 
   function formatMoney(n) {
-    return "$" + Math.round(n).toLocaleString("es-MX");
+    var whole = Math.round(n * 100) % 100 === 0;
+    return "$" + Number(n).toLocaleString("es-MX", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 });
   }
 
   var catalog = {
     brand: brand, products: products, delivery: delivery, wholesaleFrom: wholesaleFrom, freeShippingFrom: freeShippingFrom, leadTime: leadTime,
-    getProduct: getProduct, getVariant: getVariant, getDelivery: getDelivery, unitPrice: unitPrice, quote: quote, formatMoney: formatMoney,
+    getProduct: getProduct, getVariant: getVariant, getDelivery: getDelivery, minWholesale: minWholesale, unitPrice: unitPrice, quote: quote, formatMoney: formatMoney,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = catalog;
