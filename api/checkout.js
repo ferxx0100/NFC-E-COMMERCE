@@ -10,6 +10,7 @@
  * nunca se confía en lo que manda el navegador.
  */
 const C = require("../assets/js/catalog.js");
+const P = require("../assets/js/pay-catalog.js");
 
 function clean(value, max) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -33,24 +34,37 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const mode = body.mode === "negocio" ? "negocio" : "reventa";
-  const q = C.quote(mode, Array.isArray(body.items) ? body.items.slice(0, 20) : [], body.delivery);
-  if (q.error) return res.status(400).json({ error: q.error });
-
   const customer = body.customer || {};
-  const items = q.lines.map((l) => ({
-    id: l.platform.id,
-    title: `Tarjeta NFC ${C.brand.name} · ${l.platform.name}`,
-    quantity: l.qty,
-    unit_price: q.unit,
-    currency_id: C.brand.currency,
-  }));
-  if (q.shipping) {
-    items.push({ id: "envio", title: q.delivery.name, quantity: 1, unit_price: q.shipping, currency_id: C.brand.currency });
+  let items;
+  let meta;
+  let shipping;
+
+  if (body.store === "pay") {
+    const q = P.quote(body.package, body.qty, body.delivery);
+    if (q.error) return res.status(400).json({ error: q.error });
+    items = [{ id: q.pkg.id, title: `Kit de cobro ${P.brand.name} · ${q.pkg.name}`, quantity: q.qty, unit_price: q.unit, currency_id: P.brand.currency }];
+    shipping = { amount: q.shipping, name: q.delivery.name };
+    meta = { store: "pay", package: q.pkg.name, delivery: q.delivery.name, machine: clean(customer.machine, 120) };
+  } else {
+    const mode = body.mode === "negocio" ? "negocio" : "reventa";
+    const q = C.quote(mode, Array.isArray(body.items) ? body.items.slice(0, 20) : [], body.delivery, body.finish);
+    if (q.error) return res.status(400).json({ error: q.error });
+    items = q.lines.map((l) => ({
+      id: l.platform.id,
+      title: `Tarjeta NFC ${C.brand.name} · ${l.platform.name} · ${q.finish.name}`,
+      quantity: l.qty,
+      unit_price: q.unit,
+      currency_id: C.brand.currency,
+    }));
+    shipping = { amount: q.shipping, name: q.delivery.name };
+    meta = { store: "tarjetas", mode, finish: q.finish.name, tier: q.tier ? q.tier.name : null, gift_cards: q.giftCards, delivery: q.delivery.name };
+  }
+  if (shipping.amount) {
+    items.push({ id: "envio", title: shipping.name, quantity: 1, unit_price: shipping.amount, currency_id: C.brand.currency });
   }
 
   const siteUrl = (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/$/, "");
-  const reference = "TK-" + Date.now().toString(36).toUpperCase();
+  const reference = (body.store === "pay" ? "TP-" : "TK-") + Date.now().toString(36).toUpperCase();
   const back = `${siteUrl}/gracias.html`;
 
   const preference = {
@@ -67,10 +81,7 @@ module.exports = async function handler(req, res) {
     // Datos para preparar el pedido; se ven en el detalle del pago en Mercado Pago.
     metadata: {
       reference,
-      mode,
-      tier: q.tier ? q.tier.name : null,
-      gift_cards: q.giftCards,
-      delivery: q.delivery.name,
+      ...meta,
       customer: {
         name: clean(customer.name, 80),
         phone: clean(customer.phone, 20),

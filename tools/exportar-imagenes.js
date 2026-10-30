@@ -18,6 +18,7 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
     ...C.platforms.map((p) => ({ q: `art=card&id=${p.id}`, file: `tarjeta-${p.id}.png`, w: 1284, h: 810, transparent: true })),
     ...C.platforms.map((p) => ({ q: `art=post&id=${p.id}`, file: `post-${p.id}.jpg`, w: 1080, h: 1350 })),
     { q: "art=kit", file: "post-kit-7.jpg", w: 1080, h: 1350 },
+    { q: "art=materiales", file: "post-materiales.jpg", w: 1080, h: 1350 },
     { q: "art=og", file: "og.jpg", w: 1200, h: 630 },
   ];
   for (const s of shots) {
@@ -29,5 +30,28 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
     await p.close();
     console.log("✓", s.file);
   }
+  await reel(browser);
   await browser.close();
 })();
+
+// Video vertical (Reels, TikTok, estados): 3 vueltas de la animación del celular.
+async function reel(browser) {
+  const { execFileSync } = require("child_process");
+  const fs = require("fs");
+  const os = require("os");
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "reel-"));
+  const fps = 30, seconds = 18;
+  const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
+  await p.goto(page("art=reel"));
+  await p.evaluate(() => document.fonts.ready);
+  for (let i = 0; i < fps * seconds; i++) {
+    await p.evaluate((ms) => window.seek(ms), (i * 1000) / fps);
+    await p.screenshot({ path: path.join(tmp, String(i).padStart(4, "0") + ".jpg"), type: "jpeg", quality: 92 });
+  }
+  await p.close();
+  execFileSync("ffmpeg", ["-v", "error", "-y", "-framerate", String(fps), "-i", path.join(tmp, "%04d.jpg"),
+    "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+    path.join(OUT, "reel-que-es-nfc.mp4")]);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  console.log("✓ reel-que-es-nfc.mp4");
+}

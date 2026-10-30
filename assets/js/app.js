@@ -19,7 +19,7 @@
   }
 
   // ---------- Estado (se recuerda en este navegador) ----------
-  var state = { mode: "reventa", qty: {}, delivery: "zmg", resale: C.resale.suggested, customer: {} };
+  var state = { mode: "reventa", finish: C.finishes[0].id, qty: {}, delivery: "zmg", resale: C.resale.suggested, customer: {} };
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || "null");
     if (saved && typeof saved === "object") Object.assign(state, saved);
@@ -32,7 +32,7 @@
     return C.platforms.map(function (p) { return { platform: p.id, qty: state.qty[p.id] || 0 }; });
   }
   function currentQuote() {
-    return C.quote(state.mode, items(), state.delivery);
+    return C.quote(state.mode, items(), state.delivery, state.finish);
   }
 
   // Reparte n piezas entre los 7 diseños lo más parejo posible.
@@ -60,7 +60,6 @@
   function renderStatic() {
     var markSvg = '<svg viewBox="-6 -21 30 42" aria-hidden="true">' + CARDS.mark(0, 0, 1, "#C9A96E") + "</svg>";
     $$("[data-mark]").forEach(function (el) { el.innerHTML = markSvg; });
-    $$("[data-card]").forEach(function (el) { el.innerHTML = CARDS.card(el.dataset.card, { animated: el.hasAttribute("data-animated") }); });
     $$("[data-wa]").forEach(function (el) { el.href = wa("Hola, quiero información de las tarjetas " + C.brand.name); el.target = "_blank"; el.rel = "noopener"; });
     $$("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 
@@ -77,14 +76,14 @@
     $("#marquee").innerHTML = names + names + names + names;
 
     $("#collection").innerHTML = C.platforms.map(function (p) {
-      return '<article class="c-item"><div class="tilt">' + CARDS.card(p.id) + '<div class="shine"></div></div>' +
+      return '<article class="c-item"><div class="tilt" data-tk="' + p.id + '"></div>' +
         '<div class="c-meta"><div><h3>' + esc(p.name) + "</h3><p>" + esc(p.use) + "</p></div>" +
         '<button class="add-btn" type="button" data-add="' + p.id + '" aria-label="Agregar ' + esc(p.name) + ' al paquete">+</button></div></article>';
     }).join("");
 
     // Ejemplo de ganancia con el nivel recomendado.
     var t = C.tiers[1];
-    var exQ = C.quote("reventa", C.platforms.map(function (p) { return { platform: p.id, qty: spread(t.min)[p.id] }; }), "zmg");
+    var exQ = C.quote("reventa", C.platforms.map(function (p) { return { platform: p.id, qty: spread(t.min)[p.id] }; }), "zmg", C.finishes[0].id);
     var exP = C.profit(exQ, C.resale.suggested);
     $("#example").innerHTML =
       '<div><span class="eyebrow">Ejemplo con el ' + esc(t.name) + '</span><div class="amount gold">+' + money(exP.gain) + '</div>' +
@@ -102,7 +101,7 @@
     }).join("");
 
     $("#rows").innerHTML = C.platforms.map(function (p) {
-      return '<div class="row" data-row="' + p.id + '"><div class="mini">' + CARDS.card(p.id) + "</div>" +
+      return '<div class="row" data-row="' + p.id + '"><div class="mini" data-tk="' + p.id + '"></div>' +
         '<div class="row-info"><strong>' + esc(p.name) + "</strong><span>" + esc(p.use) + "</span></div>" +
         '<div class="stepper"><button type="button" data-dec="' + p.id + '" aria-label="Quitar ' + esc(p.name) + '">−</button>' +
         '<input type="number" min="0" max="999" inputmode="numeric" data-qty="' + p.id + '" aria-label="Cantidad de ' + esc(p.name) + '" value="0">' +
@@ -110,7 +109,7 @@
     }).join("");
 
     $("#tiers").innerHTML = C.tiers.map(function (t, i) {
-      var q = C.quote("reventa", C.platforms.map(function (p) { return { platform: p.id, qty: spread(t.min)[p.id] }; }), "zmg");
+      var q = C.quote("reventa", C.platforms.map(function (p) { return { platform: p.id, qty: spread(t.min)[p.id] }; }), "zmg", C.finishes[0].id);
       var pr = C.profit(q, C.resale.suggested);
       var gifts = (t.giftCards ? ["<strong>+" + t.giftCards + " tarjetas de regalo</strong>"] : []).concat(t.gifts.map(esc));
       return '<div class="tier' + (i === 1 ? " featured" : "") + '">' +
@@ -122,11 +121,51 @@
         '<a class="btn ' + (i === 1 ? "btn-gold" : "btn-line") + '" href="#paquete" data-preset="' + t.min + '">Elegir ' + esc(t.name.replace("Kit ", "")) + "</a></div>";
     }).join("");
 
+    var deltas = C.finishes.filter(function (f) { return f.delta; }).map(function (f) {
+      return f.name + " " + (f.delta > 0 ? "+" : "−") + money(Math.abs(f.delta));
+    });
+    $$("[data-finish-note]").forEach(function (el) { el.textContent = "Precios en " + C.finishes[0].name + ". Otros materiales por pieza: " + deltas.join(" · ") + "."; });
+
     $("#zones").innerHTML = ZONES.slice(0, 6).map(function (z) { return "<span>" + z + "</span>"; }).join("");
     $("#s-zone").innerHTML = '<option value="">Selecciona</option>' + ZONES.map(function (z) { return "<option>" + z + "</option>"; }).join("");
     $("#s-kit").innerHTML = '<option value="">Selecciona</option>' + C.tiers.map(function (t) {
       return "<option>" + esc(t.name) + " · " + t.min + " piezas · " + money(t.min * t.price) + "</option>";
     }).join("") + "<option>Aún no lo sé, quiero asesoría</option>";
+  }
+
+  // ---------- Materiales ----------
+  function renderFinish() {
+    var f = C.getFinish(state.finish);
+    $$("[data-finish-picker]").forEach(function (box) {
+      var compact = box.classList.contains("compact");
+      box.innerHTML = (compact ? "" : '<span class="lbl">Elige el material</span>') + '<div class="finishes">' + C.finishes.map(function (x) {
+        return '<button type="button" class="finish" data-finish="' + x.id + '" aria-pressed="' + (x.id === f.id) + '">' +
+          '<i style="background:' + CARDS.swatch(x.id) + '"></i><span>' + esc(x.name) + "<small>" + (x.stock ? "En stock" : "Bajo pedido") + "</small></span></button>";
+      }).join("") + "</div>" +
+        (compact ? "" : '<p class="finish-info">' + (f.stock ? '<span class="ok">● En stock en Guadalajara</span>' : "○ Bajo pedido · " + C.leadTime) +
+          " · Sugerido para reventa: " + money(f.resale) + "</p>");
+    });
+    $$("[data-tk]").forEach(function (el) {
+      el.innerHTML = CARDS.card(el.dataset.tk, { finish: f.id }) + (el.classList.contains("tilt") ? '<div class="shine"></div>' : "");
+    });
+    renderHeroCard();
+  }
+
+  function setFinish(id) {
+    state.finish = C.getFinish(id).id;
+    state.resale = C.getFinish(id).resale;
+    renderFinish();
+    renderBuilder();
+  }
+
+  // ---------- Animación del celular en la portada ----------
+  var heroSeq = ["google", "instagram", "whatsapp"];
+  var heroIdx = 0;
+  function renderHeroCard() {
+    var id = heroSeq[heroIdx % heroSeq.length];
+    $("#hero-card").innerHTML = CARDS.card(id, { finish: state.finish });
+    $("#phone-open").innerHTML = CARDS.screen(id);
+    $(".nfc-burst").style.setProperty("--burst", C.getPlatform(id).accent);
   }
 
   // ---------- Armado del paquete ----------
@@ -153,12 +192,13 @@
       var tier = q.tier;
       html += "<h3>Tu paquete</h3>" +
         '<div class="tier-name">' + (tier ? esc(tier.name) : "Arma tu kit") + "</div>" +
-        '<div class="muted" style="font-size:.92rem">' + (tier ? count + " tarjetas a " + money(q.unit) + " cada una" : "El mayoreo empieza en " + C.tiers[0].min + " piezas") + "</div>";
+        '<div class="muted" style="font-size:.92rem">' + (tier ? count + " tarjetas a " + money(q.unit) + " cada una" : "El mayoreo empieza en " + C.tiers[0].min + " piezas") + "</div>" +
+        finishLine(q.finish);
 
       if (q.next) {
         var missing = q.next.min - count;
         html += '<div class="progress" style="margin-top:18px">Agrega <strong style="color:var(--text)">' + missing + "</strong> más para " + esc(q.next.name) + ": " +
-          money(q.next.price) + " c/u" + (q.next.giftCards ? " y " + q.next.giftCards + " tarjetas de regalo" : "") +
+          money(q.next.price + q.finish.delta) + " c/u" + (q.next.giftCards ? " y " + q.next.giftCards + " tarjetas de regalo" : "") +
           '<div class="bar"><i style="width:' + Math.min(100, (count / q.next.min) * 100) + '%"></i></div></div>';
       } else {
         html += '<div class="progress" style="margin-top:18px;color:var(--gold-2)">Tienes el mejor precio por pieza.</div>';
@@ -170,7 +210,7 @@
           gifts.map(function (g) { return "<li>" + g + "</li>"; }).join("") + "</ul></div>";
       }
 
-      var saving = (C.retail.price - q.unit) * count;
+      var saving = (C.retail.price + q.finish.delta - q.unit) * count;
       html += '<div class="sum-rows">' +
         "<div><span>Tarjetas</span><strong>" + count + (q.giftCards ? " + " + q.giftCards + " de regalo" : "") + "</strong></div>" +
         "<div><span>Precio por pieza</span><strong>" + money(q.unit) + "</strong></div>" +
@@ -186,12 +226,12 @@
     } else {
       html += "<h3>Para tu negocio</h3>" +
         '<div class="tier-name">' + (count ? count + (count === 1 ? " tarjeta" : " tarjetas") : "Elige tus tarjetas") + "</div>" +
-        '<div class="muted" style="font-size:.92rem">Te las entregamos programadas con tus enlaces.</div>' +
+        '<div class="muted" style="font-size:.92rem">Te las entregamos programadas con tus enlaces.</div>' + finishLine(q.finish) +
         '<div class="sum-rows">' +
-        "<div><span>Precio por pieza</span><strong>" + money(C.retail.price) + "</strong></div>" +
+        "<div><span>Precio por pieza</span><strong>" + money(q.unit) + "</strong></div>" +
         "<div><span>Programación y prueba</span><strong>Incluida</strong></div></div>" +
         '<div class="sum-total"><span>Total</span><strong data-tw="total">' + money(q.subtotal) + "</strong></div>" +
-        '<div class="progress">¿Necesitas ' + C.tiers[0].min + ' o más? <a href="#paquete" data-switch="reventa" style="color:var(--gold)">Cambia a mayoreo</a> y paga desde ' + money(C.tiers[0].price) + " por pieza.</div>";
+        '<div class="progress">¿Necesitas ' + C.tiers[0].min + ' o más? <a href="#paquete" data-switch="reventa" style="color:var(--gold)">Cambia a mayoreo</a> y paga desde ' + money(C.tiers[0].price + q.finish.delta) + " por pieza.</div>";
     }
     html += '<p class="sum-error">' + (count && q.error ? esc(q.error) : "") + "</p>" +
       '<button class="btn btn-gold btn-block" type="button" data-open-order' + (q.error ? " disabled" : "") + ">Continuar con mi pedido</button>";
@@ -202,6 +242,11 @@
     }
     lastTier = q.tier ? q.tier.id : "";
     save();
+  }
+
+  function finishLine(f) {
+    return '<div class="finish-line"><i style="background:' + CARDS.swatch(f.id) + '"></i>' + esc(f.name) + " · " +
+      (f.stock ? '<span class="ok">en stock</span>' : "bajo pedido, " + C.leadTime) + "</div>";
   }
 
   function setQty(id, n) {
@@ -250,8 +295,8 @@
     }
     var needsAddress = state.delivery !== "pickup";
     var html = '<div class="d-lines">' + q.lines.map(function (l) {
-      return '<div class="d-line"><div class="mini">' + CARDS.card(l.platform.id) + "</div><span>" + l.qty + " × " + esc(l.platform.name) + "</span><strong>" + money(l.qty * q.unit) + "</strong></div>";
-    }).join("") + "</div>";
+      return '<div class="d-line"><div class="mini">' + CARDS.card(l.platform.id, { finish: q.finish.id }) + "</div><span>" + l.qty + " × " + esc(l.platform.name) + "</span><strong>" + money(l.qty * q.unit) + "</strong></div>";
+    }).join("") + "</div>" + finishLine(q.finish);
     if (q.giftCards) html += '<div class="gift"><div class="gift-title">' + giftIcon + "+" + q.giftCards + " tarjetas de regalo</div><ul><li>Elige los diseños por WhatsApp después de tu compra.</li></ul></div>";
 
     html += '<div class="d-block"><span class="lbl">Entrega</span>' + C.delivery.map(function (d) {
@@ -298,7 +343,8 @@
   }
 
   function orderText(q, c) {
-    var lines = q.lines.map(function (l) { return "• " + l.qty + " × " + l.platform.name; }).join("\n");
+    var lines = q.lines.map(function (l) { return "• " + l.qty + " × " + l.platform.name; }).join("\n") +
+      "\nMaterial: " + q.finish.name + (q.finish.stock ? " (en stock)" : " (bajo pedido)");
     var where = state.delivery === "pickup" ? "Recojo en punto de entrega" :
       c.street + ", Col. " + c.colonia + ", CP " + c.zip + ", " + c.city + ", " + c.state;
     return "Hola, quiero hacer este pedido de " + C.brand.name + " (" + (state.mode === "reventa" ? "mayoreo para revender" : "para mi negocio") + "):\n\n" +
@@ -336,7 +382,7 @@
     fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: state.mode, items: items(), delivery: state.delivery, customer: c }),
+      body: JSON.stringify({ mode: state.mode, finish: state.finish, items: items(), delivery: state.delivery, customer: c }),
     })
       .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error); return j; }); })
       .then(function (j) { location.href = j.init_point; })
@@ -354,7 +400,8 @@
     if (!t) return;
     var d = t.dataset;
 
-    if (d.inc) setQty(d.inc, (state.qty[d.inc] || 0) + 1);
+    if (d.finish) setFinish(d.finish);
+    else if (d.inc) setQty(d.inc, (state.qty[d.inc] || 0) + 1);
     else if (d.dec) setQty(d.dec, (state.qty[d.dec] || 0) - 1);
     else if (d.mode) setMode(d.mode);
     else if (d.modeLink || d.switch) setMode(d.modeLink || d.switch);
@@ -460,10 +507,18 @@
   }
 
   renderStatic();
+  renderFinish();
   renderBuilder();
 
+  // Cada vuelta de la animación muestra otra plataforma.
+  $(".phone").addEventListener("animationiteration", function (e) {
+    if (e.target !== e.currentTarget) return;
+    heroIdx++;
+    renderHeroCard();
+  });
+
   if (finePointer && !reduceMotion) {
-    tilt($("#stage"), $("#hero-tilt"), 22);
+    tilt($("#stage"), $("#hero-tilt"), 12);
     $$(".c-item").forEach(function (item) { tilt(item, $(".tilt", item), 14); });
   }
 })();

@@ -26,6 +26,21 @@
     { id: "menu", name: "Menú / Web", eyebrow: "MENÚ · WEB · CATÁLOGO", lines: ["Todo lo que", "ofrecemos"], stars: false, accent: "#C9A96E", use: "Menú digital, página web, catálogo, pagos" },
   ];
 
+  /*
+   * Materiales. El precio por pieza es el del nivel (o el de negocio) más "delta".
+   * "resale" es el precio sugerido de reventa para ese material.
+   * Solo los que tienen stock: true se entregan de inmediato; el resto es bajo pedido.
+   */
+  var finishes = [
+    { id: "pvc-negro", name: "PVC negro mate", group: "Plástico", stock: true, delta: 0, resale: 349 },
+    { id: "papel-negro", name: "Papel negro", group: "Papel", stock: false, delta: -50, resale: 249 },
+    { id: "metal-negro", name: "Metal negro", group: "Metal", stock: false, delta: 200, resale: 699 },
+    { id: "metal-blanco", name: "Metal blanco", group: "Metal", stock: false, delta: 200, resale: 699 },
+    { id: "metal-dorado", name: "Metal dorado", group: "Metal", stock: false, delta: 230, resale: 749 },
+    { id: "metal-plateado", name: "Metal plateado", group: "Metal", stock: false, delta: 230, resale: 749 },
+  ];
+  var leadTime = "7 a 12 días hábiles";
+
   // Compra para tu propio negocio (1 a 6 piezas): se entregan programadas.
   var retail = { price: 349, maxQty: 6 };
 
@@ -38,8 +53,8 @@
     { id: "distribuidor", name: "Kit Distribuidor", min: 105, price: 105, giftCards: 15, gifts: ["Exhibidor acrílico de mostrador", "Zona preferente en la ZMG", "Apareces en nuestro directorio de distribuidores"] },
   ];
 
-  // Precio sugerido de reventa y el rango del simulador de ganancias.
-  var resale = { suggested: 349, min: 199, max: 499 };
+  // Precio sugerido de reventa (PVC) y el rango del simulador de ganancias.
+  var resale = { suggested: 349, min: 149, max: 999 };
 
   var delivery = [
     { id: "zmg", name: "Entrega en la ZMG", detail: "Guadalajara, Zapopan, Tlaquepaque, Tonalá, Tlajomulco y El Salto · 24 a 48 h", cost: 0 },
@@ -50,6 +65,11 @@
   function getPlatform(id) {
     for (var i = 0; i < platforms.length; i++) if (platforms[i].id === id) return platforms[i];
     return null;
+  }
+
+  function getFinish(id) {
+    for (var i = 0; i < finishes.length; i++) if (finishes[i].id === id) return finishes[i];
+    return finishes[0];
   }
 
   function getDelivery(id) {
@@ -72,8 +92,10 @@
    * Cotización completa de un pedido.
    * mode: "reventa" (mayoreo, mínimo 7) o "negocio" (1 a 6, programadas).
    * items: [{ platform, qty }]
+   * finishId: material de las tarjetas (un material por pedido).
    */
-  function quote(mode, items, deliveryId) {
+  function quote(mode, items, deliveryId, finishId) {
+    var finish = getFinish(finishId);
     var lines = [];
     var qty = 0;
     (items || []).forEach(function (it) {
@@ -85,7 +107,7 @@
     });
 
     var tier = mode === "reventa" ? tierFor(qty) : null;
-    var unit = mode === "reventa" ? (tier ? tier.price : tiers[0].price) : retail.price;
+    var unit = (mode === "reventa" ? (tier ? tier.price : tiers[0].price) : retail.price) + finish.delta;
     var error = null;
     if (!qty) error = "Agrega al menos una tarjeta.";
     else if (mode === "reventa" && qty < tiers[0].min) error = "El mayoreo empieza en " + tiers[0].min + " piezas.";
@@ -96,6 +118,7 @@
     var shipping = d.freeFrom && qty >= d.freeFrom ? 0 : d.cost;
     return {
       mode: mode,
+      finish: finish,
       lines: lines,
       qty: qty,
       unit: unit,
@@ -121,8 +144,8 @@
   }
 
   var catalog = {
-    brand: brand, platforms: platforms, retail: retail, tiers: tiers, resale: resale, delivery: delivery,
-    getPlatform: getPlatform, getDelivery: getDelivery, tierFor: tierFor, nextTier: nextTier,
+    brand: brand, platforms: platforms, finishes: finishes, leadTime: leadTime, retail: retail, tiers: tiers, resale: resale, delivery: delivery,
+    getPlatform: getPlatform, getFinish: getFinish, getDelivery: getDelivery, tierFor: tierFor, nextTier: nextTier,
     quote: quote, profit: profit, formatMoney: formatMoney,
   };
 

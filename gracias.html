@@ -27,7 +27,8 @@
       var wa = "https://wa.me/" + C.brand.whatsapp + "?text=" +
         encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + ".");
       var el = document.getElementById("result");
-      var back = '<a class="btn btn-line" href="index.html">Volver a ' + C.brand.name + "</a>";
+      var isPay = ref.indexOf("TP-") === 0;
+      var back = '<a class="btn btn-line" href="' + (isPay ? "pay/" : "index.html") + '">Volver a ' + C.brand.name + (isPay ? " Pay" : "") + "</a>";
       var waBtn = '<a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>';
 
       function clearOrder() {

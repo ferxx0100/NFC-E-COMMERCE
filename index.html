@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TAKTO · Tarjetas NFC premium en Guadalajara</title>
-  <meta name="description" content="Tarjetas NFC negras premium para reseñas de Google, Instagram, TikTok, WhatsApp y más. Cómpralas para tu negocio o revéndelas en Guadalajara con precio de mayoreo y regalos.">
+  <meta name="description" content="Tarjetas NFC premium en PVC, papel y metal para reseñas de Google, Instagram, TikTok, WhatsApp y más. Cómpralas para tu negocio o revéndelas en Guadalajara con precio de mayoreo y regalos.">
   <meta name="theme-color" content="#070707">
   <meta property="og:title" content="TAKTO · Un toque. Más clientes.">
   <meta property="og:description" content="Tarjetas NFC premium para negocios. Revende en Guadalajara y gana más del 100% por pieza.">
@@ -20,6 +20,7 @@
     <div class="container">
       <a class="logo" href="#top" aria-label="TAKTO inicio"><span data-mark></span>TAKTO</a>
       <nav class="nav" aria-label="Principal">
+        <a href="#nfc">¿Qué es NFC?</a>
         <a href="#coleccion">Colección</a>
         <a href="#gana">Gana revendiendo</a>
         <a href="#niveles">Niveles y regalos</a>
@@ -48,28 +49,56 @@
             <span class="line"><span>Más clientes.</span></span>
             <span class="line"><span class="gold">Más ganancia.</span></span>
           </h1>
-          <p class="lead fade-up d1">Tarjetas NFC negras de acabado premium. Tus clientes acercan el celular y llegan directo a tu reseña de Google, tu Instagram o tu WhatsApp. Úsalas en tu negocio o revéndelas y gana más del 100% por pieza.</p>
+          <p class="lead fade-up d1">Tarjetas NFC premium en PVC negro, papel negro y metal. Tus clientes acercan el celular y llegan directo a tu reseña de Google, tu Instagram o tu WhatsApp. Úsalas en tu negocio o revéndelas y gana más del 100% por pieza.</p>
           <div class="hero-cta fade-up d2">
             <a class="btn btn-gold" href="#paquete" data-mode-link="reventa">Quiero revender
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
             <a class="btn btn-line" href="#paquete" data-mode-link="negocio">Comprar para mi negocio</a>
           </div>
           <div class="hero-stats fade-up d3">
-            <div><strong>7</strong><span>diseños en stock</span></div>
+            <div><strong>7</strong><span>diseños · 6 materiales</span></div>
             <div><strong data-margin>+100%</strong><span>margen sugerido</span></div>
             <div><strong>24 h</strong><span>entrega en la ZMG</span></div>
           </div>
         </div>
-        <div class="stage" id="stage" aria-hidden="true">
-          <div class="stage-card back-2" data-card="instagram"></div>
-          <div class="stage-card back-1" data-card="whatsapp"></div>
-          <div class="stage-card front"><div class="tilt" id="hero-tilt"><div data-card="google" data-animated></div><div class="shine"></div></div></div>
-          <div class="phone-hint"><span class="dot"></span><div>Reseña recibida<small>hace 2 segundos · ★★★★★</small></div></div>
+        <div class="nfc-stage" id="stage" aria-hidden="true">
+          <div class="nfc-scene" id="hero-tilt">
+            <div class="nfc-card"><div id="hero-card"></div><div class="shine"></div></div>
+            <div class="nfc-burst"><i></i><i></i><i></i></div>
+            <div class="phone">
+              <div class="phone-screen">
+                <div class="scr scr-idle"><span class="scr-time">9:41</span><span class="scr-date">jueves 30 de octubre</span><span class="scr-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 7c-2.5 3-2.5 7 0 10M12 9c-1.3 1.8-1.3 4.2 0 6M16 5c3.5 4 3.5 10 0 14"/></svg>Acerca a la tarjeta</span></div>
+                <div class="scr scr-open" id="phone-open"></div>
+              </div>
+            </div>
+          </div>
+          <p class="nfc-caption">Así funciona: <strong>acerca el celular</strong> y se abre solo.</p>
         </div>
       </div>
     </section>
 
     <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+    <!-- Qué es NFC -->
+    <section class="section" id="nfc">
+      <div class="container">
+        <div class="section-head center reveal">
+          <span class="eyebrow">¿Qué es NFC?</span>
+          <h2>La misma tecnología con la que <span class="gold">pagas sin tocar.</span></h2>
+          <p class="lead" style="margin:0 auto">Cada tarjeta trae un chip diminuto que guarda un enlace. Cuando un celular se acerca a 2 o 3 centímetros, lo lee y abre ese enlace al instante. Sin apps, sin batería y sin escanear nada.</p>
+        </div>
+        <div class="nfc-steps reveal-stagger">
+          <div class="nfc-step"><div class="mini-anim a-approach"><span class="m-card"></span><span class="m-phone"></span></div><h3>1. Acerca</h3><p>Tu cliente acerca la parte de arriba de su celular a la tarjeta.</p></div>
+          <div class="nfc-step"><div class="mini-anim a-waves"><span class="m-chip"></span><i></i><i></i><i></i></div><h3>2. Conecta</h3><p>El celular le da energía al chip y lee el enlace en menos de un segundo.</p></div>
+          <div class="nfc-step"><div class="mini-anim a-open"><span class="m-screen"><b></b><b></b><b></b></span><span class="m-check">★★★★★</span></div><h3>3. Listo</h3><p>Se abre tu reseña de Google, tu Instagram o tu WhatsApp.</p></div>
+        </div>
+        <div class="vs reveal">
+          <div class="vs-col"><span class="vs-tag">Código QR</span><ol><li>Abrir la cámara</li><li>Enfocar el código</li><li>Tocar el enlace que aparece</li></ol></div>
+          <div class="vs-mid">vs</div>
+          <div class="vs-col win"><span class="vs-tag">NFC TAKTO</span><ol><li>Acercar el celular. Listo.</li></ol><p>Funciona con iPhone XS o más reciente y con la mayoría de los Android con NFC.</p></div>
+        </div>
+      </div>
+    </section>
 
     <!-- Colección -->
     <section class="section" id="coleccion">
@@ -77,9 +106,9 @@
         <div class="section-head reveal">
           <span class="eyebrow">La colección</span>
           <h2>Siete tarjetas. <span class="muted">Una para cada negocio.</span></h2>
-          <p class="lead">PVC negro mate con chip NFC213 original. Funciona con iPhone y Android, sin apps. Se programan en 30 segundos con tu celular.</p>
-          <span class="stock-tag">En stock en Guadalajara</span>
+          <p class="lead">Chip NFC213 original en todos los materiales. Funciona con iPhone y Android, sin apps. Se programan en 30 segundos con tu celular.</p>
         </div>
+        <div class="finish-picker reveal" data-finish-picker></div>
         <div class="collection reveal-stagger" id="collection"></div>
       </div>
     </section>
@@ -115,6 +144,7 @@
               <button type="button" data-mode="reventa" aria-pressed="true">Para revender</button>
               <button type="button" data-mode="negocio" aria-pressed="false">Para mi negocio</button>
             </div>
+            <div class="finish-picker compact" data-finish-picker></div>
             <div class="presets" id="presets"></div>
             <div class="rows" id="rows"></div>
             <button type="button" class="fill-even" id="clear">Vaciar selección</button>
@@ -131,6 +161,7 @@
           <span class="eyebrow">Niveles y regalos</span>
           <h2>Entre más vendes, <span class="gold">más te regalamos.</span></h2>
           <p class="lead" style="margin:0 auto">Las tarjetas de regalo son ganancia directa: te las enviamos sin costo junto con tu pedido.</p>
+          <p class="fine" data-finish-note style="margin-top:14px"></p>
         </div>
         <div class="tiers reveal-stagger" id="tiers"></div>
         <p class="fine" style="text-align:center;margin-top:28px">Ganancia estimada si vendes todas las piezas, incluidas las de regalo, al precio sugerido. Tu ganancia real depende de tus ventas.</p>

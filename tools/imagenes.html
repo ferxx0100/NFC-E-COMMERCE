@@ -22,6 +22,16 @@
     .kit { width: 1080px; height: 1350px; }
     .kit .fan { position: absolute; left: 50%; top: 600px; width: 0; height: 0; }
     .kit .fan > div { position: absolute; width: 640px; left: -320px; top: -200px; transform-origin: 50% 160%; filter: drop-shadow(0 30px 50px rgba(0,0,0,.7)); }
+    .reel { width: 1080px; height: 1920px; }
+    .reel .nfc-scene { position: absolute; left: 90px; width: 900px; top: 470px; }
+    .reel .copy { position: absolute; left: 72px; right: 72px; bottom: 150px; text-align: center; }
+    .reel h2 { font-size: 104px; margin: 0 0 22px; line-height: 1; }
+    .reel p { font-size: 38px; color: #a1a1aa; margin: 0; }
+    .reel .top { position: absolute; top: 200px; left: 0; right: 0; text-align: center; font-size: 34px; letter-spacing: .3em; color: #c9a96e; font-weight: 600; }
+    .materiales { width: 1080px; height: 1350px; }
+    .materiales .grid { position: absolute; left: 110px; right: 110px; top: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .materiales .grid div { filter: drop-shadow(0 24px 40px rgba(0,0,0,.6)); }
+    .materiales .grid span { display: block; text-align: center; color: #a1a1aa; font-size: 24px; margin-top: 12px; font-weight: 600; }
     .og { width: 1200px; height: 630px; }
     .og .tk-wrap { position: absolute; width: 620px; right: 40px; top: 120px; transform: rotate(-8deg); filter: drop-shadow(0 40px 60px rgba(0,0,0,.8)); }
     .og .copy { position: absolute; left: 72px; top: 200px; width: 520px; }
@@ -59,11 +69,39 @@
       html = '<div class="art kit">' + brand + '<div class="fan">' + cards + "</div>" +
         '<div class="copy" style="position:absolute;left:72px;right:72px;bottom:90px"><h2 style="font-size:80px;margin:0 0 18px;line-height:1">Kit de 7 diseños.<br><span class="gold">Revende y gana.</span></h2>' +
         '<p style="font-size:32px;color:#a1a1aa;margin:0">Desde ' + C.formatMoney(first.min * first.price) + " · Guadalajara</p></div></div>";
+    } else if (art === "materiales") {
+      var ids = ["google", "instagram", "whatsapp", "tripadvisor", "tiktok", "menu"];
+      html = '<div class="art materiales">' + brand + '<div class="grid">' + C.finishes.map(function (f, i) {
+        return "<div>" + CARDS.card(ids[i], { finish: f.id }) + "<span>" + f.name + "</span></div>";
+      }).join("") + "</div>" +
+        '<div class="copy" style="position:absolute;left:72px;right:72px;bottom:60px"><h2 style="font-size:64px;margin:0;line-height:1.05">PVC, papel y metal.<br><span class="gold">Todas con NFC.</span></h2></div></div>';
+    } else if (art === "reel") {
+      html = '<div class="art reel">' + brand + '<div class="top">¿QUÉ ES NFC?</div>' +
+        '<div class="nfc-scene"><div class="nfc-card"><div id="hero-card"></div><div class="shine"></div></div>' +
+        '<div class="nfc-burst"><i></i><i></i><i></i></div><div class="phone"><div class="phone-screen">' +
+        '<div class="scr scr-idle"><span class="scr-time">9:41</span><span class="scr-date">jueves 30 de octubre</span><span class="scr-hint">Acerca a la tarjeta</span></div>' +
+        '<div class="scr scr-open" id="phone-open"></div></div></div></div>' +
+        '<div class="copy"><h2>Acerca tu celular.<br><span class="gold">Listo.</span></h2><p>Sin apps · iPhone y Android · ' + C.brand.name + "</p></div></div>";
     } else {
       html = '<div class="art og">' + brand + '<div class="copy"><h2>Un toque.<br><span class="gold">Más clientes.</span></h2><p>Tarjetas NFC premium · Guadalajara</p></div>' +
         '<div class="tk-wrap">' + CARDS.card("google") + "</div></div>";
     }
     document.getElementById("out").innerHTML = html;
+
+    // Video: el exportador llama a seek(ms) cuadro por cuadro.
+    var reelSeq = ["google", "instagram", "whatsapp"], reelLoop = -1;
+    window.seek = function (ms) {
+      var loop = Math.floor(ms / 6000) % reelSeq.length;
+      if (loop !== reelLoop) {
+        reelLoop = loop;
+        var pid = reelSeq[loop];
+        document.getElementById("hero-card").innerHTML = CARDS.card(pid);
+        document.getElementById("phone-open").innerHTML = CARDS.screen(pid);
+        document.querySelector(".nfc-burst").style.setProperty("--burst", C.getPlatform(pid).accent);
+      }
+      document.getAnimations().forEach(function (a) { a.pause(); a.currentTime = ms % 6000; });
+    };
+    if (art === "reel") window.seek(0);
   </script>
 </body>
 </html>
