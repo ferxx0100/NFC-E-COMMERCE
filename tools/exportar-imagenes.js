@@ -14,17 +14,18 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
 
 (async () => {
   const browser = await chromium.launch();
-  const shots = [
-    ...C.platforms.map((p) => ({ q: `art=card&id=${p.id}`, file: `tarjeta-${p.id}.png`, w: 1284, h: 810, transparent: true })),
-    ...C.platforms.map((p) => ({ q: `art=post&id=${p.id}`, file: `post-${p.id}.jpg`, w: 1080, h: 1350 })),
-    { q: "art=kit", file: "post-kit-7.jpg", w: 1080, h: 1350 },
-    { q: "art=materiales", file: "post-materiales.jpg", w: 1080, h: 1350 },
-    { q: "art=og", file: "og.jpg", w: 1200, h: 630 },
-  ];
+  const shots = [];
+  C.products.forEach((p) => p.variants.forEach((v) => {
+    shots.push({ q: `art=solo&p=${p.id}&v=${v.id}`, file: `tarjeta-${p.id}-${v.id}.png`, w: 1284, h: 810, transparent: true });
+  }));
+  C.getProduct("redes").variants.forEach((v) => shots.push({ q: `art=post&p=redes&v=${v.id}`, file: `post-${v.id}.jpg`, w: 1080, h: 1350 }));
+  C.products.filter((p) => p.id !== "redes").forEach((p) => shots.push({ q: `art=post&p=${p.id}`, file: `post-${p.id}.jpg`, w: 1080, h: 1350 }));
+  shots.push({ q: "art=productos", file: "post-productos.jpg", w: 1080, h: 1350 });
+  shots.push({ q: "art=og", file: "og.jpg", w: 1200, h: 630 });
   for (const s of shots) {
     const p = await browser.newPage({ viewport: { width: s.w, height: s.h } });
     await p.goto(page(s.q));
-    await p.evaluate(() => document.fonts.ready);
+    await p.evaluate(() => Promise.all([document.fonts.load("40px 'Instrument Serif'"), document.fonts.load("italic 40px 'Instrument Serif'")]).then(() => document.fonts.ready));
     const jpg = s.file.endsWith(".jpg");
     await p.screenshot({ path: path.join(OUT, s.file), omitBackground: !!s.transparent, type: jpg ? "jpeg" : "png", quality: jpg ? 90 : undefined });
     await p.close();
@@ -34,16 +35,16 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
   await browser.close();
 })();
 
-// Video vertical (Reels, TikTok, estados): 3 vueltas de la animación del celular.
+// Video vertical (Reels, TikTok, estados): una vuelta de la animación por plataforma.
 async function reel(browser) {
   const { execFileSync } = require("child_process");
   const fs = require("fs");
   const os = require("os");
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "reel-"));
-  const fps = 30, seconds = 18;
+  const fps = 30, seconds = 6 * C.getProduct("redes").variants.length;
   const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   await p.goto(page("art=reel"));
-  await p.evaluate(() => document.fonts.ready);
+  await p.evaluate(() => Promise.all([document.fonts.load("40px 'Instrument Serif'"), document.fonts.load("italic 40px 'Instrument Serif'")]).then(() => document.fonts.ready));
   for (let i = 0; i < fps * seconds; i++) {
     await p.evaluate((ms) => window.seek(ms), (i * 1000) / fps);
     await p.screenshot({ path: path.join(tmp, String(i).padStart(4, "0") + ".jpg"), type: "jpeg", quality: 92 });

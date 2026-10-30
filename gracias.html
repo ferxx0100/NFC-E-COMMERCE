@@ -33,9 +33,9 @@
 
       function clearOrder() {
         try {
-          var s = JSON.parse(localStorage.getItem("takto_state_v1") || "{}");
-          s.qty = {};
-          localStorage.setItem("takto_state_v1", JSON.stringify(s));
+          var s = JSON.parse(localStorage.getItem("takto_state_v2") || "{}");
+          s.cart = [];
+          localStorage.setItem("takto_state_v2", JSON.stringify(s));
         } catch (e) {}
       }
 
@@ -43,7 +43,7 @@
         clearOrder();
         el.innerHTML = '<span class="eyebrow">Pago aprobado</span><h2>¡Gracias por tu compra!</h2>' +
           '<p class="lead" style="margin:0 auto">' + (ref ? "Pedido <strong>" + ref + "</strong>. " : "") +
-          "Te escribimos por WhatsApp para coordinar tu entrega y elegir tus tarjetas de regalo.</p>" +
+          "Te escribimos por WhatsApp para coordinar tu entrega y, si tu pedido es bajo pedido, enviarte la prueba digital.</p>" +
           '<div class="hero-cta">' + waBtn + back + "</div>";
       } else if (status === "pending" || status === "in_process") {
         clearOrder();
@@ -53,7 +53,7 @@
       } else {
         el.innerHTML = '<span class="eyebrow">Pago no completado</span><h2>No se hizo ningún cargo.</h2>' +
           '<p class="lead" style="margin:0 auto">Tu paquete sigue guardado. Puedes intentarlo de nuevo o pedir por WhatsApp.</p>' +
-          '<div class="hero-cta"><a class="btn btn-gold" href="index.html#paquete">Volver a mi paquete</a>' + waBtn + "</div>";
+          '<div class="hero-cta"><a class="btn btn-primary" href="index.html#paquete">Volver a mi paquete</a>' + waBtn + "</div>";
       }
     })();
   </script>

@@ -28,7 +28,7 @@
   }
 
   // ---------- Contenido ----------
-  var markSvg = '<svg viewBox="-6 -21 30 42" aria-hidden="true">' + CARDS.mark(0, 0, 1, "#C9A96E") + "</svg>";
+  var markSvg = '<svg viewBox="-6 -21 30 42" aria-hidden="true">' + CARDS.mark(0, 0, 1, "currentColor") + "</svg>";
   $$("[data-mark]").forEach(function (el) { el.innerHTML = markSvg; });
   $$("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
   $$("[data-wa]").forEach(function (el) { el.href = wa("Hola, quiero información de " + P.brand.name); el.target = "_blank"; el.rel = "noopener"; });
@@ -40,7 +40,7 @@
   $$("[data-from]").forEach(function (el) { el.textContent = "Desde " + money(cheapest); });
 
   var words = ["Tarjeta de crédito", "Débito", "NFC", "Apple Pay", "Google Pay", "Billetes MXN", "Reloj inteligente"];
-  var track = words.map(function (w) { return '<span><i style="background:var(--gold)"></i>' + w + "</span>"; }).join("");
+  var track = words.map(function (w) { return '<span>' + w + "</span>"; }).join("");
   $("#marquee").innerHTML = track + track + track;
 
   $("#machines").innerHTML = P.machines.map(function (m) {
@@ -57,7 +57,7 @@
       '<div class="price">' + money(p.price) + " <small>por kit</small></div>" +
       '<div class="inv">' + esc(p.pitch) + "</div>" +
       "<ul>" + p.features.map(function (f) { return "<li>" + check + "<span>" + esc(f) + "</span></li>"; }).join("") + "</ul>" +
-      '<button class="btn ' + (p.featured ? "btn-gold" : "btn-line") + '" type="button" data-buy="' + p.id + '" style="margin-top:auto">Lo quiero</button></div>';
+      '<button class="btn ' + (p.featured ? "btn-primary" : "btn-line") + '" type="button" data-buy="' + p.id + '" style="margin-top:auto">Lo quiero</button></div>';
   }).join("");
 
   // ---------- Calculadora ----------
@@ -84,7 +84,7 @@
       "<div><span>Ventas extra al año</span><strong>+" + money(e.extra * 12) + "</strong></div>" +
       "<div><span>El kit instalado se paga en</span><strong>" + months + "</strong></div></div>" +
       '<p class="fine">Estimación antes de comisiones del servicio de cobro. Depende del tráfico y la ubicación de tu máquina.</p>' +
-      '<button class="btn btn-gold btn-block" type="button" data-buy="instalado">Quiero mi kit instalado</button>';
+      '<button class="btn btn-primary btn-block" type="button" data-buy="instalado">Quiero mi kit instalado</button>';
     save();
   }
 
@@ -158,7 +158,7 @@
       "<div><span>" + esc(q.delivery.name) + "</span><strong>" + (q.shipping ? money(q.shipping) : q.pkg.install ? "Incluida" : "Gratis") + "</strong></div></div>" +
       '<div class="sum-total"><span>Total</span><strong>' + money(q.total) + "</strong></div>" +
       (q.error ? '<p class="form-error">' + esc(q.error) + "</p>" : "") +
-      '<div class="pay"><button class="btn btn-gold btn-block" type="submit" data-pay="mp"' + (q.error ? " disabled" : "") + ">Pagar con Mercado Pago</button>" +
+      '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp"' + (q.error ? " disabled" : "") + ">Pagar con Mercado Pago</button>" +
       '<button class="btn btn-wa btn-block" type="submit" data-pay="wa">Pedir por WhatsApp</button></div>' +
       '<p class="form-error" id="order-error" hidden></p>' +
       '<p class="form-note">La activación del servicio de cobro de la terminal se contrata aparte. Te contactamos para agendar la instalación.</p></div></form>';

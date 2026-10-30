@@ -6,7 +6,7 @@
  *   MP_ACCESS_TOKEN  Access token de producción o de prueba de Mercado Pago.
  *   SITE_URL         URL pública de la tienda, p. ej. https://takto.mx
  *
- * Los precios, niveles y regalos se recalculan aquí con catalog.js:
+ * Los precios (menudeo y mayoreo) se recalculan aquí con catalog.js y pay-catalog.js:
  * nunca se confía en lo que manda el navegador.
  */
 const C = require("../assets/js/catalog.js");
@@ -46,18 +46,26 @@ module.exports = async function handler(req, res) {
     shipping = { amount: q.shipping, name: q.delivery.name };
     meta = { store: "pay", package: q.pkg.name, delivery: q.delivery.name, machine: clean(customer.machine, 120) };
   } else {
-    const mode = body.mode === "negocio" ? "negocio" : "reventa";
-    const q = C.quote(mode, Array.isArray(body.items) ? body.items.slice(0, 20) : [], body.delivery, body.finish);
+    const q = C.quote(Array.isArray(body.items) ? body.items.slice(0, 40) : [], body.delivery);
     if (q.error) return res.status(400).json({ error: q.error });
-    items = q.lines.map((l) => ({
-      id: l.platform.id,
-      title: `Tarjeta NFC ${C.brand.name} · ${l.platform.name} · ${q.finish.name}`,
-      quantity: l.qty,
-      unit_price: q.unit,
-      currency_id: C.brand.currency,
-    }));
+    items = [];
+    q.groups.forEach((g) => {
+      g.lines.forEach((l) => {
+        items.push({
+          id: `${g.product.id}-${l.variant.id}`,
+          title: `${g.product.name} · ${l.variant.name}`,
+          quantity: l.qty,
+          unit_price: g.unit,
+          currency_id: C.brand.currency,
+        });
+      });
+    });
     shipping = { amount: q.shipping, name: q.delivery.name };
-    meta = { store: "tarjetas", mode, finish: q.finish.name, tier: q.tier ? q.tier.name : null, gift_cards: q.giftCards, delivery: q.delivery.name };
+    meta = {
+      store: "tarjetas",
+      delivery: q.delivery.name,
+      pricing: q.groups.map((g) => `${g.product.name}: ${g.qty} pzas ${g.wholesale ? "mayoreo" : "menudeo"} a ${g.unit}`).join(" | "),
+    };
   }
   if (shipping.amount) {
     items.push({ id: "envio", title: shipping.name, quantity: 1, unit_price: shipping.amount, currency_id: C.brand.currency });

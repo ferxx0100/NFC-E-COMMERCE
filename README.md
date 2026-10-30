@@ -11,42 +11,35 @@ Sin dependencias: HTML, CSS y JavaScript, más una función de servidor (`api/ch
 
 ## TAKTO (tarjetas NFC)
 
-- **Portada animada**: un celular se acerca a la tarjeta y abre la reseña de Google, el Instagram o el WhatsApp.
-- **¿Qué es NFC?**: explicación en 3 pasos animados y comparación contra código QR.
-- **6 materiales**: PVC negro (en stock), papel negro y metal negro, blanco, dorado y plateado (bajo pedido). Cada uno con su precio.
-- **Colección de 7 tarjetas** (Google, Instagram, TikTok, Facebook, WhatsApp, Tripadvisor, Menú/Web) dibujadas en SVG, con inclinación 3D y animaciones.
-- **Arma tu paquete**: el cliente elige cuántas de cada diseño. Dos modos:
-  - *Para revender*: mayoreo desde 7 piezas. El precio baja por nivel y los regalos se desbloquean en vivo. Incluye simulador de ganancia.
-  - *Para mi negocio*: de 1 a 6 piezas a precio público, entregadas programadas.
-- **Niveles y regalos**: Arranque, Emprendedor, Negocio y Distribuidor.
-- **Alta de distribuidor**: formulario que abre WhatsApp con los datos.
-- **Bajo pedido**: placa acrílica, sticker y diseño con logo (cotización por WhatsApp).
-- **Pedido**: entrega en la ZMG, recoger o envío nacional; pago con Mercado Pago o pedido por WhatsApp.
+- **Portada animada**: un celular se acerca a la tarjeta y abre la reseña de Google, Instagram, WhatsApp, TikTok o Facebook.
+- **¿Qué es NFC?**: explicación en 3 pasos animados y datos del chip.
+- **4 productos**: tarjetas para reseñas y redes (PVC negro con logo, en stock), metálica (plata, dorada y negra), papel negro y PVC con el logo de la empresa (negra o blanca). Las tres últimas son bajo pedido.
+- **Menudeo y mayoreo**: de 1 a 19 piezas precio normal; desde 20 piezas de un mismo producto, precio de mayoreo (se pueden mezclar plataformas o colores). Más descuento en 50 y 100.
+- **Envío gratis desde 3 piezas**; con menos cuesta $99, o se recoge en Guadalajara.
+- **Para quién**: hoteles, restaurantes y bares, escuelas, consultorios, salones y profesionistas.
+- **Video de configuración incluido** en cada compra (hay que grabarlo y mandarlo después de la venta).
 
-## Cambiar precios, regalos, textos y número
+## Cambiar precios, productos y número
 
 Todo está en **`assets/js/catalog.js`**:
 
 | Qué | Dónde |
 | --- | --- |
-| Nombre de la marca y WhatsApp | `brand` |
-| Diseños de tarjeta (textos y colores) | `platforms` |
-| Materiales, sobreprecio y disponibilidad | `finishes`, `leadTime` |
-| Precio para negocio (1 a 6) | `retail` |
-| Niveles de mayoreo, precio por pieza y regalos | `tiers` |
-| Precio sugerido de reventa | `resale` |
-| Opciones y costos de entrega | `delivery` |
+| WhatsApp y nombre de la marca | `brand` |
+| Desde cuántas piezas es mayoreo | `wholesaleFrom` |
+| Desde cuántas piezas el envío es gratis | `freeShippingFrom` |
+| Productos, precio de menudeo, precios de mayoreo y variantes | `products` |
+| Costo de envío | `delivery` |
 
-Los textos largos de la página están en `index.html`.
+Las tarjetas se dibujan en `assets/js/cards.js`. Tipografía: Instrument Serif (incluida en `assets/fonts/`, licencia OFL) para títulos e Inter para el texto.
 
 ## Imágenes de la marca
 
 Las tarjetas se dibujan con código (`assets/js/cards.js`), así que cambian solas al editar `catalog.js`. Las imágenes listas para redes sociales están en `assets/img/marca/`:
 
-- `post-*.jpg` (1080 × 1350, formato Instagram) para cada diseño y el kit de 7
-- `tarjeta-*.png` con fondo transparente
-- `post-materiales.jpg` con los 6 materiales
-- `reel-que-es-nfc.mp4` (1080 × 1920, 18 s) para Reels, TikTok y estados de WhatsApp
+- `post-*.jpg` (1080 × 1350, formato Instagram): uno por plataforma, uno por producto y `post-productos.jpg` con toda la línea
+- `tarjeta-*.png` con fondo transparente, una por producto y variante
+- `reel-que-es-nfc.mp4` (1080 × 1920, 30 s) para Reels, TikTok y estados de WhatsApp
 - `og.jpg` para cuando se comparte el enlace
 
 Las fotos y el video de TAKTO Pay están en `assets/img/pay/`.
