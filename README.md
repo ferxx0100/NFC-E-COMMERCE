@@ -49,7 +49,7 @@ Pasos que tienes que hacer tú (sin esto Google tarda mucho más en encontrarte)
 | Preguntas frecuentes, giros y ciudades | `FAQ`, `SECTORS` y `CITIES` en `assets/js/views.js` |
 | Dibujo de las tarjetas | `assets/js/cards.js` |
 
-Tipografía: Inter en toda la página, con títulos rectos en peso extragrueso.
+Tipografía: Outfit (incluida en `assets/fonts/`, licencia OFL). Fondo claro para que resalten las tarjetas.
 
 ## Imágenes de la marca
 
@@ -91,6 +91,14 @@ npm run dev
 ```
 
 Publica el sitio en `public/` y lo abre en http://localhost:3000 (incluidas las páginas de ciudad).
+
+## Marketing
+
+Guiones para grupos de Facebook y video de 20 segundos: `marketing/facebook-y-video.md`.
+
+## Revisar si Mercado Pago está listo
+
+Abre `https://tu-sitio/api/checkout` en el navegador: dice si falta la clave `MP_ACCESS_TOKEN` o si está en modo prueba o producción.
 
 ## Publicar en Vercel
 

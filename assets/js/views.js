@@ -15,15 +15,12 @@
   }
 
   var FAQ = [
-    { q: "¿Todas las tarjetas tienen NFC?", a: "Sí. Todas nuestras tarjetas, de plástico, metálicas y de papel, llevan un chip NFC NTAG213 original." },
-    { q: "¿Qué es una tarjeta NFC para reseñas de Google?", a: "Es una tarjeta con un chip NFC que guarda el enlace de reseñas de tu negocio. Tu cliente acerca su celular, se abre tu perfil de Google y te deja su calificación en segundos, sin buscarte ni escanear nada." },
-    { q: "¿Cómo funciona la tecnología NFC?", a: "NFC significa comunicación de campo cercano. El chip no tiene batería: el celular le da energía al acercarse a 1 a 4 cm, lee el enlace guardado y lo abre al instante." },
-    { q: "¿Funciona con iPhone y Android?", a: "Sí. En iPhone XS o más reciente funciona sin abrir nada; en iPhone 7 a X, desde el lector NFC del Centro de control. En Android basta con tener el NFC activado." },
-    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(Math.min.apply(null, C.products.map(function (p) { return p.retail; }))) + " por pieza en menudeo. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo, a partir de " + money(Math.min.apply(null, C.products.map(function (p) { return p.wholesale; }))) + " por pieza." },
-    { q: "¿Venden tarjetas NFC al mayoreo?", a: "Sí. Desde " + C.wholesaleFrom + " piezas de un mismo producto aplica el precio de mayoreo, aunque mezcles diseños o colores. Es el precio para revender o surtir varias sucursales." },
-    { q: "¿Hacen envíos a toda la República?", a: "Sí, enviamos a todo México desde Guadalajara. El envío es gratis desde " + C.freeShippingFrom + " piezas; con menos cuesta " + money(C.delivery[0].cost) + "." },
-    { q: "¿Puedo cambiar el enlace de la tarjeta?", a: "Sí, cuantas veces quieras con una app gratuita, mientras la tarjeta no esté bloqueada. Con tu compra recibes un video que te enseña a configurarla." },
-    { q: "¿Qué es mejor, NFC o código QR?", a: "Con NFC tu cliente solo acerca el celular. Con QR tiene que abrir la cámara, enfocar y tocar el enlace." },
+    { q: "¿Todas las tarjetas son NFC?", a: "Sí. Todas llevan chip NFC original, en plástico, metal o papel." },
+    { q: "¿Funcionan con iPhone y Android?", a: "Sí. Solo acercas el celular a la tarjeta. Sin apps." },
+    { q: "¿Llegan programadas?", a: "Sí, si nos das tu enlace al comprar. Si no, te mandamos un video corto para programarlas tú en un minuto." },
+    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(Math.min.apply(null, C.products.map(function (p) { return p.retail; }))) + " por pieza. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo." },
+    { q: "¿Hacen envíos a toda la República?", a: "Sí. Gratis desde " + C.freeShippingFrom + " piezas; con menos cuesta " + money(C.delivery[0].cost) + "." },
+    { q: "¿Puedo cambiar el enlace después?", a: "Sí, las veces que quieras." },
   ];
 
   var SECTORS = [
@@ -76,7 +73,7 @@
     return p.stock ? C.leadTime.stock : C.leadTime.order;
   }
 
-  // Tarjeta de producto con giro 3D, dos precios que se pueden elegir y botón de compra.
+  // Tarjeta de producto: imagen girando, colores, dos precios, cantidad y botón.
   function product(p, variantId, pick) {
     var CARDS = root.CARDS;
     var v = C.getVariant(p, variantId) || p.variants[0];
@@ -84,28 +81,27 @@
     return '<article class="product shape-' + p.shape + '" id="' + p.id + '" data-product="' + p.id + '">' +
       '<div class="product-media"><div class="tilt"><div class="flip" style="animation-delay:-' + C.products.indexOf(p) * 2.3 + 's">' +
       '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id) + "</div>" +
-      '<div class="face back" data-face="back">' + CARDS.back(p.id, v.id) + "</div></div></div></div>" +
+      '<div class="face back" data-face="back">' + CARDS.back(p.id, v.id) + "</div></div></div>" +
+      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + "</div>" +
       '<div class="product-body">' +
-      '<div class="tags"><span class="tag-nfc">NFC</span><span>' + esc(p.materialShort) + '</span><span class="' + (p.stock ? "in" : "") + '">' + (p.stock ? "En stock" : "Bajo pedido") + "</span></div>" +
-      "<h3>" + esc(p.name) + "</h3>" +
-      '<p class="product-desc">' + esc(p.short) + " <span>" + esc(p.material) + " · chip NFC · " + esc(stockLabel(p)) + "</span></p>" +
+      '<p class="kicker">NFC · ' + esc(p.materialShort) + "</p>" +
+      "<h3>" + esc(p.name.replace("Tarjeta NFC ", "Tarjeta ").replace("Tarjetas NFC ", "Tarjetas ")) + "</h3>" +
       '<div class="variants" role="group" aria-label="' + esc(p.variantLabel) + '">' + p.variants.map(function (x) {
-        return '<button type="button" class="variant" data-variant="' + p.id + ":" + x.id + '" aria-pressed="' + (x.id === v.id) + '">' + CARDS.swatch(p.id, x.id) + esc(x.name) + "</button>";
+        return '<button type="button" class="variant" data-variant="' + p.id + ":" + x.id + '" aria-pressed="' + (x.id === v.id) + '" title="' + esc(x.name) + '">' + CARDS.swatch(p.id, x.id) + "<span>" + esc(x.name) + "</span></button>";
       }).join("") + "</div>" +
-      '<div class="two-prices" role="radiogroup" aria-label="Tipo de compra">' +
-      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><span>Menudeo</span><strong>' + money(p.retail) + "</strong><small>1 a " + (C.wholesaleFrom - 1) + " piezas</small></button>" +
-      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><span>Mayoreo</span><strong>' + money(p.wholesale) + "</strong><small>desde " + C.wholesaleFrom + " piezas</small></button></div>" +
+      '<div class="two-prices" role="radiogroup" aria-label="Precio">' +
+      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo</small></button>" +
+      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><strong>' + money(p.wholesale) + "</strong><small>Mayoreo " + C.wholesaleFrom + "+</small></button></div>" +
       '<div class="buy"><div class="stepper"><button type="button" data-pick-dec="' + p.id + '" aria-label="Menos">−</button>' +
       '<input type="number" min="1" max="999" inputmode="numeric" data-pick="' + p.id + '" value="' + n + '" aria-label="Cantidad"><button type="button" data-pick-inc="' + p.id + '" aria-label="Más">+</button></div>' +
-      '<button type="button" class="btn btn-primary" data-add="' + p.id + '">Agregar</button></div>' +
+      '<button type="button" class="btn btn-primary" data-add="' + p.id + '">Agregar al carrito</button></div>' +
       '<p class="pick-note" data-pick-note="' + p.id + '">' + pickNote(p, n) + "</p>" +
       "</div></article>";
   }
 
   function pickNote(p, n) {
-    if (n >= C.wholesaleFrom) return n + " piezas a precio de mayoreo: " + money(p.wholesale * n);
-    if (n > 1) return n + " piezas a precio de menudeo: " + money(p.retail * n);
-    return "Video de configuración incluido";
+    var unit = n >= C.wholesaleFrom ? p.wholesale : p.retail;
+    return n + (n === 1 ? " pieza" : " piezas") + " · " + money(unit * n) + (n >= C.wholesaleFrom ? " (mayoreo)" : "");
   }
 
   function products(sel, picks) {

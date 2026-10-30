@@ -31,6 +31,7 @@
   var products = [
     {
       id: "google",
+      cartName: "Reseñas Google",
       name: "Tarjeta NFC de reseñas de Google",
       short: "Tus clientes te califican con 5 estrellas en segundos.",
       material: "Plástico rígido",
@@ -47,6 +48,7 @@
     },
     {
       id: "redes",
+      cartName: "Redes sociales",
       name: "Tarjetas NFC para redes sociales",
       short: "Más seguidores y mensajes sin que te busquen por nombre.",
       material: "Plástico rígido",
@@ -65,6 +67,7 @@
     },
     {
       id: "lisa",
+      cartName: "Lisa de plástico",
       name: "Tarjeta NFC lisa de plástico",
       short: "Negra o blanca, lista para abrir cualquier enlace.",
       material: "Plástico mate",
@@ -81,6 +84,7 @@
     },
     {
       id: "metal",
+      cartName: "Metálica",
       name: "Tarjeta NFC metálica",
       short: "Acero con acabado cepillado. La más elegante para presentarte.",
       material: "Metal (acero inoxidable)",
@@ -98,6 +102,7 @@
     },
     {
       id: "papel",
+      cartName: "Papel negro",
       name: "Tarjeta NFC de papel negro",
       short: "Ligera y mate. Ideal para eventos y para repartir.",
       material: "Papel negro grueso",
@@ -115,7 +120,6 @@
 
   var delivery = [
     { id: "envio", name: "Envío a todo México", detail: "Gratis desde " + freeShippingFrom + " piezas", cost: 99 },
-    { id: "pickup", name: "Recoger en Guadalajara", detail: "Te compartimos la ubicación por WhatsApp", cost: 0 },
   ];
 
   function getProduct(id) {

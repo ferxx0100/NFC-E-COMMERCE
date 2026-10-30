@@ -86,7 +86,7 @@
     renderCount();
     var bag = $(".bag");
     if (bag.animate && !reduceMotion) bag.animate([{ transform: "scale(1)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }], { duration: 400 });
-    toast("Agregaste " + n + " × " + p.name + " · " + v.name);
+    toast("Agregado al carrito ✓");
   }
 
   function setLine(i, qty) {
@@ -122,60 +122,46 @@
   function renderOrder() {
     var q = currentQuote(), body = $("#drawer-body");
     if (!q.qty) {
-      body.innerHTML = '<div class="empty-msg"><p>Aún no agregas tarjetas.</p><a class="btn btn-primary" href="#productos" data-close-order>Ver tarjetas</a></div>';
+      body.innerHTML = '<div class="empty-msg"><p>Tu carrito está vacío.</p><a class="btn btn-primary" href="#productos" data-close-order>Ver tarjetas</a></div>';
       return;
     }
     var html = q.groups.map(function (g) {
-      return '<div class="d-group"><div class="d-group-head"><span>' + esc(g.product.name) + "</span><span>" + money(g.total) + "</span></div>" +
-        g.lines.map(function (l) {
+      return '<div class="d-group">' + g.lines.map(function (l) {
           var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id; });
-          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id) + "</div><span>" + esc(l.variant.name) + "</span>" +
-            '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="0" max="999" data-line="' + i + '" value="' + l.qty + '" aria-label="Cantidad"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div></div>';
+          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id) + "</div>" +
+            '<span class="d-name">' + esc(l.product.cartName) + "<small>" + esc(l.variant.name) + " · " + money(g.unit) + " c/u</small></span>" +
+            '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="1" max="999" inputmode="numeric" data-line="' + i + '" value="' + l.qty + '" aria-label="Cantidad"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div>' +
+            '<button type="button" class="remove" data-remove="' + i + '" aria-label="Quitar del carrito">×</button></div>';
         }).join("") +
         (g.wholesale
-          ? '<p class="d-note ok">Precio de mayoreo: ' + money(g.unit) + " c/u · ahorras " + money(g.saving) + "</p>"
-          : '<p class="d-note">Menudeo: ' + money(g.unit) + " c/u. Agrega " + g.missing + " más de este producto y paga " + money(g.product.wholesale) + " c/u.</p>") +
+          ? '<p class="d-note ok">Precio de mayoreo aplicado</p>'
+          : '<p class="d-note">Con ' + g.missing + " más pagas " + money(g.product.wholesale) + " c/u (mayoreo)</p>") +
         "</div>";
     }).join("");
 
-    var missingShip = C.freeShippingFrom - q.qty;
-    html += '<div class="d-block"><span class="lbl">Entrega</span>' + C.delivery.map(function (d) {
-      var cost = q.qty >= C.freeShippingFrom ? 0 : d.cost;
-      return '<label class="radio"><input type="radio" name="delivery" value="' + d.id + '"' + (state.delivery === d.id ? " checked" : "") + ">" +
-        "<span><strong>" + esc(d.name) + "</strong><small>" + esc(d.detail) + "</small></span><em>" + (cost ? money(cost) : "Gratis") + "</em></label>";
-    }).join("") +
-      (missingShip > 0 && state.delivery === "envio" ? '<p class="d-note">Agrega ' + missingShip + (missingShip === 1 ? " pieza" : " piezas") + " más y el envío es gratis.</p>" : "") + "</div>";
-
-    var needsAddress = state.delivery === "envio";
-    var custom = q.groups.some(function (g) { return !g.product.stock; });
-    html += '<form id="order-form" novalidate><div class="d-block"><span class="lbl">Tus datos</span><div class="form-grid">' +
-      field("name", "Nombre completo", "text", true, 'autocomplete="name" required') +
-      field("phone", "WhatsApp", "tel", false, 'autocomplete="tel" inputmode="tel" pattern="[0-9 +]{10,16}" required') +
-      field("email", "Correo", "email", false, 'autocomplete="email" required') +
-      (needsAddress
-        ? field("street", "Calle y número", "text", true, 'autocomplete="address-line1" required') +
-          field("colonia", "Colonia", "text", false, "required") +
-          field("zip", "Código postal", "text", false, 'inputmode="numeric" pattern="[0-9]{5}" required') +
-          field("city", "Ciudad", "text", false, 'autocomplete="address-level2" required') +
-          field("state", "Estado", "text", false, "required")
-        : "") +
-      '<div class="full"><label for="o-links">Enlaces para programar (opcional)</label><textarea id="o-links" name="links" rows="2" placeholder="Si quieres que te las enviemos programadas">' + esc(state.customer.links || "") + "</textarea></div>" +
-      "</div>" + (custom ? '<p class="d-note">Las tarjetas bajo pedido se fabrican en 7 a 12 días hábiles.</p>' : "") + "</div>" +
-      '<div class="d-block"><div class="sum-rows" style="margin:0 0 14px">' +
+    html += '<form id="order-form" novalidate><div class="d-block"><span class="lbl">Envío</span><div class="form-grid">' +
+      field("name", "Nombre", "text", true, 'autocomplete="name" required') +
+      field("phone", "WhatsApp", "tel", true, 'autocomplete="tel" inputmode="tel" pattern="[0-9 +]{10,16}" required') +
+      field("street", "Calle y número", "text", true, 'autocomplete="address-line1" required') +
+      field("zip", "Código postal", "text", false, 'inputmode="numeric" pattern="[0-9]{5}" autocomplete="postal-code" required') +
+      field("city", "Ciudad", "text", false, 'autocomplete="address-level2" required') +
+      field("state", "Estado", "text", true, 'autocomplete="address-level1" required') +
+      field("links", "Enlace para programarlas (opcional)", "text", true, 'placeholder="Tu link de Google, Instagram o WhatsApp"') +
+      "</div></div>" +
+      '<div class="d-block"><div class="sum-rows" style="margin:0 0 12px">' +
       "<div><span>" + q.qty + (q.qty === 1 ? " pieza" : " piezas") + "</span><strong>" + money(q.subtotal) + "</strong></div>" +
       "<div><span>Envío</span><strong>" + (q.shipping ? money(q.shipping) : "Gratis") + "</strong></div></div>" +
       '<div class="sum-total"><span>Total</span><strong>' + money(q.total) + "</strong></div>" +
-      '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp">Pagar con Mercado Pago</button>' +
-      '<button class="btn btn-wa btn-block" type="submit" data-pay="wa">Pedir por WhatsApp</button></div>' +
-      '<p class="form-error" id="order-error" hidden></p>' +
-      '<p class="form-note">Tarjeta, OXXO o transferencia con Mercado Pago. Incluye el video de configuración.</p></div></form>';
+      '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp">Pagar ' + money(q.total) + "</button>" +
+      '<button class="btn btn-line btn-block" type="submit" data-pay="wa">Pedir por WhatsApp</button></div>' +
+      '<p class="form-error" id="order-error" hidden></p></div></form>';
     body.innerHTML = html;
   }
 
   function readCustomer() {
     var form = $("#order-form");
     if (!form) return state.customer;
-    $$("input, textarea", form).forEach(function (el) { if (el.name) state.customer[el.name] = el.value.trim(); });
+    $$("input", form).forEach(function (el) { if (el.name) state.customer[el.name] = el.value.trim(); });
     save();
     return state.customer;
   }
@@ -185,11 +171,11 @@
       return g.product.name + " (" + (g.wholesale ? "mayoreo" : "menudeo") + ", " + money(g.unit) + " c/u):\n" +
         g.lines.map(function (l) { return "  • " + l.qty + " × " + l.variant.name; }).join("\n");
     }).join("\n");
-    var where = state.delivery === "pickup" ? "Recojo en Guadalajara" : c.street + ", Col. " + c.colonia + ", CP " + c.zip + ", " + c.city + ", " + c.state;
+    var where = c.street + ", CP " + c.zip + ", " + c.city + ", " + c.state;
     return "Hola, quiero hacer este pedido de " + C.brand.name + ":\n\n" + lines +
       "\n\nSubtotal: " + money(q.subtotal) + "\nEnvío: " + (q.shipping ? money(q.shipping) : "Gratis") + "\nTotal: " + money(q.total) +
-      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\nCorreo: " + c.email + "\nEntrega: " + where +
-      (c.links ? "\n\nEnlaces para programar:\n" + c.links : "");
+      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\nEnvío: " + where +
+      (c.links ? "\nProgramar con: " + c.links : "");
   }
 
   function submitOrder(e) {
@@ -217,12 +203,14 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items: state.cart, delivery: state.delivery, customer: c }),
     })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error); return j; }); })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.init_point) throw new Error(j.error || "Error " + r.status); return j; });
+      })
       .then(function (j) { location.href = j.init_point; })
-      .catch(function () {
+      .catch(function (ex) {
         btn.disabled = false;
-        btn.textContent = "Pagar con Mercado Pago";
-        err.textContent = "El pago en línea no está disponible en este momento. Haz tu pedido por WhatsApp y te mandamos tu liga de pago.";
+        btn.textContent = "Pagar " + money(q.total);
+        err.textContent = "No se pudo abrir Mercado Pago (" + ex.message + "). Puedes pedir por WhatsApp.";
         err.hidden = false;
       });
   }
@@ -247,10 +235,13 @@
       state.pick[id] = Math.max(1, Math.min(999, (state.pick[id] || 1) + (d.pickInc ? 1 : -1)));
       renderPick(C.getProduct(id));
     } else if (d.add) addToCart(d.add);
-    else if (d.lineInc || d.lineDec) {
+    else if (d.remove !== undefined) {
+      readCustomer();
+      setLine(+d.remove, 0);
+    } else if (d.lineInc || d.lineDec) {
       readCustomer();
       var i = +(d.lineInc || d.lineDec);
-      setLine(i, state.cart[i].qty + (d.lineInc ? 1 : -1));
+      setLine(i, Math.max(1, state.cart[i].qty + (d.lineInc ? 1 : -1)));
     } else if (t.hasAttribute("data-open-order")) openOrder();
     else if (t.hasAttribute("data-close-order")) closeOrder();
     else if (t.classList.contains("menu-btn")) {
@@ -270,14 +261,9 @@
   });
 
   drawer.addEventListener("change", function (e) {
-    if (e.target.name === "delivery") {
+    if (e.target.dataset.line !== undefined) {
       readCustomer();
-      state.delivery = e.target.value;
-      save();
-      renderOrder();
-    } else if (e.target.dataset.line !== undefined) {
-      readCustomer();
-      setLine(+e.target.dataset.line, parseInt(e.target.value, 10) || 0);
+      setLine(+e.target.dataset.line, Math.max(1, parseInt(e.target.value, 10) || 1));
     }
   });
   drawer.addEventListener("input", function (e) { if (e.target.closest("#order-form")) readCustomer(); });

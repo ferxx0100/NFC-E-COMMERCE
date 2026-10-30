@@ -96,15 +96,14 @@ function render(template, page) {
   html = html.replace("{{H1}}", page.h1).replace("{{JSONLD}}", jsonld(page.ld));
   html = html
     .replace("<!--@products-->", V.products())
-    .replace("<!--@sectors-->", V.sectors())
     .replace("<!--@faq-->", V.faq() + (page.faq || []).map((f) => "<details><summary>" + esc(f.q) + "</summary><p>" + esc(f.a) + "</p></details>").join(""))
     .replace("<!--@cities-->", V.cityLinks(page.city, "/"))
     .replace("<!--@local-->", page.local || "");
   return html;
 }
 
-function h1Lines(a, b, c) {
-  return ['<span class="line"><span>' + a + "</span></span>", '<span class="line"><span>' + b + "</span></span>", '<span class="line"><span class="hl">' + c + "</span></span>"].join(" ");
+function h1Lines(a, b) {
+  return ['<span class="line"><span>' + a + "</span></span>", '<span class="line"><span class="hl">' + b + "</span></span>"].join(" ");
 }
 
 function build() {
@@ -121,9 +120,9 @@ function build() {
     url: home,
     title: "Tarjetas NFC para Reseñas de Google | Menudeo y Mayoreo | TAKTO",
     description: "Tarjetas NFC de plástico, metálicas y de papel para reseñas de Google, Instagram, WhatsApp, TikTok y Facebook. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.formatMoney(minWholesale) + ". Envíos a todo México.",
-    eyebrow: "Tarjetas NFC de plástico, metal y papel",
-    h1: h1Lines("Tarjetas NFC:", "acerca el celular", "y se abre tu reseña."),
-    lead: "Cada tarjeta lleva un chip NFC. Tu cliente acerca su iPhone o Android a unos centímetros y se abre tu perfil de Google, Instagram o WhatsApp. Sin apps y sin escanear nada.",
+    eyebrow: "Plástico · Metal · Papel",
+    h1: h1Lines("Tarjetas NFC.", "Acerca el celular y listo."),
+    lead: "Tarjetas con chip NFC para Google, Instagram y WhatsApp. Te llegan programadas.",
     city: null,
     ld: [organization(), { "@context": "https://schema.org", "@type": "WebSite", name: C.brand.name, url: home, inLanguage: "es-MX" }, ...productsLd(home), faqLd()],
   }));
@@ -134,14 +133,12 @@ function build() {
     const url = SITE + "/tarjetas-nfc/" + c.slug + "/";
     const local =
       '<section class="section light local" id="local"><div class="container local-box">' +
-      '<div class="reveal"><span class="eyebrow">' + esc(c.name) + ", " + esc(c.state) + "</span>" +
-      "<h2>Tarjetas NFC en <span class=\"hl\">" + esc(c.name) + ".</span></h2>" +
-      '<p class="lead">' + esc(c.focus) + " Te enviamos tus tarjetas listas para usar o para revender.</p></div>" +
-      '<ul class="local-facts reveal">' +
-      "<li><strong>" + esc(c.days) + "</strong><span>Entrega en " + esc(c.name) + "</span></li>" +
+      "<h2>Tarjetas NFC en " + esc(c.name) + ", " + esc(c.state) + "</h2>" +
+      '<ul class="local-facts">' +
+      "<li><strong>" + esc(c.days) + "</strong><span>Entrega</span></li>" +
       "<li><strong>Gratis</strong><span>Envío desde " + C.freeShippingFrom + " piezas</span></li>" +
-      "<li><strong>" + C.formatMoney(minWholesale) + "</strong><span>Mayoreo desde " + C.wholesaleFrom + " piezas</span></li>" +
-      "<li><strong>WhatsApp</strong><span>" + esc(C.brand.phoneDisplay) + "</span></li></ul></div></section>";
+      "<li><strong>" + C.formatMoney(minWholesale) + "</strong><span>Mayoreo desde " + C.wholesaleFrom + "</span></li></ul>" +
+      '<p class="muted">' + esc(c.focus) + "</p></div></section>";
     const faq = [
       { q: "¿Hacen envíos de tarjetas NFC a " + c.name + "?", a: "Sí. Enviamos a " + c.name + ", " + c.state + " en " + c.days + ". El envío es gratis desde " + C.freeShippingFrom + " piezas." },
       { q: "¿Puedo revender tarjetas NFC en " + c.name + "?", a: "Sí. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo y te damos el video para configurarlas para cada cliente." },
@@ -151,9 +148,9 @@ function build() {
       url,
       title: "Tarjetas NFC en " + c.name + " | Reseñas de Google y Mayoreo | TAKTO",
       description: "Venta de tarjetas NFC en " + c.name + ", " + c.state + ": reseñas de Google, Instagram, WhatsApp y tarjetas metálicas. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.wholesaleFrom + " piezas. Entrega en " + c.days + ".",
-      eyebrow: "Tarjetas NFC · " + c.name + ", " + c.state,
-      h1: h1Lines("Tarjetas NFC", "en " + esc(c.name) + ":", "acerca y se abre tu reseña."),
-      lead: "Vendemos tarjetas NFC de plástico, metal y papel a negocios de " + c.name + ". Tu cliente acerca su celular y se abre tu Google, Instagram o WhatsApp. Entrega en " + c.days + ".",
+      eyebrow: "Tarjetas NFC · " + c.state,
+      h1: h1Lines("Tarjetas NFC en " + esc(c.name) + ".", "Acerca el celular y listo."),
+      lead: "Acerca el celular y se abre tu Google, Instagram o WhatsApp. Entrega en " + c.days + ".",
       city: c.slug,
       local,
       faq,
