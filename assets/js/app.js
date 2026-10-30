@@ -53,6 +53,9 @@
     var n = state.pick[p.id] || 1, input = $('[data-pick="' + p.id + '"]');
     if (document.activeElement !== input) input.value = n;
     $('[data-pick-note="' + p.id + '"]').textContent = VIEWS.pickNote(p, n);
+    $$('[data-tier][data-pid="' + p.id + '"]').forEach(function (b) {
+      b.setAttribute("aria-checked", (b.dataset.tier === "wholesale") === n >= C.wholesaleFrom);
+    });
   }
 
   function renderCount() {
@@ -67,6 +70,7 @@
     var k = heroSeq[heroIdx % heroSeq.length], v = C.getVariant(C.getProduct(k[0]), k[1]);
     $("#hero-card").innerHTML = CARDS.card(k[0], k[1]);
     $("#phone-open").innerHTML = CARDS.screen(v.screen);
+    $("#banner-app").textContent = CARDS.appName(v.screen);
     $(".nfc-burst").style.setProperty("--burst", v.color);
   }
 
@@ -143,7 +147,7 @@
       (missingShip > 0 && state.delivery === "envio" ? '<p class="d-note">Agrega ' + missingShip + (missingShip === 1 ? " pieza" : " piezas") + " más y el envío es gratis.</p>" : "") + "</div>";
 
     var needsAddress = state.delivery === "envio";
-    var custom = q.groups.some(function (g) { return !g.product.stock || g.product.note; });
+    var custom = q.groups.some(function (g) { return !g.product.stock; });
     html += '<form id="order-form" novalidate><div class="d-block"><span class="lbl">Tus datos</span><div class="form-grid">' +
       field("name", "Nombre completo", "text", true, 'autocomplete="name" required') +
       field("phone", "WhatsApp", "tel", false, 'autocomplete="tel" inputmode="tel" pattern="[0-9 +]{10,16}" required') +
@@ -156,7 +160,7 @@
           field("state", "Estado", "text", false, "required")
         : "") +
       '<div class="full"><label for="o-links">Enlaces para programar (opcional)</label><textarea id="o-links" name="links" rows="2" placeholder="Si quieres que te las enviemos programadas">' + esc(state.customer.links || "") + "</textarea></div>" +
-      "</div>" + (custom ? '<p class="d-note">Para tarjetas personalizadas te pediremos tu logo por WhatsApp y te enviaremos una prueba digital.</p>' : "") + "</div>" +
+      "</div>" + (custom ? '<p class="d-note">Las tarjetas bajo pedido se fabrican en 7 a 12 días hábiles.</p>' : "") + "</div>" +
       '<div class="d-block"><div class="sum-rows" style="margin:0 0 14px">' +
       "<div><span>" + q.qty + (q.qty === 1 ? " pieza" : " piezas") + "</span><strong>" + money(q.subtotal) + "</strong></div>" +
       "<div><span>Envío</span><strong>" + (q.shipping ? money(q.shipping) : "Gratis") + "</strong></div></div>" +
@@ -233,6 +237,11 @@
       state.sel[parts[0]] = parts[1];
       save();
       renderVariant(C.getProduct(parts[0]));
+    } else if (d.tier) {
+      // Menudeo regresa a 1 pieza; mayoreo sube al mínimo de mayoreo.
+      var cur = state.pick[d.pid] || 1;
+      state.pick[d.pid] = d.tier === "wholesale" ? Math.max(cur, C.wholesaleFrom) : cur >= C.wholesaleFrom ? 1 : cur;
+      renderPick(C.getProduct(d.pid));
     } else if (d.pickInc || d.pickDec) {
       var id = d.pickInc || d.pickDec;
       state.pick[id] = Math.max(1, Math.min(999, (state.pick[id] || 1) + (d.pickInc ? 1 : -1)));

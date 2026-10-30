@@ -9,7 +9,6 @@
   // Prefijo distinto en build.js y en el navegador para que los ids de los SVG nunca se repitan.
   var PREFIX = typeof document === "undefined" ? "b" : "c" + Math.random().toString(36).slice(2, 6);
   var SANS = "Inter, 'Helvetica Neue', Arial, sans-serif";
-  var SERIF = "'Instrument Serif', Georgia, serif";
   var STAR = "M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6 5.6 21.1 7 14l-5.3-5 7.2-.9z";
   var TIKTOK = "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z";
 
@@ -148,7 +147,7 @@
       body = storefront(120, 92, 300) + wordmarkGoogle(270, 500, 116) + stars(270, 536, 50, "#FBBC04") + contactless(270, 690, 52, st.ink);
     } else if (v.id === "instagram") {
       body = igGlyph(160, 150, 220, "#fff") +
-        '<text x="270" y="530" text-anchor="middle" font-family="' + SERIF + '" font-style="italic" font-size="124" fill="#fff">Instagram</text>' + contactless(270, 676, 52, "#fff");
+        '<text x="270" y="520" text-anchor="middle" font-family="' + SANS + '" font-size="90" font-weight="800" letter-spacing="-2" fill="#fff">Instagram</text>' + contactless(270, 676, 52, "#fff");
     } else if (v.id === "whatsapp") {
       body = waGlyph(150, 130, 240, "#fff") +
         '<text x="270" y="520" text-anchor="middle" font-family="' + SANS + '" font-size="88" font-weight="800" letter-spacing="-2" fill="#fff">WhatsApp</text>' + contactless(270, 676, 52, "#fff");
@@ -180,52 +179,38 @@
     plata: { bg: ["#f8f8fa", "#c9c9ce", "#96969c"], ink: "#2b2b30", light: true },
     dorada: { bg: ["#f5e2b4", "#d2b175", "#9c7a42"], ink: "#3b2a0c", light: true },
   };
-  var FOIL = ["#f2e6c9", "#cdb27c", "#a58852"];
+
+  function nfcLabel(x, y, color, size) {
+    return '<text x="' + x + '" y="' + y + '" text-anchor="middle" font-family="' + SANS + '" font-size="' + (size || 20) + '" font-weight="700" letter-spacing="6" fill="' + color + '" opacity=".7">NFC</text>';
+  }
 
   function horizontalFront(p, v, id) {
     var W = 856, H = 540, st;
     if (p.id === "lisa") {
       st = LISA[v.id] || LISA.negra;
-      return svg(W, H, p.name + " " + v.name, base(id, W, H, 34, st.bg, "pvc", st.light) +
-        '<rect x="278" y="190" width="300" height="160" rx="20" fill="none" stroke="' + st.ink + '" stroke-opacity=".22" stroke-width="2.5" stroke-dasharray="10 9"/>' +
-        '<text x="428" y="282" text-anchor="middle" font-family="' + SANS + '" font-size="26" font-weight="600" letter-spacing="7" fill="' + st.ink + '" opacity=".4">TU LOGO</text>' +
-        contactless(772, 456, 36, st.ink));
+      return svg(W, H, p.name + " " + v.name, base(id, W, H, 34, st.bg, "pvc", st.light) + contactless(776, 452, 38, st.ink) + nfcLabel(776, 518, st.ink, 16));
     }
     if (p.id === "metal") {
       st = METAL[v.id] || METAL.negra;
       var shade = st.light ? "#000" : "#fff";
       return svg(W, H, p.name + " " + v.name, base(id, W, H, 30, st.bg, "brushed", st.light) +
         '<rect x="26" y="26" width="330" height="488" rx="20" fill="' + shade + '" fill-opacity=".07" stroke="' + shade + '" stroke-opacity=".14" stroke-width="2"/>' +
-        contactless(191, 250, 58, st.ink) +
-        '<text x="191" y="372" text-anchor="middle" font-family="' + SANS + '" font-size="20" font-weight="600" letter-spacing="6" fill="' + st.ink + '" opacity=".75">NFC</text>' +
-        '<text x="400" y="262" font-family="' + SERIF + '" font-size="62" fill="' + st.ink + '">Andrea Ramírez</text>' +
-        '<text x="402" y="306" font-family="' + SANS + '" font-size="18" font-weight="500" letter-spacing="5" fill="' + st.ink + '" opacity=".8">DIRECTORA COMERCIAL</text>' +
-        '<text x="402" y="456" font-family="' + SANS + '" font-size="19" font-weight="500" fill="' + st.ink + '" opacity=".75">andrea@empresa.mx</text>');
+        contactless(191, 250, 58, st.ink) + nfcLabel(191, 372, st.ink));
     }
-    // Papel negro con tinta metálica.
-    return svg(W, H, p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) +
-      '<defs><linearGradient id="' + id + 'f" x1="0" y1="0" x2="1" y2="1">' + FOIL.map(function (c, i) { return '<stop offset="' + i / 2 + '" stop-color="' + c + '"/>'; }).join("") + "</linearGradient></defs>" +
-      '<g transform="translate(428 150)" fill="url(#' + id + 'f)">' +
-      [-50, -25, 0, 25, 50].map(function (a) { return '<ellipse cx="0" cy="-26" rx="11" ry="30" transform="rotate(' + a + ' 0 18)"/>'; }).join("") + "</g>" +
-      '<text x="428" y="280" text-anchor="middle" font-family="' + SERIF + '" font-size="80" fill="url(#' + id + 'f)">Tu marca</text>' +
-      '<text x="428" y="326" text-anchor="middle" font-family="' + SANS + '" font-size="18" font-weight="500" letter-spacing="7" fill="#b9b3a8">ESTUDIO · GUADALAJARA</text>' +
-      contactless(428, 438, 34, "#d9cdb3"));
+    return svg(W, H, p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) + contactless(428, 250, 44, "#d9d3c7") + nfcLabel(428, 340, "#d9d3c7", 18));
   }
 
   function horizontalBack(p, v, id) {
     var W = 856, H = 540, st;
     if (p.id === "lisa") {
       st = LISA[v.id] || LISA.negra;
-      return svg(W, H, "Reverso " + p.name, base(id, W, H, 34, st.bg, "pvc", st.light) + contactless(428, 270, 64, st.ink) +
-        '<text x="428" y="392" text-anchor="middle" font-family="' + SANS + '" font-size="22" font-weight="600" letter-spacing="6" fill="' + st.ink + '" opacity=".6">NFC</text>');
+      return svg(W, H, "Reverso " + p.name, base(id, W, H, 34, st.bg, "pvc", st.light) + contactless(428, 250, 64, st.ink) + nfcLabel(428, 372, st.ink, 22));
     }
     if (p.id === "metal") {
       st = METAL[v.id] || METAL.negra;
-      return svg(W, H, "Reverso " + p.name, base(id, W, H, 30, st.bg, "brushed", st.light) +
-        '<text x="428" y="300" text-anchor="middle" font-family="' + SERIF + '" font-size="72" fill="' + st.ink + '">empresa.mx</text>');
+      return svg(W, H, "Reverso " + p.name, base(id, W, H, 30, st.bg, "brushed", st.light) + nfcLabel(428, 280, st.ink, 26));
     }
-    return svg(W, H, "Reverso " + p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) +
-      '<text x="428" y="290" text-anchor="middle" font-family="' + SERIF + '" font-size="64" fill="#e6dfd2">tumarca.mx</text>');
+    return svg(W, H, "Reverso " + p.name, base(id, W, H, 18, ["#1b1a19", "#141312", "#0e0d0c"], "paper", false) + nfcLabel(428, 280, "#d9d3c7", 24));
   }
 
   function parts(productId, variantId) {
@@ -267,5 +252,11 @@
     return SCREENS[id] || SCREENS.google;
   }
 
-  window.CARDS = { card: card, back: back, mark: mark, logo: logo, swatch: swatch, screen: screen };
+  // Nombre de la app que abre el iPhone al leer la tarjeta (aviso en la animación).
+  var APPS = { google: "Google Maps", instagram: "Instagram", whatsapp: "WhatsApp", facebook: "Facebook", tiktok: "TikTok" };
+  function appName(id) {
+    return APPS[id] || "Safari";
+  }
+
+  window.CARDS = { card: card, back: back, mark: mark, logo: logo, swatch: swatch, screen: screen, appName: appName };
 })();

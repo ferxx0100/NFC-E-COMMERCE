@@ -13,7 +13,7 @@
     .brand svg { width: 34px; height: 34px; }
     .tag { position: absolute; top: 56px; right: 72px; border: 1px solid currentColor; opacity: .7; border-radius: 999px; padding: 12px 22px; font: 500 22px/1 var(--sans); letter-spacing: .1em; }
     .copy { position: absolute; left: 72px; right: 72px; bottom: 88px; }
-    .copy h2 { font-size: 104px; margin: 0 0 18px; }
+    .copy h2 { font-size: 84px; margin: 0 0 18px; }
     .copy p { font: 400 32px/1.4 var(--sans); color: #a1a1aa; margin: 0; }
     .light .copy p { color: #5c5c63; }
     .shadow { filter: drop-shadow(0 50px 70px rgba(0,0,0,.55)); }
@@ -23,7 +23,7 @@
     .post .one { position: absolute; left: 90px; right: 90px; top: 300px; transform: rotate(-6deg); }
     .post .one.v { left: 50%; right: auto; width: 440px; margin-left: -220px; top: 170px; }
     .post .copy.v { bottom: 70px; }
-    .post .copy.v h2 { font-size: 92px; }
+    .post .copy.v h2 { font-size: 76px; }
     .grid-v { position: absolute; left: 130px; right: 130px; top: 160px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
     .grid-h { position: absolute; left: 90px; right: 90px; top: 640px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
     .post .fan { position: absolute; left: 50%; top: 560px; }
@@ -33,12 +33,12 @@
     .og { width: 1200px; height: 630px; }
     .og .one { position: absolute; width: 290px; right: 140px; top: 70px; transform: rotate(-8deg); }
     .og .copy { top: 190px; bottom: auto; width: 520px; }
-    .og .copy h2 { font-size: 84px; }
+    .og .copy h2 { font-size: 66px; }
     .og .copy p { font-size: 26px; }
     .reel { width: 1080px; height: 1920px; }
     .reel .nfc-scene { position: absolute; left: 150px; width: 780px; top: 330px; }
     .reel .copy { text-align: center; bottom: 160px; }
-    .reel .copy h2 { font-size: 120px; }
+    .reel .copy h2 { font-size: 100px; }
     .reel .top { position: absolute; top: 210px; left: 0; right: 0; text-align: center; font: 500 30px/1 var(--sans); letter-spacing: .3em; color: #a1a1aa; }
   </style>
 </head>
@@ -80,7 +80,7 @@
       html = '<div class="art post">' + brand +
         '<div class="grid-v">' + vs.map(function (k) { return '<div class="shadow">' + CARDS.card(k[0], k[1]) + "</div>"; }).join("") + "</div>" +
         '<div class="grid-h">' + hs.map(function (k) { return '<div class="shadow">' + CARDS.card(k[0], k[1]) + "</div>"; }).join("") + "</div>" +
-        '<div class="copy" style="bottom:70px"><h2 style="font-size:80px">Tarjetas NFC<br><span class="hl">para tu negocio.</span></h2><p>Menudeo y mayoreo · Envíos a todo México</p></div></div>';
+        '<div class="copy" style="bottom:70px"><h2 style="font-size:72px">Tarjetas NFC<br><span class="hl">para tu negocio.</span></h2><p>Menudeo y mayoreo · Envíos a todo México</p></div></div>';
     } else if (art === "reel") {
       html = '<div class="art reel">' + brand + '<div class="top">¿QUÉ ES NFC?</div>' +
         '<div class="nfc-scene"><div class="nfc-card"><div id="hero-card"></div></div>' +

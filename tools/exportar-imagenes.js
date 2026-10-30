@@ -28,7 +28,7 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
   for (const s of shots) {
     const p = await browser.newPage({ viewport: { width: s.w, height: s.h } });
     await p.goto(page(s.q));
-    await p.evaluate(() => Promise.all([document.fonts.load("40px 'Instrument Serif'"), document.fonts.load("italic 40px 'Instrument Serif'")]).then(() => document.fonts.ready));
+    await p.evaluate(() => document.fonts.ready);
     const jpg = s.file.endsWith(".jpg");
     await p.screenshot({ path: path.join(OUT, s.file), omitBackground: !!s.transparent, type: jpg ? "jpeg" : "png", quality: jpg ? 90 : undefined });
     await p.close();
@@ -47,7 +47,7 @@ async function reel(browser) {
   const fps = 30, seconds = 36;
   const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   await p.goto(page("art=reel"));
-  await p.evaluate(() => Promise.all([document.fonts.load("40px 'Instrument Serif'"), document.fonts.load("italic 40px 'Instrument Serif'")]).then(() => document.fonts.ready));
+  await p.evaluate(() => document.fonts.ready);
   for (let i = 0; i < fps * seconds; i++) {
     await p.evaluate((ms) => window.seek(ms), (i * 1000) / fps);
     await p.screenshot({ path: path.join(tmp, String(i).padStart(4, "0") + ".jpg"), type: "jpeg", quality: 92 });

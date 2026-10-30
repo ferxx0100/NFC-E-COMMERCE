@@ -13,11 +13,11 @@ Sin dependencias: HTML, CSS y JavaScript, más una función de servidor (`api/ch
 
 Página corta pensada para vender y para aparecer en Google:
 
-1. **Portada**: un celular se acerca a la tarjeta y abre Google, Instagram, WhatsApp, Facebook o TikTok.
-2. **Productos**, cada uno con **dos precios** (menudeo y mayoreo desde 20 piezas) y tarjetas que giran en 3D:
-   - Reseñas de Google (PVC, negra o blanca) · en stock
-   - Redes sociales: Instagram, WhatsApp, Facebook y TikTok (PVC) · en stock
-   - Lisa o con tu logo (PVC negra o blanca) · en stock; con logo desde 20 piezas
+1. **Portada que explica NFC**: un iPhone se acerca a la tarjeta, lee el chip NFC (aparece el aviso "Etiqueta NFC") y abre Google, Instagram, WhatsApp, Facebook o TikTok, con 3 pasos que se iluminan al ritmo de la animación.
+2. **Productos** (todos con chip NFC), cada uno con **dos precios que se pueden elegir** (menudeo o mayoreo desde 20 piezas) y tarjetas que giran en 3D:
+   - Reseñas de Google (plástico, negra o blanca) · en stock
+   - Redes sociales: Instagram, WhatsApp, Facebook y TikTok (plástico) · en stock
+   - Lisa de plástico (negra o blanca) · en stock
    - Metálica (negra, plata o dorada) · bajo pedido
    - Papel negro · bajo pedido
 3. Cómo funciona NFC, qué te llevas, para quién, preguntas frecuentes y ciudades.
@@ -49,7 +49,7 @@ Pasos que tienes que hacer tú (sin esto Google tarda mucho más en encontrarte)
 | Preguntas frecuentes, giros y ciudades | `FAQ`, `SECTORS` y `CITIES` en `assets/js/views.js` |
 | Dibujo de las tarjetas | `assets/js/cards.js` |
 
-Tipografía: Instrument Serif (incluida en `assets/fonts/`, licencia OFL) para títulos e Inter para el texto.
+Tipografía: Inter en toda la página, con títulos rectos en peso extragrueso.
 
 ## Imágenes de la marca
 
