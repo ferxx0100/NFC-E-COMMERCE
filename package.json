@@ -1,0 +1,11 @@
+{
+  "name": "tapreview-mx",
+  "private": true,
+  "description": "Tienda en línea de placas y tarjetas NFC",
+  "scripts": {
+    "dev": "node dev-server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

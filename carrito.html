@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carrito · TapReview MX</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div data-header></div>
+
+  <main class="container">
+    <h1 style="font-size:2rem;margin-top:32px">Tu carrito</h1>
+    <div id="cart-root"></div>
+  </main>
+
+  <div data-footer></div>
+
+  <script src="assets/js/catalog.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script>
+    (function () {
+      var C = window.CATALOG, S = window.STORE, esc = S.escapeHtml;
+      var root = document.getElementById("cart-root");
+      var STATES = ["Aguascalientes","Baja California","Baja California Sur","Campeche","Chiapas","Chihuahua","Ciudad de México","Coahuila","Colima","Durango","Estado de México","Guanajuato","Guerrero","Hidalgo","Jalisco","Michoacán","Morelos","Nayarit","Nuevo León","Oaxaca","Puebla","Querétaro","Quintana Roo","San Luis Potosí","Sinaloa","Sonora","Tabasco","Tamaulipas","Tlaxcala","Veracruz","Yucatán","Zacatecas"];
+      var DRAFT = "tapreview_checkout_draft";
+
+      function loadDraft() { try { return JSON.parse(localStorage.getItem(DRAFT) || "{}"); } catch (e) { return {}; } }
+      function saveDraft(data) { try { localStorage.setItem(DRAFT, JSON.stringify(data)); } catch (e) {} }
+
+      function field(name, label, type, opts) {
+        opts = opts || {};
+        return '<div class="' + (opts.full ? "full" : "") + '"><label for="f-' + name + '">' + label + "</label>" +
+          '<input id="f-' + name + '" name="' + name + '" type="' + type + '"' + (opts.required === false ? "" : " required") +
+          (opts.pattern ? ' pattern="' + opts.pattern + '"' : "") + (opts.auto ? ' autocomplete="' + opts.auto + '"' : "") +
+          ' placeholder=" "></div>';
+      }
+
+      function render() {
+        var sum = S.summary();
+        if (!sum.lines.length) {
+          root.innerHTML = '<div class="empty"><h2>Tu carrito está vacío</h2><p>Elige la placa ideal para tu negocio.</p>' +
+            '<a class="btn btn-primary" href="index.html#productos">Ver productos</a></div>';
+          return;
+        }
+
+        var lines = sum.lines.map(function (l) {
+          var it = l.item;
+          return '<div class="cart-line">' +
+            '<div class="mini-pv">' + S.preview(it.platform, "", l.product.shape) + "</div>" +
+            '<div class="cart-line-info">' +
+            "<h3>" + esc(l.product.name) + "</h3>" +
+            '<div class="cart-line-meta">' + esc(l.platform ? l.platform.name : it.platform) +
+            (it.businessName ? " · " + esc(it.businessName) : "") + "<br>" +
+            (it.link ? esc(it.link) : "<em>Enlace por confirmar</em>") +
+            (it.notes ? "<br>Diseño: " + esc(it.notes) : "") + "</div>" +
+            '<div class="cart-line-actions">' +
+            '<div class="qty"><button type="button" data-dec="' + it.id + '" aria-label="Menos">−</button>' +
+            '<input type="number" min="1" max="999" value="' + it.qty + '" data-qty="' + it.id + '" aria-label="Cantidad">' +
+            '<button type="button" data-inc="' + it.id + '" aria-label="Más">+</button></div>' +
+            '<button type="button" class="link-btn" data-remove="' + it.id + '">Eliminar</button>' +
+            "</div></div>" +
+            '<div class="cart-line-price">' + C.formatMoney(l.total) +
+            "<small>" + C.formatMoney(l.unit) + " c/u" + (l.off ? " (-" + Math.round(l.off * 100) + "%)" : "") + "</small></div>" +
+            "</div>";
+        }).join("");
+
+        var missing = C.config.freeShippingFrom - sum.subtotal;
+        var pct = Math.min(100, Math.round((sum.subtotal / C.config.freeShippingFrom) * 100));
+        var ship = '<div class="ship-progress">' +
+          (missing > 0 ? "Te faltan <strong>" + C.formatMoney(missing) + "</strong> para envío gratis." : "<strong>¡Tienes envío gratis!</strong>") +
+          '<div class="bar"><i style="width:' + pct + '%"></i></div></div>';
+
+        root.innerHTML =
+          '<div class="cart-layout">' +
+          "<div>" + lines + '<p style="margin-top:20px"><a href="index.html#productos">← Seguir comprando</a></p></div>' +
+          '<aside class="panel">' +
+          "<h2 style=\"font-size:1.3rem\">Resumen</h2>" + ship +
+          '<div class="totals">' +
+          "<div><span>Subtotal</span><span>" + C.formatMoney(sum.subtotal) + "</span></div>" +
+          "<div><span>Envío</span><span>" + (sum.shipping ? C.formatMoney(sum.shipping) : "Gratis") + "</span></div>" +
+          '<div class="grand"><span>Total</span><span>' + C.formatMoney(sum.total) + "</span></div>" +
+          "</div>" +
+          '<form id="checkout" novalidate>' +
+          '<h3 style="margin-top:8px">Datos de envío</h3>' +
+          '<div class="form-grid">' +
+          field("name", "Nombre completo", "text", { full: true, auto: "name" }) +
+          field("email", "Correo electrónico", "email", { auto: "email" }) +
+          field("phone", "Teléfono (10 dígitos)", "tel", { pattern: "[0-9 ]{10,14}", auto: "tel" }) +
+          field("street", "Calle y número", "text", { full: true, auto: "address-line1" }) +
+          field("colonia", "Colonia", "text", { auto: "address-level3" }) +
+          field("zip", "Código postal", "text", { pattern: "[0-9]{5}", auto: "postal-code" }) +
+          field("city", "Ciudad / Municipio", "text", { auto: "address-level2" }) +
+          '<div><label for="f-state">Estado</label><select id="f-state" name="state" required><option value="">Selecciona</option>' +
+          STATES.map(function (s) { return "<option>" + s + "</option>"; }).join("") + "</select></div>" +
+          '<div class="full"><label for="f-notes">Notas (opcional)</label><textarea id="f-notes" name="notes" rows="2" maxlength="300"></textarea></div>' +
+          "</div>" +
+          '<div class="pay-actions">' +
+          '<button type="submit" class="btn btn-primary btn-block" data-pay="mp">Pagar con Mercado Pago</button>' +
+          '<button type="submit" class="btn btn-wa btn-block" data-pay="wa">Hacer pedido por WhatsApp</button>' +
+          "</div>" +
+          '<p class="form-error" id="checkout-error" hidden></p>' +
+          '<p style="font-size:.8rem;color:var(--muted);margin-top:12px">Tarjeta, OXXO o transferencia vía Mercado Pago. Tus datos se usan solo para tu envío.</p>' +
+          "</form></aside></div>";
+
+        var draft = loadDraft(), form = document.getElementById("checkout");
+        Object.keys(draft).forEach(function (k) { if (form.elements[k]) form.elements[k].value = draft[k]; });
+        form.addEventListener("input", function () { saveDraft(formData(form)); });
+        form.addEventListener("submit", onSubmit);
+      }
+
+      function formData(form) {
+        var data = {};
+        ["name", "email", "phone", "street", "colonia", "zip", "city", "state", "notes"].forEach(function (k) {
+          data[k] = (form.elements[k].value || "").trim();
+        });
+        return data;
+      }
+
+      function orderText(sum, c) {
+        var lines = sum.lines.map(function (l) {
+          var it = l.item;
+          return "• " + it.qty + " × " + l.product.name + " (" + (l.platform ? l.platform.name : it.platform) + ") — " + C.formatMoney(l.total) +
+            (it.businessName ? "\n   Negocio: " + it.businessName : "") +
+            "\n   Enlace: " + (it.link || "por confirmar") +
+            (it.notes ? "\n   Diseño: " + it.notes : "");
+        }).join("\n");
+        return "Hola, quiero hacer este pedido:\n\n" + lines +
+          "\n\nSubtotal: " + C.formatMoney(sum.subtotal) +
+          "\nEnvío: " + (sum.shipping ? C.formatMoney(sum.shipping) : "Gratis") +
+          "\nTotal: " + C.formatMoney(sum.total) +
+          "\n\nEnviar a:\n" + c.name + "\n" + c.street + ", Col. " + c.colonia + "\nCP " + c.zip + ", " + c.city + ", " + c.state +
+          "\nTel: " + c.phone + "\nCorreo: " + c.email + (c.notes ? "\nNotas: " + c.notes : "");
+      }
+
+      function onSubmit(e) {
+        e.preventDefault();
+        var form = e.target, err = document.getElementById("checkout-error");
+        var method = (e.submitter && e.submitter.dataset.pay) || "mp";
+        err.hidden = true;
+        if (!form.checkValidity()) {
+          var bad = form.querySelector(":invalid");
+          err.textContent = "Revisa el campo «" + form.querySelector('label[for="' + bad.id + '"]').textContent + "».";
+          err.hidden = false; bad.focus(); return;
+        }
+        var customer = formData(form), sum = S.summary();
+
+        if (method === "wa") {
+          window.open("https://wa.me/" + C.config.whatsapp + "?text=" + encodeURIComponent(orderText(sum, customer)), "_blank", "noopener");
+          return;
+        }
+
+        var btn = e.submitter;
+        btn.disabled = true; btn.textContent = "Conectando con Mercado Pago…";
+        fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer: customer,
+            items: S.read().map(function (it) {
+              return { productId: it.productId, platform: it.platform, link: it.link, businessName: it.businessName, notes: it.notes, qty: it.qty };
+            }),
+          }),
+        })
+          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || "Error"); return j; }); })
+          .then(function (j) { location.href = j.init_point; })
+          .catch(function () {
+            btn.disabled = false; btn.textContent = "Pagar con Mercado Pago";
+            err.textContent = "No pudimos conectar con Mercado Pago en este momento. Puedes hacer tu pedido por WhatsApp.";
+            err.hidden = false;
+          });
+      }
+
+      root.addEventListener("click", function (e) {
+        var t = e.target, it;
+        if (t.dataset.remove) { S.remove(t.dataset.remove); render(); }
+        else if (t.dataset.inc || t.dataset.dec) {
+          var id = t.dataset.inc || t.dataset.dec;
+          it = S.read().filter(function (x) { return x.id === id; })[0];
+          if (it) { S.setQty(id, it.qty + (t.dataset.inc ? 1 : -1)); render(); }
+        }
+      });
+      root.addEventListener("change", function (e) {
+        var id = e.target.dataset.qty;
+        if (id) { S.setQty(id, parseInt(e.target.value, 10) || 1); render(); }
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
