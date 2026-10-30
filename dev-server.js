@@ -10,7 +10,7 @@ const checkout = require("./api/checkout.js");
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
-const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json" };
+const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json" };
 
 function withHelpers(res) {
   res.status = (code) => { res.statusCode = code; return res; };

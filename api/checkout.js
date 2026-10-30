@@ -4,14 +4,12 @@
  *
  * Variables de entorno:
  *   MP_ACCESS_TOKEN  Access token de producción o de prueba de Mercado Pago.
- *   SITE_URL         URL pública de la tienda, p. ej. https://tapreview.mx
+ *   SITE_URL         URL pública de la tienda, p. ej. https://takto.mx
  *
- * Los precios se recalculan aquí con catalog.js: nunca se confía en el
- * precio que manda el navegador.
+ * Los precios, niveles y regalos se recalculan aquí con catalog.js:
+ * nunca se confía en lo que manda el navegador.
  */
 const C = require("../assets/js/catalog.js");
-
-const MAX_LINES = 30;
 
 function clean(value, max) {
   return String(value == null ? "" : value).trim().slice(0, max);
@@ -34,44 +32,25 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "Solicitud inválida" });
     }
   }
-  const rawItems = Array.isArray(body.items) ? body.items.slice(0, MAX_LINES) : [];
+
+  const mode = body.mode === "negocio" ? "negocio" : "reventa";
+  const q = C.quote(mode, Array.isArray(body.items) ? body.items.slice(0, 20) : [], body.delivery);
+  if (q.error) return res.status(400).json({ error: q.error });
+
   const customer = body.customer || {};
-
-  const items = [];
-  const details = [];
-  let subtotal = 0;
-  for (const raw of rawItems) {
-    const product = C.getProduct(raw.productId);
-    const platform = C.getPlatform(raw.platform);
-    const qty = Math.max(1, Math.min(999, parseInt(raw.qty, 10) || 1));
-    if (!product || !platform) continue;
-    const unit = C.unitPrice(product, qty);
-    subtotal += unit * qty;
-    items.push({
-      id: product.id,
-      title: `${product.name} · ${platform.name}`,
-      quantity: qty,
-      unit_price: unit,
-      currency_id: C.config.currency,
-    });
-    details.push({
-      product: product.id,
-      platform: platform.id,
-      qty,
-      link: clean(raw.link, 300),
-      business: clean(raw.businessName, 60),
-      notes: clean(raw.notes, 400),
-    });
-  }
-  if (!items.length) return res.status(400).json({ error: "El carrito está vacío" });
-
-  const shipping = C.shippingFor(subtotal);
-  if (shipping) {
-    items.push({ id: "envio", title: "Envío nacional", quantity: 1, unit_price: shipping, currency_id: C.config.currency });
+  const items = q.lines.map((l) => ({
+    id: l.platform.id,
+    title: `Tarjeta NFC ${C.brand.name} · ${l.platform.name}`,
+    quantity: l.qty,
+    unit_price: q.unit,
+    currency_id: C.brand.currency,
+  }));
+  if (q.shipping) {
+    items.push({ id: "envio", title: q.delivery.name, quantity: 1, unit_price: q.shipping, currency_id: C.brand.currency });
   }
 
   const siteUrl = (process.env.SITE_URL || `https://${req.headers.host}`).replace(/\/$/, "");
-  const reference = "TR-" + Date.now().toString(36).toUpperCase();
+  const reference = "TK-" + Date.now().toString(36).toUpperCase();
   const back = `${siteUrl}/gracias.html`;
 
   const preference = {
@@ -81,22 +60,25 @@ module.exports = async function handler(req, res) {
       name: clean(customer.name, 80),
       email: clean(customer.email, 120),
       phone: { number: clean(customer.phone, 20) },
-      address: { zip_code: clean(customer.zip, 10), street_name: clean(customer.street, 120) },
     },
     back_urls: { success: back, pending: back, failure: back },
     auto_return: "approved",
-    statement_descriptor: C.config.storeName.slice(0, 22),
+    statement_descriptor: C.brand.name,
     // Datos para preparar el pedido; se ven en el detalle del pago en Mercado Pago.
     metadata: {
       reference,
+      mode,
+      tier: q.tier ? q.tier.name : null,
+      gift_cards: q.giftCards,
+      delivery: q.delivery.name,
       customer: {
         name: clean(customer.name, 80),
-        email: clean(customer.email, 120),
         phone: clean(customer.phone, 20),
-        address: [customer.street, customer.colonia, customer.zip, customer.city, customer.state].map((v) => clean(v, 120)).join(", "),
+        email: clean(customer.email, 120),
+        address: [customer.street, customer.colonia, customer.zip, customer.city, customer.state].map((v) => clean(v, 120)).filter(Boolean).join(", "),
+        links: clean(customer.links, 1000),
         notes: clean(customer.notes, 300),
       },
-      lines: details,
     },
   };
 

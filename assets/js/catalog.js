@@ -1,146 +1,129 @@
 /*
- * Catálogo y reglas de precio.
- * Este archivo lo usan tanto el navegador (window.CATALOG) como la función
- * de servidor api/checkout.js (require), para que el precio cobrado siempre
- * se recalcule del lado del servidor con los mismos datos.
+ * Marca, catálogo y reglas de precio.
+ * Lo usan el navegador (window.CATALOG) y la función api/checkout.js (require),
+ * así el precio que se cobra siempre se recalcula en el servidor.
  *
- * Para cambiar precios, productos o plataformas, edita solo este archivo.
+ * Para cambiar precios, regalos, plataformas o la marca, edita solo este archivo.
  */
 (function (root) {
-  var config = {
-    storeName: "TapReview MX",
+  var brand = {
+    name: "TAKTO",
+    tagline: "Un toque. Más clientes.",
+    city: "Guadalajara",
+    // WhatsApp para pedidos: 521 + 10 dígitos, sin "+" ni espacios.
+    whatsapp: "5213300000000",
     currency: "MXN",
-    // Número de WhatsApp para pedidos, en formato internacional sin "+" ni espacios.
-    whatsapp: "5215500000000",
-    freeShippingFrom: 999,
-    shippingCost: 149,
   };
 
-  // Descuento por volumen: se aplica por línea según la cantidad.
-  var tiers = [
-    { min: 1, off: 0 },
-    { min: 3, off: 0.1 },
-    { min: 5, off: 0.15 },
-    { min: 10, off: 0.25 },
-    { min: 25, off: 0.35 },
-  ];
-
-  // Plataformas a las que se puede programar el chip NFC.
+  // Las 7 tarjetas de la colección. "accent" es el color de detalle sobre el negro.
   var platforms = [
-    { id: "google", name: "Google", headline: "¡Déjanos tu reseña en Google!", cta: "Toca para calificarnos", stars: true, bg: "#1a56db", fg: "#ffffff", placeholder: "https://g.page/r/tu-negocio/review" },
-    { id: "instagram", name: "Instagram", headline: "Síguenos en Instagram", cta: "Toca para seguirnos", stars: false, bg: "linear-gradient(160deg,#5b2bd6 0%,#d6249f 50%,#fd7e14 100%)", fg: "#ffffff", placeholder: "https://instagram.com/tu_negocio" },
-    { id: "tiktok", name: "TikTok", headline: "Síguenos en TikTok", cta: "Toca para seguirnos", stars: false, bg: "#111111", fg: "#ffffff", placeholder: "https://www.tiktok.com/@tu_negocio" },
-    { id: "facebook", name: "Facebook", headline: "Síguenos en Facebook", cta: "Toca para seguirnos", stars: false, bg: "#1d3fd1", fg: "#ffffff", placeholder: "https://facebook.com/tu_negocio" },
-    { id: "whatsapp", name: "WhatsApp", headline: "Escríbenos por WhatsApp", cta: "Toca para chatear", stars: false, bg: "#128c4a", fg: "#ffffff", placeholder: "https://wa.me/5215500000000" },
-    { id: "tripadvisor", name: "Tripadvisor", headline: "Califícanos en Tripadvisor", cta: "Toca para calificarnos", stars: true, bg: "#15a46b", fg: "#ffffff", placeholder: "https://www.tripadvisor.com.mx/..." },
-    { id: "custom", name: "Mi enlace", headline: "Conoce más de nosotros", cta: "Toca con tu celular", stars: false, bg: "#0f172a", fg: "#ffffff", placeholder: "https://tu-sitio.com" },
+    { id: "google", name: "Google", eyebrow: "GOOGLE · RESEÑAS", lines: ["Déjanos tu", "reseña"], stars: true, accent: "#4285F4", use: "Restaurantes, consultorios, talleres, hoteles" },
+    { id: "instagram", name: "Instagram", eyebrow: "INSTAGRAM", lines: ["Síguenos", "en un toque"], stars: false, accent: "#E1306C", use: "Boutiques, barberías, salones, cafeterías" },
+    { id: "tiktok", name: "TikTok", eyebrow: "TIKTOK", lines: ["Míranos", "en acción"], stars: false, accent: "#25F4EE", use: "Food trucks, gimnasios, marcas jóvenes" },
+    { id: "facebook", name: "Facebook", eyebrow: "FACEBOOK", lines: ["Únete a nuestra", "comunidad"], stars: false, accent: "#1877F2", use: "Negocios de barrio, escuelas, eventos" },
+    { id: "whatsapp", name: "WhatsApp", eyebrow: "WHATSAPP", lines: ["Escríbenos", "ahora mismo"], stars: false, accent: "#25D366", use: "Pedidos a domicilio, citas, cotizaciones" },
+    { id: "tripadvisor", name: "Tripadvisor", eyebrow: "TRIPADVISOR", lines: ["Cuéntanos tu", "experiencia"], stars: true, accent: "#34E0A1", use: "Hoteles, tours, bares y restaurantes turísticos" },
+    { id: "menu", name: "Menú / Web", eyebrow: "MENÚ · WEB · CATÁLOGO", lines: ["Todo lo que", "ofrecemos"], stars: false, accent: "#C9A96E", use: "Menú digital, página web, catálogo, pagos" },
   ];
 
-  var products = [
-    {
-      id: "placa-escritorio",
-      name: "Placa NFC de escritorio",
-      tagline: "Acrílico premium que se sostiene sola en mostrador o mesa.",
-      description:
-        "Placa de acrílico transparente de 1.8 mm con chip NFC integrado y base para escritorio. Tus clientes acercan el celular y llegan directo a tu perfil de reseñas o redes, sin descargar ninguna app. Ideal para recepción, caja, mesas de restaurante y consultorios.",
-      price: 449,
-      compareAt: 599,
-      images: ["assets/img/placas-stack.jpg", "assets/img/estructura-4-capas.jpg", "assets/img/plataformas.jpg"],
-      platforms: ["google", "instagram", "tiktok", "facebook", "whatsapp", "tripadvisor", "custom"],
-      features: [
-        "Chip NFC213 original, compatible con iPhone y Android",
-        "Acrílico transparente de 1.8 mm, acabado brillante",
-        "Base de escritorio incluida",
-        "Te lo entregamos programado con tu enlace",
-        "Funciona también con código QR impreso",
-      ],
-      badge: "Más vendido",
-      shape: "stand",
-    },
-    {
-      id: "sticker-nfc",
-      name: "Tarjeta NFC adhesiva",
-      tagline: "Cuadrada, delgada y con adhesivo de superficie completa.",
-      description:
-        "Estructura de 4 capas: acrílico transparente, impresión a color, antena NFC y respaldo adhesivo. Pégala en la caja registradora, la puerta, la terminal de cobro o el menú. Resistente al uso diario y fácil de limpiar.",
-      price: 299,
-      compareAt: 399,
-      images: ["assets/img/estructura-4-capas.jpg", "assets/img/plataformas.jpg", "assets/img/placas-stack.jpg"],
-      platforms: ["google", "instagram", "tiktok", "facebook", "whatsapp", "tripadvisor", "custom"],
-      features: [
-        "Estructura premium de 4 capas",
-        "Respaldo adhesivo de superficie completa",
-        "Chip NFC213 reprogramable",
-        "Medida aproximada 9 × 9 cm",
-        "Te lo entregamos programado con tu enlace",
-      ],
-      badge: null,
-      shape: "square",
-    },
-    {
-      id: "personalizada",
-      name: "Placa NFC 100% personalizada",
-      tagline: "Con tu logo, tus colores y el texto que tú quieras.",
-      description:
-        "Diseñamos la placa con la identidad de tu marca: logotipo, colores, mensaje y código QR de respaldo. Te enviamos una prueba digital para aprobación antes de producir. Disponible en formato de escritorio o adhesivo.",
-      price: 599,
-      compareAt: 799,
-      images: ["assets/img/plataformas.jpg", "assets/img/tiktok.jpg", "assets/img/whatsapp.jpg"],
-      platforms: ["google", "instagram", "tiktok", "facebook", "whatsapp", "tripadvisor", "custom"],
-      features: [
-        "Diseño con tu logo y colores de marca",
-        "Prueba digital para aprobación antes de producir",
-        "Formato de escritorio o adhesivo",
-        "Código QR de respaldo opcional",
-        "Programación del chip incluida",
-      ],
-      badge: "Personalizable",
-      shape: "stand",
-      custom: true,
-    },
+  // Compra para tu propio negocio (1 a 6 piezas): se entregan programadas.
+  var retail = { price: 349, maxQty: 6 };
+
+  // Mayoreo para revender: el precio por pieza depende del total del pedido.
+  // "giftCards" son tarjetas extra que enviamos sin costo; "gifts" son extras del nivel.
+  var tiers = [
+    { id: "arranque", name: "Kit Arranque", min: 7, price: 170, giftCards: 0, gifts: ["Tarjeta demo programada con tu WhatsApp", "Guía de venta y mensajes listos para WhatsApp"] },
+    { id: "emprendedor", name: "Kit Emprendedor", min: 21, price: 142, giftCards: 3, gifts: ["Guía de venta y mensajes listos para WhatsApp", "Pack de imágenes para tus redes"] },
+    { id: "negocio", name: "Kit Negocio", min: 49, price: 122, giftCards: 7, gifts: ["Exhibidor acrílico de mostrador", "Pack de imágenes para tus redes", "Capacitación 1 a 1 por videollamada"] },
+    { id: "distribuidor", name: "Kit Distribuidor", min: 105, price: 105, giftCards: 15, gifts: ["Exhibidor acrílico de mostrador", "Zona preferente en la ZMG", "Apareces en nuestro directorio de distribuidores"] },
   ];
 
-  function getProduct(id) {
-    for (var i = 0; i < products.length; i++) if (products[i].id === id) return products[i];
-    return null;
-  }
+  // Precio sugerido de reventa y el rango del simulador de ganancias.
+  var resale = { suggested: 349, min: 199, max: 499 };
+
+  var delivery = [
+    { id: "zmg", name: "Entrega en la ZMG", detail: "Guadalajara, Zapopan, Tlaquepaque, Tonalá, Tlajomulco y El Salto · 24 a 48 h", cost: 0 },
+    { id: "pickup", name: "Recoger en punto de entrega", detail: "Te compartimos la ubicación por WhatsApp", cost: 0 },
+    { id: "nacional", name: "Envío a todo México", detail: "2 a 5 días hábiles · gratis desde 21 piezas", cost: 199, freeFrom: 21 },
+  ];
 
   function getPlatform(id) {
     for (var i = 0; i < platforms.length; i++) if (platforms[i].id === id) return platforms[i];
     return null;
   }
 
-  function discountFor(qty) {
-    var off = 0;
-    for (var i = 0; i < tiers.length; i++) if (qty >= tiers[i].min) off = tiers[i].off;
-    return off;
+  function getDelivery(id) {
+    for (var i = 0; i < delivery.length; i++) if (delivery[i].id === id) return delivery[i];
+    return delivery[0];
   }
 
-  // Precio unitario redondeado a pesos enteros.
-  function unitPrice(product, qty) {
-    return Math.round(product.price * (1 - discountFor(qty)));
+  function tierFor(qty) {
+    var t = null;
+    for (var i = 0; i < tiers.length; i++) if (qty >= tiers[i].min) t = tiers[i];
+    return t;
   }
 
-  function shippingFor(subtotal) {
-    if (subtotal <= 0) return 0;
-    return subtotal >= config.freeShippingFrom ? 0 : config.shippingCost;
+  function nextTier(qty) {
+    for (var i = 0; i < tiers.length; i++) if (tiers[i].min > qty) return tiers[i];
+    return null;
+  }
+
+  /*
+   * Cotización completa de un pedido.
+   * mode: "reventa" (mayoreo, mínimo 7) o "negocio" (1 a 6, programadas).
+   * items: [{ platform, qty }]
+   */
+  function quote(mode, items, deliveryId) {
+    var lines = [];
+    var qty = 0;
+    (items || []).forEach(function (it) {
+      var pl = getPlatform(it.platform);
+      var n = Math.max(0, Math.min(999, parseInt(it.qty, 10) || 0));
+      if (!pl || !n) return;
+      lines.push({ platform: pl, qty: n });
+      qty += n;
+    });
+
+    var tier = mode === "reventa" ? tierFor(qty) : null;
+    var unit = mode === "reventa" ? (tier ? tier.price : tiers[0].price) : retail.price;
+    var error = null;
+    if (!qty) error = "Agrega al menos una tarjeta.";
+    else if (mode === "reventa" && qty < tiers[0].min) error = "El mayoreo empieza en " + tiers[0].min + " piezas.";
+    else if (mode === "negocio" && qty > retail.maxQty) error = "Para más de " + retail.maxQty + " piezas usa precio de mayoreo.";
+
+    var subtotal = unit * qty;
+    var d = getDelivery(deliveryId);
+    var shipping = d.freeFrom && qty >= d.freeFrom ? 0 : d.cost;
+    return {
+      mode: mode,
+      lines: lines,
+      qty: qty,
+      unit: unit,
+      tier: tier,
+      next: mode === "reventa" ? nextTier(qty) : null,
+      giftCards: tier ? tier.giftCards : 0,
+      subtotal: subtotal,
+      delivery: d,
+      shipping: qty ? shipping : 0,
+      total: qty ? subtotal + shipping : 0,
+      error: error,
+    };
+  }
+
+  // Ganancia estimada si se venden todas las piezas (incluidas las de regalo).
+  function profit(q, resalePrice) {
+    var sold = q.qty + q.giftCards;
+    return { sold: sold, revenue: sold * resalePrice, gain: sold * resalePrice - q.subtotal };
   }
 
   function formatMoney(n) {
-    return "$" + Number(n).toLocaleString("es-MX", { maximumFractionDigits: 0 }) + " MXN";
+    return "$" + Math.round(n).toLocaleString("es-MX");
   }
 
   var catalog = {
-    config: config,
-    tiers: tiers,
-    platforms: platforms,
-    products: products,
-    getProduct: getProduct,
-    getPlatform: getPlatform,
-    discountFor: discountFor,
-    unitPrice: unitPrice,
-    shippingFor: shippingFor,
-    formatMoney: formatMoney,
+    brand: brand, platforms: platforms, retail: retail, tiers: tiers, resale: resale, delivery: delivery,
+    getPlatform: getPlatform, getDelivery: getDelivery, tierFor: tierFor, nextTier: nextTier,
+    quote: quote, profit: profit, formatMoney: formatMoney,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = catalog;

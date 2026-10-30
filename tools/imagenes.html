@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>Plantillas de imágenes · TAKTO</title>
+  <link rel="stylesheet" href="../assets/css/takto.css">
+  <style>
+    body { background: #000; padding: 0; margin: 0; }
+    .art { position: relative; overflow: hidden; background: radial-gradient(900px 700px at 70% 20%, rgba(201,169,110,.18), transparent 60%), #070707; color: #f5f5f4; font-family: Inter, sans-serif; }
+    .art::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 72px 72px; mask-image: radial-gradient(ellipse at 60% 40%, #000, transparent 70%); }
+    .art > * { position: relative; z-index: 1; }
+    .brand { position: absolute; top: 64px; left: 72px; display: flex; gap: 14px; align-items: center; font-weight: 700; letter-spacing: .32em; font-size: 28px; }
+    .brand svg { width: 40px; height: 40px; }
+    .card-solo { width: 1284px; height: 810px; background: transparent; }
+    .post { width: 1080px; height: 1350px; }
+    .post .tk-wrap { position: absolute; left: 90px; right: 90px; top: 330px; transform: rotate(-6deg); filter: drop-shadow(0 60px 80px rgba(0,0,0,.8)); }
+    .post .copy { position: absolute; left: 72px; right: 72px; bottom: 90px; }
+    .post h2 { font-size: 88px; margin: 0 0 18px; line-height: 1; }
+    .post p { font-size: 32px; color: #a1a1aa; margin: 0; }
+    .post .pill { position: absolute; top: 60px; right: 72px; border: 1px solid rgba(201,169,110,.5); color: #c9a96e; border-radius: 999px; padding: 12px 22px; font-size: 22px; font-weight: 600; letter-spacing: .08em; }
+    .kit { width: 1080px; height: 1350px; }
+    .kit .fan { position: absolute; left: 50%; top: 600px; width: 0; height: 0; }
+    .kit .fan > div { position: absolute; width: 640px; left: -320px; top: -200px; transform-origin: 50% 160%; filter: drop-shadow(0 30px 50px rgba(0,0,0,.7)); }
+    .og { width: 1200px; height: 630px; }
+    .og .tk-wrap { position: absolute; width: 620px; right: 40px; top: 120px; transform: rotate(-8deg); filter: drop-shadow(0 40px 60px rgba(0,0,0,.8)); }
+    .og .copy { position: absolute; left: 72px; top: 200px; width: 520px; }
+    .og h2 { font-size: 72px; margin: 0 0 18px; line-height: 1; }
+    .og p { font-size: 26px; color: #a1a1aa; margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="out"></div>
+  <script src="../assets/js/catalog.js"></script>
+  <script src="../assets/js/cards.js"></script>
+  <script>
+    /*
+     * Plantillas que tools/exportar-imagenes.js convierte en PNG.
+     * Abre esta página con ?art=post&id=google (o card, kit, og) para verla.
+     */
+    var C = window.CATALOG, q = new URLSearchParams(location.search);
+    var art = q.get("art") || "post", id = q.get("id") || "google";
+    var p = C.getPlatform(id) || C.platforms[0];
+    var mark = '<svg viewBox="-6 -21 30 42">' + CARDS.mark(0, 0, 1, "#C9A96E") + "</svg>";
+    var brand = '<div class="brand">' + mark + C.brand.name + "</div>";
+    var first = C.tiers[0];
+    var html = "";
+    if (art === "card") {
+      html = '<div class="card-solo">' + CARDS.card(id) + "</div>";
+    } else if (art === "post") {
+      html = '<div class="art post">' + brand + '<div class="pill">EN STOCK · GDL</div>' +
+        '<div class="tk-wrap">' + CARDS.card(id) + "</div>" +
+        '<div class="copy"><h2>' + p.name + '<br><span class="gold">en un toque.</span></h2><p>Tarjeta NFC premium · ' + p.use + "</p></div></div>";
+    } else if (art === "kit") {
+      var cards = C.platforms.map(function (pl, i) {
+        var a = (i - 3) * 9;
+        return '<div style="transform:rotate(' + a + "deg) translateY(" + Math.abs(i - 3) * 14 + 'px);z-index:' + (10 - Math.abs(i - 3)) + '">' + CARDS.card(pl.id) + "</div>";
+      }).join("");
+      html = '<div class="art kit">' + brand + '<div class="fan">' + cards + "</div>" +
+        '<div class="copy" style="position:absolute;left:72px;right:72px;bottom:90px"><h2 style="font-size:80px;margin:0 0 18px;line-height:1">Kit de 7 diseños.<br><span class="gold">Revende y gana.</span></h2>' +
+        '<p style="font-size:32px;color:#a1a1aa;margin:0">Desde ' + C.formatMoney(first.min * first.price) + " · Guadalajara</p></div></div>";
+    } else {
+      html = '<div class="art og">' + brand + '<div class="copy"><h2>Un toque.<br><span class="gold">Más clientes.</span></h2><p>Tarjetas NFC premium · Guadalajara</p></div>' +
+        '<div class="tk-wrap">' + CARDS.card("google") + "</div></div>";
+    }
+    document.getElementById("out").innerHTML = html;
+  </script>
+</body>
+</html>

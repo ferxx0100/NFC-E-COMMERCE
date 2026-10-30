@@ -3,49 +3,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gracias por tu compra · TapReview MX</title>
+  <title>Tu pedido · TAKTO</title>
   <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#070707">
+  <link rel="icon" href="assets/img/marca/icono.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/takto.css">
 </head>
 <body>
-  <div data-header></div>
-
-  <main class="container">
-    <div class="empty" id="result"></div>
-  </main>
-
-  <div data-footer></div>
+  <section class="final" style="min-height:100vh;display:flex;align-items:center">
+    <div class="container" id="result"></div>
+  </section>
 
   <script src="assets/js/catalog.js"></script>
-  <script src="assets/js/layout.js"></script>
-  <script src="assets/js/store.js"></script>
   <script>
     (function () {
-      var C = window.CATALOG, S = window.STORE, esc = S.escapeHtml;
+      var C = window.CATALOG;
       var q = new URLSearchParams(location.search);
       var status = q.get("status") || q.get("collection_status");
-      var ref = q.get("external_reference") || "";
-      var wa = "https://wa.me/" + C.config.whatsapp + "?text=" +
-        encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + ". Les envío mi información.");
+      var ref = (q.get("external_reference") || "").replace(/[^A-Z0-9-]/gi, "");
+      var wa = "https://wa.me/" + C.brand.whatsapp + "?text=" +
+        encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + ".");
       var el = document.getElementById("result");
+      var back = '<a class="btn btn-line" href="index.html">Volver a ' + C.brand.name + "</a>";
+      var waBtn = '<a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>';
+
+      function clearOrder() {
+        try {
+          var s = JSON.parse(localStorage.getItem("takto_state_v1") || "{}");
+          s.qty = {};
+          localStorage.setItem("takto_state_v1", JSON.stringify(s));
+        } catch (e) {}
+      }
 
       if (status === "approved") {
-        S.clear();
-        el.innerHTML = "<h1>¡Gracias por tu compra!</h1>" +
-          "<p>Tu pago fue aprobado" + (ref ? " · Pedido <strong>" + esc(ref) + "</strong>" : "") + ". Te enviaremos la guía de rastreo por correo.</p>" +
-          '<p>Si tu placa es personalizada, mándanos tu logo por WhatsApp.</p><a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>';
+        clearOrder();
+        el.innerHTML = '<span class="eyebrow">Pago aprobado</span><h2>¡Gracias por tu compra!</h2>' +
+          '<p class="lead" style="margin:0 auto">' + (ref ? "Pedido <strong>" + ref + "</strong>. " : "") +
+          "Te escribimos por WhatsApp para coordinar tu entrega y elegir tus tarjetas de regalo.</p>" +
+          '<div class="hero-cta">' + waBtn + back + "</div>";
       } else if (status === "pending" || status === "in_process") {
-        S.clear();
-        el.innerHTML = "<h1>Tu pago está pendiente</h1>" +
-          "<p>Si pagaste en OXXO o por transferencia, el pago puede tardar en acreditarse. Te avisaremos por correo cuando se confirme.</p>" +
-          '<a class="btn btn-ghost" href="index.html">Volver a la tienda</a>';
+        clearOrder();
+        el.innerHTML = '<span class="eyebrow">Pago pendiente</span><h2>Estamos esperando tu pago.</h2>' +
+          '<p class="lead" style="margin:0 auto">Si pagaste en OXXO o por transferencia, puede tardar en acreditarse. Te avisamos en cuanto se confirme.</p>' +
+          '<div class="hero-cta">' + back + "</div>";
       } else {
-        el.innerHTML = "<h1>El pago no se completó</h1>" +
-          "<p>No se realizó ningún cargo. Tus productos siguen en el carrito.</p>" +
-          '<a class="btn btn-primary" href="carrito.html">Volver al carrito</a> <a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Pedir por WhatsApp</a>';
+        el.innerHTML = '<span class="eyebrow">Pago no completado</span><h2>No se hizo ningún cargo.</h2>' +
+          '<p class="lead" style="margin:0 auto">Tu paquete sigue guardado. Puedes intentarlo de nuevo o pedir por WhatsApp.</p>' +
+          '<div class="hero-cta"><a class="btn btn-gold" href="index.html#paquete">Volver a mi paquete</a>' + waBtn + "</div>";
       }
     })();
   </script>

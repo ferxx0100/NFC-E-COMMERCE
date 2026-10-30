@@ -1,31 +1,54 @@
-# TapReview MX — Tienda de placas NFC
+# TAKTO — Tarjetas NFC premium (Guadalajara)
 
-Tienda en línea (en español, precios en MXN) para vender placas y tarjetas NFC de reseñas y redes sociales: Google, Instagram, TikTok, Facebook, WhatsApp, Tripadvisor o cualquier enlace.
+Página única de venta de tarjetas NFC negras para negocios, con programa de reventa por mayoreo, niveles con regalos y simulador de ganancias. Sin dependencias: HTML, CSS y JavaScript, más una función de servidor para cobrar con **Mercado Pago**. También se puede pedir por **WhatsApp**.
 
-Sitio estático sin dependencias + una función de servidor para cobrar con **Mercado Pago Checkout Pro**. También permite hacer el pedido por **WhatsApp**.
+## Qué hace la página
 
-## Qué incluye
+- **Colección de 7 tarjetas** (Google, Instagram, TikTok, Facebook, WhatsApp, Tripadvisor, Menú/Web) dibujadas en SVG, con inclinación 3D y animaciones.
+- **Arma tu paquete**: el cliente elige cuántas de cada diseño. Dos modos:
+  - *Para revender*: mayoreo desde 7 piezas. El precio baja por nivel y los regalos se desbloquean en vivo. Incluye simulador de ganancia.
+  - *Para mi negocio*: de 1 a 6 piezas a precio público, entregadas programadas.
+- **Niveles y regalos**: Arranque, Emprendedor, Negocio y Distribuidor.
+- **Alta de distribuidor**: formulario que abre WhatsApp con los datos.
+- **Bajo pedido**: placa acrílica, sticker y diseño con logo (cotización por WhatsApp).
+- **Pedido**: entrega en la ZMG, recoger o envío nacional; pago con Mercado Pago o pedido por WhatsApp.
 
-| Página | Contenido |
+## Cambiar precios, regalos, textos y número
+
+Todo está en **`assets/js/catalog.js`**:
+
+| Qué | Dónde |
 | --- | --- |
-| `index.html` | Portada: beneficios, cómo funciona, productos, plataformas, precios por mayoreo, preguntas frecuentes |
-| `producto.html?id=…` | Detalle con vista previa en vivo de la placa, plataforma, enlace a programar, nombre del negocio, cantidad con descuento por volumen |
-| `carrito.html` | Carrito, barra de envío gratis, datos de envío (32 estados), pago con Mercado Pago o pedido por WhatsApp |
-| `gracias.html` | Resultado del pago (aprobado / pendiente / rechazado) |
-| `api/checkout.js` | Crea la preferencia de pago en Mercado Pago **recalculando los precios en el servidor** |
+| Nombre de la marca y WhatsApp | `brand` |
+| Diseños de tarjeta (textos y colores) | `platforms` |
+| Precio para negocio (1 a 6) | `retail` |
+| Niveles de mayoreo, precio por pieza y regalos | `tiers` |
+| Precio sugerido de reventa | `resale` |
+| Opciones y costos de entrega | `delivery` |
 
-## Personalizar
+Los textos largos de la página están en `index.html`.
 
-Todo se edita en **`assets/js/catalog.js`**:
+## Imágenes de la marca
 
-- `config.storeName`: nombre de la tienda
-- `config.whatsapp`: tu número (formato `521` + 10 dígitos, sin `+`)
-- `config.freeShippingFrom` / `config.shippingCost`: envío
-- `tiers`: descuentos por volumen
-- `products`: nombre, precio, precio tachado, fotos, características
-- `platforms`: textos y colores de cada plataforma
+Las tarjetas se dibujan con código (`assets/js/cards.js`), así que cambian solas al editar `catalog.js`. Las imágenes listas para redes sociales están en `assets/img/marca/`:
 
-Las fotos están en `assets/img/`. Las frases de la portada y las preguntas frecuentes están en `index.html`.
+- `post-*.jpg` (1080 × 1350, formato Instagram) para cada diseño y el kit de 7
+- `tarjeta-*.png` con fondo transparente
+- `og.jpg` para cuando se comparte el enlace
+
+Para regenerarlas después de cambiar textos o colores:
+
+```bash
+npm i -D playwright
+```
+
+```bash
+npx playwright install chromium
+```
+
+```bash
+node tools/exportar-imagenes.js
+```
 
 ## Correr en local
 
@@ -33,24 +56,20 @@ Las fotos están en `assets/img/`. Las frases de la portada y las preguntas frec
 npm run dev
 ```
 
-Abre http://localhost:3000. Para probar el pago usa un access token de prueba:
+Abre http://localhost:3000.
 
-```bash
-MP_ACCESS_TOKEN=TEST-xxxx npm run dev
-```
+## Publicar en Vercel
 
-## Publicar (Vercel)
+Se publica sola cada vez que hay cambios en la rama `main`. Para cobrar en línea agrega en *Settings → Environment Variables*:
 
-1. Importa el repositorio en vercel.com (no hace falta paso de build).
-2. En *Settings → Environment Variables* agrega:
-   - `MP_ACCESS_TOKEN`: tu access token de Mercado Pago (*Tus integraciones → Credenciales*)
-   - `SITE_URL`: la URL pública, p. ej. `https://tapreview.mx`
-3. Publica. Mercado Pago regresa al cliente a `gracias.html`.
+- `MP_ACCESS_TOKEN`: access token de Mercado Pago
+- `SITE_URL`: la URL pública
 
-Los datos de cada pedido (enlace a programar, nombre del negocio, dirección) quedan en el campo `metadata` del pago en Mercado Pago.
+Los datos de cada pedido quedan en el campo `metadata` del pago en Mercado Pago.
 
-## Siguientes pasos sugeridos
+## Pendientes sugeridos
 
-- Webhook de Mercado Pago (`notification_url`) para recibir los pedidos por correo o guardarlos en una base de datos.
-- Fotos propias de cada plataforma (la imagen de WhatsApp actual está en francés).
-- Aviso de privacidad y términos y condiciones (obligatorios en México para tiendas en línea).
+- Cuentas reales de distribuidor con historial de compras (por ejemplo con Supabase).
+- Fotos reales de las tarjetas en stock.
+- Aviso de privacidad y términos y condiciones.
+- Revisar en el IMPI que el nombre de la marca esté disponible antes de registrarla.
