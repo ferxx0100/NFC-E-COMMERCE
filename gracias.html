@@ -28,7 +28,7 @@
         encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + ".");
       var el = document.getElementById("result");
       var isPay = ref.indexOf("TP-") === 0;
-      var back = '<a class="btn btn-line" href="' + (isPay ? "pay/" : "index.html") + '">Volver a ' + C.brand.name + (isPay ? " Pay" : "") + "</a>";
+      var back = '<a class="btn btn-line" href="' + (isPay ? "/pay/" : "/") + '">Volver a ' + C.brand.name + (isPay ? " Pay" : "") + "</a>";
       var waBtn = '<a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>';
 
       function clearOrder() {
@@ -53,7 +53,7 @@
       } else {
         el.innerHTML = '<span class="eyebrow">Pago no completado</span><h2>No se hizo ningún cargo.</h2>' +
           '<p class="lead" style="margin:0 auto">Tu paquete sigue guardado. Puedes intentarlo de nuevo o pedir por WhatsApp.</p>' +
-          '<div class="hero-cta"><a class="btn btn-primary" href="index.html#paquete">Volver a mi paquete</a>' + waBtn + "</div>";
+          '<div class="hero-cta"><a class="btn btn-primary" href="/#productos">Volver a la tienda</a>' + waBtn + "</div>";
       }
     })();
   </script>
