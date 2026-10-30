@@ -33,9 +33,9 @@
 
       function clearOrder() {
         try {
-          var s = JSON.parse(localStorage.getItem("takto_state_v2") || "{}");
+          var s = JSON.parse(localStorage.getItem("takto_state_v3") || "{}");
           s.cart = [];
-          localStorage.setItem("takto_state_v2", JSON.stringify(s));
+          localStorage.setItem("takto_state_v3", JSON.stringify(s));
         } catch (e) {}
       }
 

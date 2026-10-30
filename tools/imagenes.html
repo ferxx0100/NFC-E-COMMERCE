@@ -17,15 +17,21 @@
     .copy p { font: 400 32px/1.4 var(--sans); color: #a1a1aa; margin: 0; }
     .light .copy p { color: #5c5c63; }
     .shadow { filter: drop-shadow(0 50px 70px rgba(0,0,0,.55)); }
-    .solo { width: 1284px; height: 810px; }
+    .solo { width: 100vw; height: 100vh; }
+    .solo svg { width: 100%; height: 100%; }
     .post { width: 1080px; height: 1350px; }
     .post .one { position: absolute; left: 90px; right: 90px; top: 300px; transform: rotate(-6deg); }
+    .post .one.v { left: 50%; right: auto; width: 440px; margin-left: -220px; top: 170px; }
+    .post .copy.v { bottom: 70px; }
+    .post .copy.v h2 { font-size: 92px; }
+    .grid-v { position: absolute; left: 130px; right: 130px; top: 160px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+    .grid-h { position: absolute; left: 90px; right: 90px; top: 640px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
     .post .fan { position: absolute; left: 50%; top: 560px; }
     .post .fan > div { position: absolute; width: 640px; left: -320px; top: -200px; transform-origin: 50% 170%; }
     .grid { position: absolute; left: 120px; right: 120px; top: 150px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; }
     .grid span { display: block; text-align: center; font: 500 22px/1 var(--sans); color: #a1a1aa; margin-top: 14px; }
     .og { width: 1200px; height: 630px; }
-    .og .one { position: absolute; width: 600px; right: 50px; top: 120px; transform: rotate(-7deg); }
+    .og .one { position: absolute; width: 290px; right: 140px; top: 70px; transform: rotate(-8deg); }
     .og .copy { top: 190px; bottom: auto; width: 520px; }
     .og .copy h2 { font-size: 84px; }
     .og .copy p { font-size: 26px; }
@@ -56,49 +62,47 @@
     if (art === "solo") {
       html = '<div class="solo">' + CARDS.card(p.id, v.id) + "</div>";
     } else if (art === "post") {
-      var visual, title, sub;
-      if (p.variants.length > 1 && p.id !== "redes") {
+      var visual, title, cls = p.shape === "v" ? " v" : "";
+      if (p.shape === "h" && p.variants.length > 1) {
         visual = '<div class="fan">' + p.variants.map(function (x, i, all) {
           var a = (i - (all.length - 1) / 2) * 12;
           return '<div class="shadow" style="transform:rotate(' + a + 'deg)">' + CARDS.card(p.id, x.id) + "</div>";
         }).join("") + "</div>";
-        title = p.name + '<br><span class="hl">' + p.variants.map(function (x) { return x.name.toLowerCase(); }).join(", ").replace(/, ([^,]*)$/, " y $1") + ".</span>";
+        title = p.name.replace("Tarjeta NFC ", "Tarjeta ") + '<br><span class="hl">' + p.variants.map(function (x) { return x.name.toLowerCase(); }).join(", ").replace(/, ([^,]*)$/, " y $1") + ".</span>";
       } else {
-        visual = '<div class="one shadow">' + CARDS.card(p.id, v.id) + "</div>";
-        title = p.id === "redes" ? v.name + '<br><span class="hl">en un toque.</span>' : p.name + '<br><span class="hl">con NFC.</span>';
+        visual = '<div class="one shadow' + cls + '">' + CARDS.card(p.id, v.id) + "</div>";
+        title = p.id === "google" ? "Reseñas de Google " + '<span class="hl">en un toque.</span>' : p.id === "redes" ? v.name + ' <span class="hl">en un toque.</span>' : p.name.replace("Tarjeta NFC ", "Tarjeta ") + '<br><span class="hl">con NFC.</span>';
       }
-      sub = (p.id === "redes" ? "Tarjeta NFC · " : "") + p.short + " · Desde " + C.formatMoney(p.retail);
-      html = '<div class="art post">' + brand + '<div class="tag">' + (p.stock ? "EN STOCK · GDL" : "BAJO PEDIDO") + "</div>" + visual +
-        '<div class="copy"><h2>' + title + "</h2><p>" + sub + "</p></div></div>";
+      html = '<div class="art post">' + brand + '<div class="tag">' + (p.stock ? "EN STOCK" : "BAJO PEDIDO") + "</div>" + visual +
+        '<div class="copy' + cls + '"><h2>' + title + "</h2><p>Tarjeta NFC · " + p.material + " · Desde " + C.formatMoney(p.retail) + "</p></div></div>";
     } else if (art === "productos") {
-      var picks = [["redes", "google"], ["metal", "dorada"], ["papel", "negro"], ["pvc", "blanca"], ["metal", "plata"], ["redes", "instagram"]];
-      html = '<div class="art post">' + brand + '<div class="grid">' + picks.map(function (k) {
-        var pp = C.getProduct(k[0]), vv = C.getVariant(pp, k[1]);
-        return '<div><div class="shadow">' + CARDS.card(k[0], k[1]) + "</div><span>" + (k[0] === "redes" ? vv.name : pp.name + " · " + vv.name) + "</span></div>";
-      }).join("") + "</div>" +
-        '<div class="copy" style="bottom:60px"><h2 style="font-size:76px">Metal, papel y PVC.<br><span class="hl">Todas con NFC.</span></h2></div></div>';
+      var vs = [["google", "negra"], ["redes", "instagram"], ["redes", "whatsapp"]], hs = [["metal", "dorada"], ["lisa", "negra"]];
+      html = '<div class="art post">' + brand +
+        '<div class="grid-v">' + vs.map(function (k) { return '<div class="shadow">' + CARDS.card(k[0], k[1]) + "</div>"; }).join("") + "</div>" +
+        '<div class="grid-h">' + hs.map(function (k) { return '<div class="shadow">' + CARDS.card(k[0], k[1]) + "</div>"; }).join("") + "</div>" +
+        '<div class="copy" style="bottom:70px"><h2 style="font-size:80px">Tarjetas NFC<br><span class="hl">para tu negocio.</span></h2><p>Menudeo y mayoreo · Envíos a todo México</p></div></div>';
     } else if (art === "reel") {
       html = '<div class="art reel">' + brand + '<div class="top">¿QUÉ ES NFC?</div>' +
         '<div class="nfc-scene"><div class="nfc-card"><div id="hero-card"></div></div>' +
         '<div class="nfc-burst"><i></i><i></i><i></i></div><div class="phone"><div class="phone-screen">' +
         '<div class="scr scr-idle"><span class="scr-time">9:41</span><span class="scr-date">jueves 30 de octubre</span><span class="scr-hint">Acerca a la tarjeta</span></div>' +
         '<div class="scr scr-open" id="phone-open"></div></div></div></div>' +
-        '<div class="copy"><h2>Acerca el celular.<br><span class="hl">Listo.</span></h2><p>Sin apps · iPhone y Android · ' + C.brand.name + "</p></div></div>";
+        '<div class="copy"><h2>Acerca el celular.<br><span class="hl">Listo.</span></h2><p>Tarjetas NFC · Sin apps · iPhone y Android</p></div></div>';
     } else {
-      html = '<div class="art og">' + brand + '<div class="copy"><h2>Acerca el celular.<br><span class="hl">Abre tu perfil.</span></h2><p>Tarjetas NFC · Guadalajara</p></div>' +
-        '<div class="one shadow">' + CARDS.card("redes", "google") + "</div></div>";
+      html = '<div class="art og">' + brand + '<div class="copy"><h2>Tarjetas NFC<br><span class="hl">para reseñas.</span></h2><p>Menudeo y mayoreo · Envíos a todo México</p></div>' +
+        '<div class="one shadow">' + CARDS.card("google", "negra") + "</div></div>";
     }
     document.getElementById("out").innerHTML = html;
 
     // Video: el exportador llama a seek(ms) cuadro por cuadro; cada vuelta de 6 s cambia de plataforma.
-    var reelSeq = C.getProduct("redes").variants, reelLoop = -1;
+    var reelSeq = [["google", "negra"], ["redes", "instagram"], ["redes", "whatsapp"], ["google", "blanca"], ["redes", "facebook"], ["redes", "tiktok"]], reelLoop = -1;
     window.seek = function (ms) {
       var loop = Math.floor(ms / 6000) % reelSeq.length;
       if (loop !== reelLoop) {
         reelLoop = loop;
-        var rv = reelSeq[loop];
-        document.getElementById("hero-card").innerHTML = CARDS.card("redes", rv.id);
-        document.getElementById("phone-open").innerHTML = CARDS.screen(rv.id);
+        var rk = reelSeq[loop], rv = C.getVariant(C.getProduct(rk[0]), rk[1]);
+        document.getElementById("hero-card").innerHTML = CARDS.card(rk[0], rk[1]);
+        document.getElementById("phone-open").innerHTML = CARDS.screen(rv.screen);
         document.querySelector(".nfc-burst").style.setProperty("--burst", rv.color);
       }
       document.getAnimations().forEach(function (a) { a.pause(); a.currentTime = ms % 6000; });

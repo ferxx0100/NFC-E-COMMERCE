@@ -1,29 +1,41 @@
 <!doctype html>
 <html lang="es-MX">
 <head>
+  <!--
+    Plantilla. build.js reemplaza los campos entre llaves dobles y los bloques marcados
+    con @, y publica esta página para el inicio y para cada ciudad en /tarjetas-nfc/ciudad/.
+  -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TAKTO · Tarjetas NFC en Guadalajara</title>
-  <meta name="description" content="Tarjetas NFC para reseñas de Google, Instagram, WhatsApp, TikTok y Facebook, metálicas, de papel negro y PVC con logo. Menudeo y mayoreo desde 20 piezas. Envío gratis desde 3 piezas.">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL}}">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#0c0c0d">
-  <meta property="og:title" content="TAKTO · Tarjetas NFC">
-  <meta property="og:description" content="Acerca el celular y abre tu perfil. Menudeo y mayoreo desde 20 piezas.">
-  <meta property="og:image" content="assets/img/marca/og.jpg">
-  <link rel="icon" href="assets/img/marca/icono.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/fonts/InstrumentSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  {{VERIFY}}
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="TAKTO">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:url" content="{{CANONICAL}}">
+  <meta property="og:image" content="{{SITE}}/assets/img/marca/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/img/marca/icono.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/InstrumentSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/takto.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/takto.css">
+  {{JSONLD}}
 </head>
 <body>
   <header class="header" id="header">
     <div class="container">
-      <a class="logo" href="#top" aria-label="TAKTO inicio"><span data-mark></span>TAKTO</a>
+      <a class="logo" href="/" aria-label="TAKTO, tarjetas NFC"><span data-mark></span>TAKTO</a>
       <nav class="nav" aria-label="Principal">
         <a href="#productos">Productos</a>
         <a href="#nfc">Cómo funciona</a>
-        <a href="#precios">Precios</a>
         <a href="#negocios">Negocios</a>
         <a href="#faq">Preguntas</a>
       </nav>
@@ -43,21 +55,17 @@
     <section class="hero">
       <div class="container">
         <div>
-          <span class="eyebrow fade-up">Tarjetas NFC · Guadalajara</span>
-          <h1>
-            <span class="line"><span>Acerca el celular.</span></span>
-            <span class="line"><span>Abre tu perfil.</span></span>
-            <span class="line"><span class="hl">Gana clientes.</span></span>
-          </h1>
-          <p class="lead fade-up d1">Tarjetas NFC para reseñas de Google, redes sociales y presentación profesional. Compra una pieza o surte tu negocio a precio de mayoreo desde 20.</p>
+          <span class="eyebrow fade-up">{{EYEBROW}}</span>
+          <h1>{{H1}}</h1>
+          <p class="lead fade-up d1">{{LEAD}}</p>
           <div class="hero-cta fade-up d2">
-            <a class="btn btn-primary" href="#productos">Ver productos</a>
-            <a class="btn btn-line" href="#precios">Precios de mayoreo</a>
+            <a class="btn btn-primary" href="#productos">Ver tarjetas y precios</a>
+            <a class="btn btn-line" data-wa href="https://wa.me/{{WHATSAPP}}">Cotizar por WhatsApp</a>
           </div>
           <div class="trust fade-up d3">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Envío gratis desde <b data-free></b> piezas</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Video de configuración incluido</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>iPhone y Android</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Envío gratis desde {{FREE}} piezas</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Mayoreo desde {{WHOLESALE}}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>iPhone y Android, sin apps</span>
           </div>
         </div>
         <div class="nfc-stage" id="stage" aria-hidden="true">
@@ -71,33 +79,7 @@
               </div>
             </div>
           </div>
-          <p class="nfc-caption">El celular toca la tarjeta y se abre el perfil del negocio.</p>
         </div>
-      </div>
-    </section>
-
-    <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
-
-    <!-- Qué es NFC -->
-    <section class="section light" id="nfc">
-      <div class="container">
-        <div class="section-head center reveal">
-          <span class="eyebrow">Cómo funciona</span>
-          <h2>¿Qué es <span class="hl">NFC</span>?</h2>
-          <p class="lead">NFC significa comunicación de campo cercano. Cada tarjeta lleva un chip pequeño, sin batería, que guarda un enlace. Al acercar un celular, el teléfono lee ese enlace y lo abre al instante.</p>
-        </div>
-        <div class="nfc-steps reveal-stagger">
-          <div class="nfc-step"><div class="mini-anim a-approach"><span class="m-card"></span><span class="m-phone"></span></div><h3>1. Acerca</h3><p>La parte de arriba del celular, a unos centímetros de la tarjeta.</p></div>
-          <div class="nfc-step"><div class="mini-anim a-waves"><span class="m-chip"></span><i></i><i></i><i></i></div><h3>2. Lee</h3><p>El celular le da energía al chip y lee el enlace en menos de un segundo.</p></div>
-          <div class="nfc-step"><div class="mini-anim a-open"><span class="m-screen"><b></b><b></b><b></b></span><span class="m-check">★★★★★</span></div><h3>3. Abre</h3><p>Aparece el perfil del negocio, listo para reseñar, seguir o escribir.</p></div>
-        </div>
-        <div class="specs reveal">
-          <div><strong>NTAG213</strong><span>Chip NFC original</span></div>
-          <div><strong>1 a 4 cm</strong><span>Distancia de lectura</span></div>
-          <div><strong>Sin batería</strong><span>Funciona por años</span></div>
-          <div><strong>100,000</strong><span>Veces que se puede reprogramar</span></div>
-        </div>
-        <p class="small reveal" style="margin-top:24px">Funciona sin abrir nada en iPhone XS o más reciente. En iPhone 7 a X, desde el lector NFC del Centro de control. En Android, con el NFC activado.</p>
       </div>
     </section>
 
@@ -106,73 +88,63 @@
       <div class="container">
         <div class="section-head reveal">
           <span class="eyebrow">Productos</span>
-          <h2>Cuatro líneas, <span class="hl">todas con NFC.</span></h2>
-          <p class="lead">Elige el formato y el diseño. Todas incluyen el video para configurarlas.</p>
+          <h2>Elige tu <span class="hl">tarjeta NFC.</span></h2>
+          <p class="lead">Dos precios por producto: menudeo desde 1 pieza y mayoreo desde {{WHOLESALE}} piezas, mezclando diseños o colores. Envío gratis desde {{FREE}} piezas.</p>
         </div>
-        <div class="products reveal-stagger" id="products"></div>
+        <div class="products" id="products"><!--@products--></div>
       </div>
     </section>
 
-    <!-- Precios -->
-    <section class="section light" id="precios">
+    <!--@local-->
+
+    <!-- Cómo funciona -->
+    <section class="section light" id="nfc">
+      <div class="container">
+        <div class="section-head center reveal">
+          <span class="eyebrow">Cómo funciona</span>
+          <h2>¿Qué es <span class="hl">NFC</span>?</h2>
+          <p class="lead">Comunicación de campo cercano. La tarjeta lleva un chip sin batería que guarda un enlace; el celular lo lee al acercarse y lo abre al instante.</p>
+        </div>
+        <div class="nfc-steps reveal-stagger">
+          <div class="nfc-step"><div class="mini-anim a-approach"><span class="m-card"></span><span class="m-phone"></span></div><h3>1. Acerca</h3><p>La parte de arriba del celular, a unos centímetros de la tarjeta.</p></div>
+          <div class="nfc-step"><div class="mini-anim a-waves"><span class="m-chip"></span><i></i><i></i><i></i></div><h3>2. Lee</h3><p>El celular le da energía al chip y lee el enlace en menos de un segundo.</p></div>
+          <div class="nfc-step"><div class="mini-anim a-open"><span class="m-screen"><b></b><b></b><b></b></span><span class="m-check">★★★★★</span></div><h3>3. Abre</h3><p>Aparece tu perfil, listo para reseñar, seguir o escribir.</p></div>
+        </div>
+        <div class="specs reveal">
+          <div><strong>NTAG213</strong><span>Chip NFC original</span></div>
+          <div><strong>1 a 4 cm</strong><span>Distancia de lectura</span></div>
+          <div><strong>Sin batería</strong><span>Funciona por años</span></div>
+          <div><strong>100,000</strong><span>Veces que se puede reprogramar</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Por qué comprar aquí -->
+    <section class="section" id="confianza">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow">Precios</span>
-          <h2>Menudeo o <span class="hl">mayoreo.</span></h2>
-          <p class="lead">Compra desde una pieza. A partir de <span data-wholesale></span> piezas de un mismo producto pagas precio de mayoreo, y puedes mezclar plataformas o colores.</p>
+          <span class="eyebrow">Compra segura</span>
+          <h2>Lo que te <span class="hl">llevas.</span></h2>
         </div>
-        <div class="modes">
-          <div class="mode-card reveal">
-            <span class="eyebrow">1 a <span data-retail-max></span> piezas</span>
-            <h3>Menudeo</h3>
-            <p class="muted">Para tu propio negocio.</p>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Precio normal por pieza</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Envío gratis desde <span data-free></span> piezas</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Te las mandamos programadas si nos das tu enlace</li>
-            </ul>
-          </div>
-          <div class="mode-card reveal">
-            <span class="eyebrow">Desde <span data-wholesale></span> piezas por producto</span>
-            <h3>Mayoreo</h3>
-            <p class="muted">Para revender o surtir varias sucursales. Entre más piezas, menor precio.</p>
-            <div class="table-wrap"><table class="prices" id="price-table"></table></div>
-            <p class="small" style="margin-top:14px">Ganancia por pieza si compras <span data-wholesale></span> y revendes al precio de menudeo.</p>
-            <a class="btn btn-line" data-wa-dist href="#" style="margin-top:8px">Quiero precio de distribuidor</a>
-          </div>
+        <div class="trust-grid reveal-stagger">
+          <div><h3>Chip NFC original</h3><p>NTAG213, compatible con todos los celulares con NFC.</p></div>
+          <div><h3>Video para configurar</h3><p>Paso a paso para programar cada tarjeta con el enlace de cada cliente.</p></div>
+          <div><h3>Envíos a todo México</h3><p>Desde Guadalajara. Gratis desde {{FREE}} piezas.</p></div>
+          <div><h3>Pago seguro</h3><p>Tarjeta, OXXO o transferencia con Mercado Pago.</p></div>
+          <div><h3>Atención por WhatsApp</h3><p>Te respondemos antes, durante y después de tu compra.</p></div>
+          <div><h3>Factura</h3><p>Pídela por WhatsApp con tus datos fiscales.</p></div>
         </div>
       </div>
     </section>
 
     <!-- Para quién -->
-    <section class="section" id="negocios">
+    <section class="section light" id="negocios">
       <div class="container">
         <div class="section-head reveal">
           <span class="eyebrow">Para quién</span>
           <h2>Dónde <span class="hl">funcionan mejor.</span></h2>
-          <p class="lead">En cualquier lugar donde un cliente espera, paga o se despide.</p>
         </div>
-        <div class="sectors reveal-stagger" id="sectors"></div>
-      </div>
-    </section>
-
-    <!-- Video incluido -->
-    <section class="section light" id="video">
-      <div class="container video-box">
-        <div class="tut reveal" aria-hidden="true">
-          <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg></span>
-          <div class="chips" id="tut-chips"></div>
-        </div>
-        <div class="reveal">
-          <span class="eyebrow">Incluido en tu compra</span>
-          <h2>Un video para <span class="hl">configurar cada tarjeta.</span></h2>
-          <p class="lead">Paso a paso, desde tu celular y con una app gratuita. Sirve para tus tarjetas y para las de cada cliente al que le vendas.</p>
-          <ol class="steps-list">
-            <li><div><strong>Copia el enlace</strong><span>Reseñas de Google, perfil de Instagram, TikTok o Facebook, chat de WhatsApp o tu contacto.</span></div></li>
-            <li><div><strong>Grábalo en la tarjeta</strong><span>Con NFC Tools, gratis en iPhone y Android. Toma menos de un minuto.</span></div></li>
-            <li><div><strong>Pruébala y entrégala</strong><span>Acerca tu celular para confirmar. Si quieres, bloquéala para que nadie la cambie.</span></div></li>
-          </ol>
-        </div>
+        <div class="sectors reveal-stagger"><!--@sectors--></div>
       </div>
     </section>
 
@@ -181,36 +153,28 @@
       <div class="container">
         <div class="section-head center reveal">
           <span class="eyebrow">Preguntas frecuentes</span>
-          <h2>Lo que más <span class="hl">nos preguntan.</span></h2>
+          <h2>Sobre las <span class="hl">tarjetas NFC.</span></h2>
         </div>
-        <div class="faq reveal">
-          <details><summary>¿Mis clientes necesitan una app?</summary><p>No. El celular abre el enlace directo en el navegador o en la app correspondiente, como Instagram o WhatsApp.</p></details>
-          <details><summary>¿Puedo cambiar el enlace después?</summary><p>Sí, cuantas veces quieras, mientras la tarjeta no esté bloqueada. El video te enseña a hacerlo.</p></details>
-          <details><summary>¿Cómo funciona el mayoreo?</summary><p>Desde <span data-wholesale></span> piezas de un mismo producto pagas precio de mayoreo, aunque mezcles plataformas o colores. Por ejemplo: 10 de Google y 10 de Instagram ya cuentan como 20.</p></details>
-          <details><summary>¿Cuánto tarda mi pedido?</summary><p>Las tarjetas de reseñas y redes salen en 24 horas. Las metálicas, de papel y con logo se fabrican en 7 a 12 días hábiles y te enviamos una prueba digital antes de producir.</p></details>
-          <details><summary>¿Cuánto cuesta el envío?</summary><p>Es gratis a todo México desde <span data-free></span> piezas. Si llevas menos, cuesta <span data-ship></span>, o puedes recoger en Guadalajara.</p></details>
-          <details><summary>¿La tarjeta metálica sí funciona?</summary><p>Sí. El chip va en una zona especial para que el metal no bloquee la señal.</p></details>
-          <details><summary>¿Dan factura?</summary><p>Sí. Envíanos tus datos fiscales por WhatsApp después de tu compra.</p></details>
-        </div>
+        <div class="faq reveal"><!--@faq--></div>
       </div>
     </section>
 
-    <section class="section light final">
-      <div class="container reveal">
-        <h2>Empieza con <span class="hl">una tarjeta.</span></h2>
-        <p class="lead">Y cuando quieras más, el mayoreo te espera desde <span data-wholesale></span> piezas.</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="#productos">Ver productos</a>
-          <a class="btn btn-line" data-wa href="#">Escríbenos por WhatsApp</a>
+    <!-- Ciudades -->
+    <section class="section light cities-section" id="ciudades">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Envíos a todo México</span>
+          <h2>Tarjetas NFC <span class="hl">en tu ciudad.</span></h2>
         </div>
+        <nav class="cities reveal" aria-label="Ciudades"><!--@cities--></nav>
       </div>
     </section>
   </main>
 
   <footer class="footer">
     <div class="container">
-      <div><a class="logo" href="#top"><span data-mark></span>TAKTO</a><p style="margin:12px 0 0">Tarjetas NFC · Guadalajara<br>© <span data-year></span> TAKTO</p></div>
-      <div class="footer-links"><a href="#productos">Productos</a><a href="#precios">Precios</a><a href="pay/">Cobro para máquinas</a><a data-wa href="#">WhatsApp</a></div>
+      <div><a class="logo" href="/"><span data-mark></span>TAKTO</a><p style="margin:12px 0 0">Tarjetas NFC · Guadalajara, Jalisco<br>WhatsApp <a href="https://wa.me/{{WHATSAPP}}" data-wa>{{PHONE}}</a><br>© <span data-year></span> TAKTO</p></div>
+      <div class="footer-links"><a href="/#productos">Productos</a><a href="/#faq">Preguntas</a><a href="/pay/">Cobro para máquinas</a><a data-wa href="https://wa.me/{{WHATSAPP}}">WhatsApp</a></div>
       <p class="legal">Google, Instagram, WhatsApp, TikTok y Facebook son marcas de sus respectivos dueños. TAKTO no está afiliado ni patrocinado por ellos; las tarjetas enlazan al perfil público de cada negocio.</p>
     </div>
   </footer>
@@ -222,12 +186,13 @@
     <div class="drawer-body" id="drawer-body"></div>
   </aside>
 
-  <a class="wa-float" data-wa href="#" aria-label="Escríbenos por WhatsApp">
+  <a class="wa-float" data-wa href="https://wa.me/{{WHATSAPP}}" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.3 18.6L4 20z"/><path d="M9.5 9.5c.3 2 2 3.8 4 4.2l1-1 1.8.8-.4 1.6c-3.4.2-7-3.4-6.8-6.8l1.6-.4.8 1.8-1 1z" fill="currentColor" stroke="none"/></svg>
   </a>
 
-  <script src="assets/js/catalog.js"></script>
-  <script src="assets/js/cards.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="/assets/js/catalog.js"></script>
+  <script src="/assets/js/cards.js"></script>
+  <script src="/assets/js/views.js"></script>
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>

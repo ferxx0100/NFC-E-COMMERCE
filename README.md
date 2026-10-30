@@ -11,35 +11,53 @@ Sin dependencias: HTML, CSS y JavaScript, más una función de servidor (`api/ch
 
 ## TAKTO (tarjetas NFC)
 
-- **Portada animada**: un celular se acerca a la tarjeta y abre la reseña de Google, Instagram, WhatsApp, TikTok o Facebook.
-- **¿Qué es NFC?**: explicación en 3 pasos animados y datos del chip.
-- **4 productos**: tarjetas para reseñas y redes (PVC negro con logo, en stock), metálica (plata, dorada y negra), papel negro y PVC con el logo de la empresa (negra o blanca). Las tres últimas son bajo pedido.
-- **Menudeo y mayoreo**: de 1 a 19 piezas precio normal; desde 20 piezas de un mismo producto, precio de mayoreo (se pueden mezclar plataformas o colores). Más descuento en 50 y 100.
-- **Envío gratis desde 3 piezas**; con menos cuesta $99, o se recoge en Guadalajara.
-- **Para quién**: hoteles, restaurantes y bares, escuelas, consultorios, salones y profesionistas.
-- **Video de configuración incluido** en cada compra (hay que grabarlo y mandarlo después de la venta).
+Página corta pensada para vender y para aparecer en Google:
 
-## Cambiar precios, productos y número
+1. **Portada**: un celular se acerca a la tarjeta y abre Google, Instagram, WhatsApp, Facebook o TikTok.
+2. **Productos**, cada uno con **dos precios** (menudeo y mayoreo desde 20 piezas) y tarjetas que giran en 3D:
+   - Reseñas de Google (PVC, negra o blanca) · en stock
+   - Redes sociales: Instagram, WhatsApp, Facebook y TikTok (PVC) · en stock
+   - Lisa o con tu logo (PVC negra o blanca) · en stock; con logo desde 20 piezas
+   - Metálica (negra, plata o dorada) · bajo pedido
+   - Papel negro · bajo pedido
+3. Cómo funciona NFC, qué te llevas, para quién, preguntas frecuentes y ciudades.
 
-Todo está en **`assets/js/catalog.js`**:
+Reglas: mayoreo desde 20 piezas de un mismo producto (se pueden mezclar diseños o colores) y envío gratis desde 3 piezas.
+
+## SEO: cómo está preparado para Google
+
+- `build.js` publica la página **ya armada** (Google lee todo el contenido sin depender de JavaScript).
+- **Una página por ciudad** en `/tarjetas-nfc/<ciudad>/` (30 ciudades) con título, descripción, tiempo de entrega y preguntas propias. La lista está en `CITIES` de `assets/js/views.js`.
+- **Datos estructurados**: negocio (Organization), productos con sus dos precios (Product + AggregateOffer), preguntas frecuentes (FAQPage) y ruta de navegación en ciudades (BreadcrumbList).
+- `sitemap.xml`, `robots.txt`, URL canónica, Open Graph y página 404.
+- Títulos y textos con las búsquedas principales: "tarjetas NFC", "tarjeta NFC reseñas Google", "tarjetas NFC mayoreo", "tarjetas NFC en <ciudad>".
+
+Pasos que tienes que hacer tú (sin esto Google tarda mucho más en encontrarte):
+
+1. **Dominio propio** (por ejemplo `takto.mx`) conectado en Vercel, y la variable `SITE_URL` con esa dirección.
+2. **Google Search Console**: agrega el dominio, pon el código en la variable `GOOGLE_SITE_VERIFICATION` de Vercel y envía `https://tu-dominio/sitemap.xml`.
+3. **Perfil de Negocio de Google** en Guadalajara como negocio que da servicio a domicilio, y pide reseñas a tus primeros clientes (con tu propia tarjeta NFC).
+4. Mismo nombre y WhatsApp en Instagram, Facebook, TikTok y directorios; enlaza siempre a tu sitio.
+
+## Cambiar precios, productos, ciudades y número
 
 | Qué | Dónde |
 | --- | --- |
-| WhatsApp y nombre de la marca | `brand` |
-| Desde cuántas piezas es mayoreo | `wholesaleFrom` |
-| Desde cuántas piezas el envío es gratis | `freeShippingFrom` |
-| Productos, precio de menudeo, precios de mayoreo y variantes | `products` |
-| Costo de envío | `delivery` |
+| WhatsApp, nombre y dirección del sitio | `brand` en `assets/js/catalog.js` |
+| Desde cuántas piezas es mayoreo / envío gratis | `wholesaleFrom` / `freeShippingFrom` en `catalog.js` |
+| Productos, precios de menudeo y mayoreo, colores | `products` en `catalog.js` |
+| Preguntas frecuentes, giros y ciudades | `FAQ`, `SECTORS` y `CITIES` en `assets/js/views.js` |
+| Dibujo de las tarjetas | `assets/js/cards.js` |
 
-Las tarjetas se dibujan en `assets/js/cards.js`. Tipografía: Instrument Serif (incluida en `assets/fonts/`, licencia OFL) para títulos e Inter para el texto.
+Tipografía: Instrument Serif (incluida en `assets/fonts/`, licencia OFL) para títulos e Inter para el texto.
 
 ## Imágenes de la marca
 
 Las tarjetas se dibujan con código (`assets/js/cards.js`), así que cambian solas al editar `catalog.js`. Las imágenes listas para redes sociales están en `assets/img/marca/`:
 
-- `post-*.jpg` (1080 × 1350, formato Instagram): uno por plataforma, uno por producto y `post-productos.jpg` con toda la línea
-- `tarjeta-*.png` con fondo transparente, una por producto y variante
-- `reel-que-es-nfc.mp4` (1080 × 1920, 30 s) para Reels, TikTok y estados de WhatsApp
+- `post-*.jpg` (1080 × 1350, formato Instagram): uno por tarjeta y `post-productos.jpg` con toda la línea
+- `tarjeta-*.png` con fondo transparente, una por producto y color (también las usa Google en los datos de producto)
+- `reel-que-es-nfc.mp4` (1080 × 1920, 36 s) para Reels, TikTok y estados de WhatsApp
 - `og.jpg` para cuando se comparte el enlace
 
 Las fotos y el video de TAKTO Pay están en `assets/img/pay/`.
@@ -72,7 +90,7 @@ El video necesita `ffmpeg` instalado.
 npm run dev
 ```
 
-Abre http://localhost:3000.
+Publica el sitio en `public/` y lo abre en http://localhost:3000 (incluidas las páginas de ciudad).
 
 ## Publicar en Vercel
 

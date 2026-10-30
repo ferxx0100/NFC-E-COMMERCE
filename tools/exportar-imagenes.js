@@ -8,6 +8,7 @@
 const path = require("path");
 const { chromium } = require("playwright");
 const C = require("../assets/js/catalog.js");
+// El reel muestra 6 tarjetas, una por vuelta de 6 s (ver reelSeq en imagenes.html).
 
 const OUT = path.join(__dirname, "..", "assets", "img", "marca");
 const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
@@ -16,10 +17,12 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
   const browser = await chromium.launch();
   const shots = [];
   C.products.forEach((p) => p.variants.forEach((v) => {
-    shots.push({ q: `art=solo&p=${p.id}&v=${v.id}`, file: `tarjeta-${p.id}-${v.id}.png`, w: 1284, h: 810, transparent: true });
+    shots.push({ q: `art=solo&p=${p.id}&v=${v.id}`, file: `tarjeta-${p.id}-${v.id}.png`, w: p.shape === "v" ? 810 : 1284, h: p.shape === "v" ? 1284 : 810, transparent: true });
   }));
-  C.getProduct("redes").variants.forEach((v) => shots.push({ q: `art=post&p=redes&v=${v.id}`, file: `post-${v.id}.jpg`, w: 1080, h: 1350 }));
-  C.products.filter((p) => p.id !== "redes").forEach((p) => shots.push({ q: `art=post&p=${p.id}`, file: `post-${p.id}.jpg`, w: 1080, h: 1350 }));
+  C.products.forEach((p) => {
+    if (p.shape === "v") p.variants.forEach((v) => shots.push({ q: `art=post&p=${p.id}&v=${v.id}`, file: `post-${p.id}-${v.id}.jpg`, w: 1080, h: 1350 }));
+    else shots.push({ q: `art=post&p=${p.id}`, file: `post-${p.id}.jpg`, w: 1080, h: 1350 });
+  });
   shots.push({ q: "art=productos", file: "post-productos.jpg", w: 1080, h: 1350 });
   shots.push({ q: "art=og", file: "og.jpg", w: 1200, h: 630 });
   for (const s of shots) {
@@ -41,7 +44,7 @@ async function reel(browser) {
   const fs = require("fs");
   const os = require("os");
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "reel-"));
-  const fps = 30, seconds = 6 * C.getProduct("redes").variants.length;
+  const fps = 30, seconds = 36;
   const p = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   await p.goto(page("art=reel"));
   await p.evaluate(() => Promise.all([document.fonts.load("40px 'Instrument Serif'"), document.fonts.load("italic 40px 'Instrument Serif'")]).then(() => document.fonts.ready));

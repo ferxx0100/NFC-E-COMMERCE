@@ -1,6 +1,6 @@
 /*
  * Marca, productos y reglas de precio de TAKTO.
- * Lo usan el navegador (window.CATALOG) y la función api/checkout.js (require),
+ * Lo usan el navegador (window.CATALOG), la función api/checkout.js y build.js,
  * así el precio que se cobra siempre se recalcula en el servidor.
  *
  * Para cambiar precios, productos o el WhatsApp, edita solo este archivo.
@@ -9,89 +9,106 @@
   var brand = {
     name: "TAKTO",
     city: "Guadalajara",
-    // WhatsApp para pedidos: 521 + 10 dígitos, sin "+" ni espacios.
-    whatsapp: "5213300000000",
+    state: "Jalisco",
+    // WhatsApp para pedidos: 52 + 10 dígitos, sin "+" ni espacios.
+    whatsapp: "523511240636",
+    phoneDisplay: "+52 351 124 0636",
+    // Dirección pública del sitio. En Vercel se toma sola; cámbiala cuando tengas tu dominio.
+    url: "https://nfc-e-commerce.vercel.app",
     currency: "MXN",
   };
 
-  // Mayoreo: desde esta cantidad por producto (se pueden mezclar colores o plataformas).
+  // Mayoreo desde esta cantidad de piezas de un mismo producto (se pueden mezclar diseños o colores).
   var wholesaleFrom = 20;
   // Envío gratis desde esta cantidad de piezas en todo el pedido.
   var freeShippingFrom = 3;
-  var leadTime = { stock: "Sale en 24 h", order: "Bajo pedido · 7 a 12 días hábiles" };
 
   /*
-   * Productos. "retail" es el precio de menudeo (1 a 19 piezas).
-   * "tiers" son los precios de mayoreo por pieza según la cantidad de ese producto.
-   * "resale" es el precio sugerido para quien revende.
+   * Productos, en el orden en que aparecen. Cada uno tiene dos precios por pieza:
+   * "retail" (menudeo, 1 a 19) y "wholesale" (mayoreo, desde 20).
+   * "shape": "v" vertical (como las tarjetas de reseñas) o "h" horizontal (presentación).
    */
   var products = [
     {
-      id: "redes",
-      name: "Tarjetas para reseñas y redes",
-      short: "Google, Instagram, WhatsApp, TikTok y Facebook",
-      material: "PVC negro mate con logo impreso",
+      id: "google",
+      name: "Tarjeta NFC de reseñas de Google",
+      short: "Tus clientes te califican con 5 estrellas en segundos.",
+      material: "PVC rígido",
       stock: true,
+      shape: "v",
       retail: 349,
-      tiers: [{ min: 20, price: 169 }, { min: 50, price: 139 }, { min: 100, price: 119 }],
-      resale: 349,
-      variantLabel: "Plataforma",
-      variants: [
-        { id: "google", name: "Google", headline: ["Déjanos tu", "reseña en Google"], stars: true, color: "#4285F4" },
-        { id: "instagram", name: "Instagram", headline: ["Síguenos en", "Instagram"], color: "#E1306C" },
-        { id: "whatsapp", name: "WhatsApp", headline: ["Escríbenos por", "WhatsApp"], color: "#25D366" },
-        { id: "tiktok", name: "TikTok", headline: ["Síguenos en", "TikTok"], color: "#25F4EE" },
-        { id: "facebook", name: "Facebook", headline: ["Síguenos en", "Facebook"], color: "#1877F2" },
-      ],
-      points: ["Listas para usar en mostrador, mesa o caja", "Se programan con el enlace de cada negocio"],
-    },
-    {
-      id: "metal",
-      name: "Tarjeta metálica",
-      short: "Tarjeta de presentación con grabado láser",
-      material: "Acero inoxidable con chip NFC en zona especial",
-      stock: false,
-      retail: 899,
-      tiers: [{ min: 20, price: 549 }, { min: 50, price: 479 }, { min: 100, price: 429 }],
-      resale: 899,
+      wholesale: 169,
       variantLabel: "Color",
       variants: [
-        { id: "plata", name: "Plata" },
-        { id: "dorada", name: "Dorada" },
-        { id: "negra", name: "Negra" },
+        { id: "negra", name: "Negra", screen: "google", color: "#4285F4" },
+        { id: "blanca", name: "Blanca", screen: "google", color: "#4285F4" },
       ],
-      points: ["Nombre y logo grabados con láser", "Abre tu contacto, web o WhatsApp"],
     },
     {
-      id: "papel",
-      name: "Tarjeta de papel negro",
-      short: "Cartón negro grueso, ligera y económica",
-      material: "Papel negro de alto gramaje con chip NFC",
-      stock: false,
-      retail: 199,
-      tiers: [{ min: 20, price: 89 }, { min: 50, price: 75 }, { min: 100, price: 65 }],
-      resale: 199,
-      variantLabel: "Color",
-      variants: [{ id: "negro", name: "Negro" }],
-      points: ["Ideal para eventos, tarjetas de presentación y regalos", "Impresión en tinta blanca o metálica"],
+      id: "redes",
+      name: "Tarjetas NFC para redes sociales",
+      short: "Más seguidores y mensajes sin buscarte por nombre.",
+      material: "PVC rígido",
+      stock: true,
+      shape: "v",
+      retail: 349,
+      wholesale: 169,
+      variantLabel: "Red social",
+      variants: [
+        { id: "instagram", name: "Instagram", screen: "instagram", color: "#E1306C" },
+        { id: "whatsapp", name: "WhatsApp", screen: "whatsapp", color: "#25D366" },
+        { id: "facebook", name: "Facebook", screen: "facebook", color: "#1877F2" },
+        { id: "tiktok", name: "TikTok", screen: "tiktok", color: "#25F4EE" },
+      ],
     },
     {
-      id: "pvc",
-      name: "Tarjeta PVC con tu logo",
-      short: "Diseño de la empresa, impresa o grabada",
-      material: "PVC rígido, formato de tarjeta bancaria",
-      stock: false,
-      retail: 399,
-      tiers: [{ min: 20, price: 189 }, { min: 50, price: 159 }, { min: 100, price: 139 }],
-      resale: 399,
+      id: "lisa",
+      name: "Tarjeta NFC lisa o con tu logo",
+      short: "La base para grabar o imprimir la marca de cada empresa.",
+      material: "PVC mate",
+      stock: true,
+      shape: "h",
+      retail: 299,
+      wholesale: 139,
       variantLabel: "Color",
+      note: "Con tu logo desde 20 piezas",
       variants: [
         { id: "negra", name: "Negra" },
         { id: "blanca", name: "Blanca" },
       ],
-      points: ["Con el logo y colores del negocio", "Te enviamos prueba digital antes de producir"],
+    },
+    {
+      id: "metal",
+      name: "Tarjeta NFC metálica",
+      short: "Tarjeta de presentación con tu nombre grabado en láser.",
+      material: "Acero inoxidable",
+      stock: false,
+      shape: "h",
+      retail: 899,
+      wholesale: 549,
+      variantLabel: "Color",
+      variants: [
+        { id: "negra", name: "Negra" },
+        { id: "plata", name: "Plata" },
+        { id: "dorada", name: "Dorada" },
+      ],
+    },
+    {
+      id: "papel",
+      name: "Tarjeta NFC de papel negro",
+      short: "Ligera, mate y con tinta metálica. Ideal para eventos.",
+      material: "Papel negro grueso",
+      stock: false,
+      shape: "h",
+      retail: 199,
+      wholesale: 89,
+      variantLabel: "Color",
+      note: "Con tu diseño desde 20 piezas",
+      variants: [{ id: "negra", name: "Negra" }],
     },
   ];
+
+  var leadTime = { stock: "Sale en 24\u00a0h", order: "Se fabrica en 7 a 12 días hábiles" };
 
   var delivery = [
     { id: "envio", name: "Envío a todo México", detail: "Gratis desde " + freeShippingFrom + " piezas", cost: 99 },
@@ -115,9 +132,7 @@
 
   // Precio por pieza según cuántas piezas de ese producto lleva el pedido.
   function unitPrice(product, qty) {
-    var price = product.retail;
-    product.tiers.forEach(function (t) { if (qty >= t.min) price = t.price; });
-    return price;
+    return qty >= wholesaleFrom ? product.wholesale : product.retail;
   }
 
   /*
@@ -143,18 +158,17 @@
       var n = byProduct[p.id];
       if (!n) return;
       var unit = unitPrice(p, n);
-      var total = unit * n;
       groups.push({
         product: p,
         qty: n,
         unit: unit,
-        total: total,
+        total: unit * n,
         wholesale: n >= wholesaleFrom,
         saving: (p.retail - unit) * n,
         missing: n < wholesaleFrom ? wholesaleFrom - n : 0,
         lines: lines.filter(function (l) { return l.product === p; }),
       });
-      subtotal += total;
+      subtotal += unit * n;
       qty += n;
     });
 
