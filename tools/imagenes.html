@@ -52,6 +52,36 @@
     .promo .grid4 .wide { grid-column: span 2; }
     .promo .cta { margin-top: 40px; background: #fff; color: #0c0c0d; border-radius: 999px; padding: 26px 56px; font: 700 52px/1 var(--sans); }
     .promo .wa { margin-top: 36px; font: 400 40px/1 var(--sans); color: #4ade80; }
+    .vert { width: 1080px; height: 1920px; }
+    .vert .scene { padding: 0 60px; }
+    .vert .big { font-size: 150px; }
+    .vert .mid { font-size: 98px; }
+    .vert .sub { font-size: 50px; }
+    .vert .cta { font-size: 60px; padding: 30px 64px; }
+    .vert .wa { font-size: 46px; }
+    .vert .price strong { font-size: 120px; }
+    .vert .gain { font-size: 92px; }
+    .vert .fan { height: 760px; }
+    .vert .fan > div { width: 380px; margin-left: -190px; }
+    .vert .s2 .nfc-scene { width: 820px; margin-top: 260px; }
+    .vert .s2 .cap { top: 220px; font-size: 72px; }
+    .vert .grid4 { gap: 26px; }
+    .vert .solo-card { width: 860px; margin-top: 70px; filter: drop-shadow(0 40px 50px rgba(0,0,0,.6)); }
+    .vert .typing { margin-top: 50px; font: 400 44px/1.3 var(--sans); color: #a1a1aa; min-height: 60px; }
+    .vert .typing b { color: #fff; }
+    .vert .pill { display: inline-block; margin-top: 40px; padding: 18px 34px; border-radius: 999px; border: 2px solid #3a3a3e; font: 700 44px/1 var(--sans); }
+    .story { width: 1080px; height: 1920px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 90px; }
+    .story .kick { font: 400 40px/1 var(--sans); letter-spacing: .14em; color: #a1a1aa; text-transform: uppercase; }
+    .story h2 { font-size: 120px; margin: 30px 0 0; line-height: 1; }
+    .story .card-v { width: 520px; margin: 80px 0; filter: drop-shadow(0 50px 60px rgba(0,0,0,.6)); transform: rotate(-6deg); }
+    .story .card-h { width: 860px; margin: 90px 0; filter: drop-shadow(0 50px 60px rgba(0,0,0,.6)); transform: rotate(-5deg); }
+    .story .prices { display: flex; gap: 24px; }
+    .story .prices div { border: 2px solid #3a3a3e; border-radius: 28px; padding: 26px 40px; text-align: left; }
+    .story .prices strong { display: block; font: 700 92px/1 var(--sans); letter-spacing: -3px; }
+    .story .prices span { font: 400 32px/1.2 var(--sans); color: #a1a1aa; }
+    .story .prices .win { background: #fff; color: #0c0c0d; border-color: #fff; }
+    .story .prices .win span { color: #55555c; }
+    .story .go { margin-top: 70px; background: #fff; color: #0c0c0d; border-radius: 999px; padding: 28px 60px; font: 700 54px/1 var(--sans); }
     .og { width: 1200px; height: 630px; }
     .og .one { position: absolute; width: 290px; right: 140px; top: 70px; transform: rotate(-8deg); }
     .og .copy { top: 190px; bottom: auto; width: 520px; }
@@ -78,6 +108,7 @@
     var p = C.getProduct(q.get("p")) || C.products[0];
     var v = C.getVariant(p, q.get("v")) || p.variants[0];
     var mark = '<svg viewBox="-6 -21 30 42">' + CARDS.mark(0, 0, 1, "currentColor") + "</svg>";
+    var LOGO = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#3b2a0c"/><path d="M28 64l22-30 22 30z" fill="#f5e2b4"/><circle cx="64" cy="34" r="7" fill="#f5e2b4"/></svg>');
     var brand = '<div class="brand">' + mark + C.brand.name + "</div>";
     var html = "";
 
@@ -125,6 +156,58 @@
         '<div class="wide">' + CARDS.card("metal", "dorada") + '</div><div class="wide">' + CARDS.card("lisa", "negra") + "</div></div></div>" +
         '<div class="scene s5"><p class="big">Mayoreo desde<br>' + C.wholesaleFrom + ' piezas</p><p class="sub">Te enseñamos a programarlas en un video.</p>' +
         '<span class="cta">Pide en el link 👇</span><span class="wa">WhatsApp ' + C.brand.phoneDisplay + "</span></div></div>";
+    } else if (art.indexOf("v-") === 0) {
+      // Videos verticales 9:16 con escenas; los tiempos van en VSCENES.
+      var gp = C.getProduct("google"), mp = C.getProduct("metal");
+      var nfcScene = '<div class="nfc-scene"><div class="nfc-card"><div>' + CARDS.card("google", "negra") + '</div></div><div class="nfc-burst" style="--burst:#4285F4"><i></i><i></i><i></i></div>' +
+        '<span class="chip-tag">Chip NFC</span><div class="phone"><div class="phone-screen">' +
+        '<div class="scr scr-idle"><span class="scr-time">9:41</span><span class="scr-date">jueves 30 de octubre</span><span class="scr-hint">Acerca a la tarjeta</span></div>' +
+        '<div class="scr-banner"><i></i><span><b>Etiqueta NFC</b>Abrir en Google Maps</span></div>' +
+        '<div class="scr scr-open">' + CARDS.screen("google") + "</div></div></div></div>";
+      var fan = '<div class="fan">' + [["google", "negra", -18], ["redes", "instagram", -6], ["redes", "whatsapp", 6], ["google", "blanca", 18]].map(function (k) {
+        return '<div style="transform:rotate(' + k[2] + 'deg)">' + CARDS.card(k[0], k[1]) + "</div>";
+      }).join("") + "</div>";
+      var grid = '<div class="grid4">' + "<div>" + CARDS.card("google", "negra") + "</div><div>" + CARDS.card("redes", "instagram") + "</div><div>" + CARDS.card("redes", "whatsapp") + "</div><div>" + CARDS.card("redes", "facebook") + "</div>" +
+        '<div class="wide">' + CARDS.card("metal", "dorada") + '</div><div class="wide">' + CARDS.card("lisa", "negra") + "</div></div>";
+      var cta = function (title) {
+        return '<div class="scene"><p class="big">' + title + '</p><span class="cta">Compra en el link 👇</span><span class="wa">WhatsApp ' + C.brand.phoneDisplay + "</span></div>";
+      };
+      var scenes;
+      if (art === "v-negocios") {
+        scenes = [
+          '<div class="scene"><p class="big">¿Tus clientes<br>no te dejan<br>reseña?</p><p class="sub">Haz que te califiquen en 3 segundos.</p>' + fan + "</div>",
+          '<div class="scene s2"><p class="cap">Acercan el celular… <span class="muted">y se abre tu Google.</span></p>' + nfcScene + "</div>",
+          '<div class="scene"><p class="mid">Google, Instagram,<br>WhatsApp <span class="muted">y metálicas.</span></p>' + grid + "</div>",
+          '<div class="scene"><p class="mid">Desde</p><p class="big">' + C.formatMoney(gp.retail) + '</p><span class="pill">Te llega programada</span><p class="sub">Sin apps · iPhone y Android</p></div>',
+          cta("Más reseñas,<br>más clientes."),
+        ];
+      } else if (art === "v-revende") {
+        scenes = [
+          '<div class="scene"><p class="big">¿Quieres<br>ganar dinero<br>extra?</p><p class="sub">Vende tarjetas NFC a negocios.</p>' + fan + "</div>",
+          '<div class="scene s2"><p class="cap">Así funcionan… <span class="muted">y todos las quieren.</span></p>' + nfcScene + "</div>",
+          '<div class="scene"><p class="mid">Cada negocio<br>quiere más reseñas.</p><div class="price"><div><span>Las compras en</span><strong>' + C.formatMoney(gp.wholesale) + '</strong></div><div class="win"><span>Las vendes en</span><strong>' + C.formatMoney(gp.retail) + '</strong></div></div><p class="gain">Ganas ' + C.formatMoney(gp.retail - gp.wholesale) + " por tarjeta</p></div>",
+          '<div class="scene"><p class="mid">Mezcla diseños<br><span class="muted">en tus ' + C.wholesaleFrom + " piezas.</span></p>" + grid + "</div>",
+          cta("Mayoreo desde<br>" + C.wholesaleFrom + " piezas"),
+        ];
+      } else {
+        scenes = [
+          '<div class="scene"><p class="big">Tu tarjeta<br>de presentación,<br><span class="muted">con NFC.</span></p></div>',
+          '<div class="scene"><p class="mid">Escribe tu nombre…</p><div class="solo-card" id="type-card"></div><p class="typing" id="type-text"></p></div>',
+          '<div class="scene"><p class="mid">…o sube tu logo.</p><div class="solo-card" id="logo-card"></div><p class="sub">Programada a tu web, menú, tienda o redes.</p></div>',
+          '<div class="scene"><p class="mid">Metálica</p><p class="big">' + C.formatMoney(mp.retail) + '</p><span class="pill">Negra · Plata · Dorada</span></div>',
+          cta("Acércala.<br>Te conocen."),
+        ];
+      }
+      html = '<div class="art promo vert">' + brand + scenes.join("") + "</div>";
+    } else if (art === "story") {
+      var sp = C.getProduct(q.get("p")) || C.getProduct("google"), sv = C.getVariant(sp, q.get("v")) || sp.variants[0];
+      var mode = q.get("modo") || "precio";
+      var cardHtml = '<div class="card-' + sp.shape + '">' + CARDS.card(sp.id, sv.id, sp.custom ? { text: q.get("t") || "" } : null) + "</div>";
+      var priceHtml = mode === "mayoreo"
+        ? '<div class="prices"><div><span>Las compras en</span><strong>' + C.formatMoney(sp.wholesale) + '</strong></div><div class="win"><span>Las vendes en</span><strong>' + C.formatMoney(sp.retail) + "</strong></div></div>"
+        : '<div class="prices"><div class="win"><span>Menudeo</span><strong>' + C.formatMoney(sp.retail) + "</strong></div><div><span>" + (sp.pack ? "Paquete de " + sp.pack : "Mayoreo " + C.minWholesale(sp) + "+") + "</span><strong>" + C.formatMoney(sp.pack ? sp.wholesale * sp.pack : sp.wholesale) + "</strong></div></div>";
+      html = '<div class="art story">' + brand + '<span class="kick">Tarjeta NFC · ' + sp.materialShort + "</span>" +
+        "<h2>" + (q.get("h") || sp.cartName) + "</h2>" + cardHtml + priceHtml + '<span class="go">Compra en el link</span></div>';
     } else if (art === "reel") {
       html = '<div class="art reel">' + brand + '<div class="top">¿QUÉ ES NFC?</div>' +
         '<div class="nfc-scene"><div class="nfc-card"><div id="hero-card"></div></div>' +
@@ -153,9 +236,12 @@
     };
     if (art === "reel") window.seek(0);
 
-    // Video promocional: escenas con entrada y salida suaves.
-    if (art === "promo") {
-      var SCENES = [[0, 3200], [3000, 9300], [9100, 13300], [13100, 16300], [16100, 18500]];
+    // Videos con escenas: entrada y salida suaves.
+    if (art === "promo" || art.indexOf("v-") === 0) {
+      var SCENES = art === "promo" ? [[0, 3200], [3000, 9300], [9100, 13300], [13100, 16300], [16100, 18500]]
+        : art === "v-personaliza" ? [[0, 2800], [2600, 8300], [8100, 12300], [12100, 15300], [15100, 18500]]
+        : [[0, 3600], [3400, 9700], [9500, 13300], [13100, 16300], [16100, 19500]];
+      var NFC_START = SCENES[1][0];
       var sceneEls = document.querySelectorAll(".promo .scene");
       window.seek = function (ms) {
         SCENES.forEach(function (sc, i) {
@@ -166,7 +252,22 @@
         });
         var fan = document.querySelectorAll(".promo .fan > div");
         fan.forEach(function (el, i) { el.style.transform = "rotate(" + ((i - 1.5) * 12 * Math.min(1, ms / 1200)) + "deg)"; });
-        document.getAnimations().forEach(function (an) { an.pause(); an.currentTime = Math.max(0, ms - 3000) % 6000; });
+        document.getAnimations().forEach(function (an) { an.pause(); an.currentTime = Math.max(0, ms - NFC_START) % 6000; });
+        // Personalización: el texto se escribe letra por letra y luego aparece el logo.
+        var tc = document.getElementById("type-card");
+        if (tc) {
+          var full = "Andrea Ramírez · Bienes raíces", n = Math.max(0, Math.min(full.length, Math.floor((ms - 3200) / 120)));
+          if (tc.dataset.n !== String(n)) {
+            tc.dataset.n = n;
+            tc.innerHTML = CARDS.card("metal", "negra", { text: full.slice(0, n) });
+            document.getElementById("type-text").innerHTML = "<b>" + full.slice(0, n) + "</b>" + (n < full.length ? "|" : "");
+          }
+          var lc = document.getElementById("logo-card");
+          if (!lc.dataset.done) {
+            lc.dataset.done = 1;
+            lc.innerHTML = CARDS.card("metal", "dorada", { text: "Estudio Nómada", logo: LOGO });
+          }
+        }
       };
       window.seek(0);
     }

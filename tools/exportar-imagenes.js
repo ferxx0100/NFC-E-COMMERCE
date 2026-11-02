@@ -25,6 +25,10 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
   });
   shots.push({ q: "art=productos", file: "post-productos.jpg", w: 1080, h: 1350 });
   shots.push({ q: "art=og", file: "og.jpg", w: 1200, h: 630 });
+  // Historias verticales con precio.
+  shots.push({ q: "art=story&p=google&v=negra&h=" + encodeURIComponent("Más reseñas en Google"), file: "historia-google.jpg", w: 1080, h: 1920 });
+  shots.push({ q: "art=story&p=redes&v=instagram&modo=mayoreo&h=" + encodeURIComponent("Revende y gana"), file: "historia-mayoreo.jpg", w: 1080, h: 1920 });
+  shots.push({ q: "art=story&p=metal&v=dorada&t=" + encodeURIComponent("Tu nombre aquí") + "&h=" + encodeURIComponent("Tarjeta metálica"), file: "historia-metal.jpg", w: 1080, h: 1920 });
   for (const s of shots) {
     const p = await browser.newPage({ viewport: { width: s.w, height: s.h } });
     await p.goto(page(s.q));
@@ -36,6 +40,9 @@ const page = (q) => "file://" + path.join(__dirname, "imagenes.html") + "?" + q;
   }
   await video(browser, "art=reel", 1080, 1920, 36, "reel-que-es-nfc.mp4");
   await video(browser, "art=promo", 1080, 1350, 18, "promo-revende-nfc.mp4");
+  await video(browser, "art=v-negocios", 1080, 1920, 19.5, "vertical-negocios.mp4");
+  await video(browser, "art=v-revende", 1080, 1920, 19.5, "vertical-revende.mp4");
+  await video(browser, "art=v-personaliza", 1080, 1920, 18.5, "vertical-personaliza.mp4");
   await browser.close();
 })();
 
