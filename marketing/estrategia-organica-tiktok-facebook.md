@@ -232,6 +232,12 @@ Ritmo: **TikTok 1 video al día** (el mismo video, sin marca de agua, se sube co
 
 ## 9. Facebook a fondo
 
+> **Actualización (nov 2026) — límite de links de Meta.** Meta está probando con páginas y perfiles en modo profesional un límite de **2 publicaciones con link externo al mes** si no pagas Meta One/Meta Verified. Pasado el límite, el link sale como texto sin clic, **también en comentarios**. **Los links de WhatsApp no cuentan** (son de Meta). Por eso en Facebook:
+> - En Reels y publicaciones **no pongas el link de la web**: pon el de WhatsApp (`https://wa.me/523511240636?text=Hola%2C%20quiero%20info%20de%20las%20tarjetas%20NFC`) o pide "Escríbeme **NFC** por mensaje" y manda la web por WhatsApp/Messenger.
+> - Hashtags: **0 a 3**; en Facebook ya casi no dan alcance. Lo que cuenta es decir la palabra clave en el texto ("tarjeta NFC", "reseñas de Google", "Guadalajara") antes del "Ver más".
+> - Guarda tus 2 links al mes para publicaciones de la página que de verdad lleven a comprar (por ejemplo, una oferta).
+> Fuentes: Press Gazette, 7 oct 2026 (https://pressgazette.co.uk/platforms/facebook-cash-for-links-scheme-excludes-publishers-for-now/); Social Media Examiner, 5 feb 2026 (https://www.socialmediaexaminer.com/what-facebooks-new-link-rules-mean-for-your-2026-strategy/); Slick Raven, 13 ene 2026 (https://slickraven.com/2026/01/13/should-you-use-hashtags-on-facebook-2026/).
+
 ### Página + perfil
 - **Perfil personal** (tu nombre real, foto real): para grupos y Marketplace. Da más confianza y los grupos aceptan más a personas que a páginas.
 - **Página TAKTO**: para Reels, reseñas, botón de WhatsApp y que te encuentren en búsqueda. Comparte cada Reel de la página a tu perfil.
