@@ -14,13 +14,30 @@
     });
   }
 
+  var ship = C.getDelivery("envio");
+  // Mínimo de mayoreo general y excepciones (p. ej. la tarjeta lisa desde 10).
+  var wsNote = C.wholesaleFrom + " piezas de un mismo producto" + C.products.filter(function (p) { return C.minWholesale(p) !== C.wholesaleFrom; }).map(function (p) { return " (" + C.minWholesale(p) + " en la " + p.cartName.toLowerCase() + ")"; }).join("");
+  var pick = C.pickup;
   var FAQ = [
+    { q: "¿Qué es una tarjeta NFC?", a: "Una tarjeta con un chip. Acercas el celular y se abre lo que tú quieras: tus reseñas de Google, Instagram, WhatsApp, tu menú o tu contacto. Sin escanear nada y sin apps." },
     { q: "¿Todas las tarjetas son NFC?", a: "Sí. Todas llevan chip NFC original, en plástico, metal o papel." },
-    { q: "¿Funcionan con iPhone y Android?", a: "Sí. Solo acercas el celular a la tarjeta. Sin apps." },
-    { q: "¿Llegan programadas?", a: "Sí, si nos das tu enlace al comprar. Si no, te mandamos un video corto para programarlas tú en un minuto." },
-    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(Math.min.apply(null, C.products.map(function (p) { return p.retail; }))) + " por pieza. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo." },
-    { q: "¿Hacen envíos a toda la República?", a: "Sí. Gratis desde " + C.freeShippingFrom + " piezas; con menos cuesta " + money(C.delivery[0].cost) + "." },
+    { q: "¿Funcionan con iPhone y Android?", a: "Sí. iPhone XS o más nuevo la lee sin apps, solo acercándolo. En Android basta con tener el NFC encendido (Ajustes → Conexiones → NFC)." },
+    { q: "¿Y si el celular de mi cliente no tiene NFC?", a: "La gran mayoría de los celulares desde 2018 tienen NFC. Si alguno no lo tiene, le compartes el mismo enlace por WhatsApp." },
+    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(Math.min.apply(null, C.products.map(function (p) { return p.retail; }))) + " por pieza. Desde " + wsNote + " pagas precio de mayoreo." },
+    { q: "¿Cómo pago?", a: "Aquí mismo en la página con Mercado Pago: tarjeta de crédito o débito, efectivo en OXXO, transferencia SPEI o saldo de Mercado Pago. Es pago seguro: nosotros nunca vemos los datos de tu tarjeta." },
+    { q: "¿Puedo recoger en Guadalajara sin pagar envío?", a: "Sí. Elige «Recoger en Guadalajara» en el carrito: pagas en línea y pasas por tu pedido sin costo de envío. Te escribimos por WhatsApp para coordinar punto y hora. Aplica en " + pick.cities.join(", ") + "." },
+    { q: "¿Hacen envíos a toda la República?", a: "Sí. El envío cuesta " + money(ship.cost) + " y es gratis desde " + C.freeShippingFrom + " piezas." },
+    { q: "¿En cuánto tiempo la recibo?", a: "Las tarjetas en existencia salen en 24 horas. Las que dicen «Bajo pedido» se fabrican en 7 a 12 días hábiles. El envío tarda de 2 a 5 días hábiles según tu ciudad." },
+    { q: "¿Llegan programadas?", a: "Sí. En el carrito eliges qué abre cada tarjeta (Google, Instagram, WhatsApp, tu web o tu contacto) y nos pasas el enlace. Si aún no lo sabes, te mandamos un video para programarla tú." },
+    { q: "¿Cómo saco mi enlace de reseñas de Google?", a: "Entra a tu Perfil de Negocio de Google, toca «Pedir reseñas» y copia el enlace. Si no lo encuentras, te ayudamos por WhatsApp." },
+    { q: "¿Puedo programarlas yo mismo?", a: "Sí. Con una app gratuita para escribir NFC (por ejemplo NFC Tools, en iPhone y Android) pegas tu enlace y acercas la tarjeta. Te mandamos un video corto con los pasos." },
     { q: "¿Puedo cambiar el enlace después?", a: "Sí, las veces que quieras." },
+    { q: "¿Pueden llevar mi nombre o logo?", a: "Las lisas, metálicas y de papel pueden ir en blanco o con tu nombre (hasta 40 caracteres). Para logo o diseño propio, escríbenos por WhatsApp." },
+    { q: "¿Venden mayoreo?", a: "Sí. Desde " + wsNote + " pagas precio de mayoreo y puedes mezclar diseños o colores. Ideal para revender." },
+    { q: "¿Necesitan batería o se gastan?", a: "No. El chip no usa batería: toma energía del celular al acercarlo. Dura años con uso normal." },
+    { q: "¿La tarjeta guarda datos de quien la toca?", a: "No. Solo tiene guardado tu enlace. No lee ni guarda información del celular de tus clientes." },
+    { q: "¿Y si mi tarjeta no funciona?", a: "Te la reemplazamos sin costo. Escríbenos por WhatsApp con tu número de pedido." },
+    { q: "¿Dan factura?", a: "Pregúntanos por WhatsApp antes de pagar y te decimos cómo." },
   ];
 
   var SECTORS = [

@@ -25,6 +25,28 @@ Página corta pensada para vender y para aparecer en Google:
 
 Reglas: mayoreo desde 20 piezas de un mismo producto (se pueden mezclar diseños o colores) y envío gratis desde 3 piezas.
 
+## Entrega y pago en la página
+
+El cliente paga ahí mismo con **Mercado Pago** (tarjeta, OXXO, SPEI o saldo) y elige en el carrito:
+
+| Opción | Costo | Qué pide |
+| --- | --- | --- |
+| **Recoger en Guadalajara** (Guadalajara, Zapopan, Tlaquepaque, Tonalá, Tlajomulco, El Salto) | Siempre $0 | Nombre y WhatsApp. Coordinamos punto y hora por WhatsApp. |
+| **Envío a toda la República** | $99, gratis desde 3 piezas | Dirección completa (calle, CP, ciudad y estado) |
+
+- Zona, municipios y nota de recolección: `pickup` en `assets/js/catalog.js`. Opciones y costo: `delivery`.
+- `api/checkout.js` vuelve a calcular todo: una opción desconocida se cobra como envío, recoger nunca cobra envío, y si es envío sin dirección o sin CP de 5 dígitos responde 400 antes de llamar a Mercado Pago.
+- En Mercado Pago, cada artículo de un pedido para recoger dice "Recoger en Guadalajara" y `metadata.delivery` lo repite.
+- `gracias.html` dice "recoges en Guadalajara" o "preparamos tu envío" según lo que eligió el cliente.
+
+## "¿Qué quieres que abra tu tarjeta?"
+
+En el carrito, por cada tarjeta (o con "Todas igual"), el cliente elige a dónde se programa: Reseñas de Google, Instagram, Facebook, TikTok, WhatsApp, página web/menú/tienda, tarjeta de contacto (vCard), otro o "Aún no sé / la programo yo con el video", y escribe su enlace, usuario o número. Cada opción trae ejemplo y ayuda (por ejemplo, cómo sacar el enlace de reseñas de Google).
+
+- Opciones y textos de ayuda: `programTargets` en `catalog.js`.
+- Se guarda en el navegador y se manda al servidor, que lo limpia (máx. 40 líneas y 300 caracteres por enlace) y lo deja en `metadata.programming` del pago. También va en el mensaje de WhatsApp.
+- Carritos guardados con el campo viejo "Enlace para programarlas" pasan solos a "Todas igual → Otro".
+
 ## SEO: cómo está preparado para Google
 
 - `build.js` publica la página **ya armada** (Google lee todo el contenido sin depender de JavaScript).
@@ -46,6 +68,8 @@ Pasos que tienes que hacer tú (sin esto Google tarda mucho más en encontrarte)
 | --- | --- |
 | WhatsApp, nombre y dirección del sitio | `brand` en `assets/js/catalog.js` |
 | Desde cuántas piezas es mayoreo / envío gratis | `wholesaleFrom` / `freeShippingFrom` en `catalog.js` |
+| Costo de envío, opción de recoger y su zona | `delivery` y `pickup` en `catalog.js` |
+| Destinos para programar las tarjetas | `programTargets` en `catalog.js` |
 | Productos, precios de menudeo y mayoreo, colores | `products` en `catalog.js` |
 | Preguntas frecuentes, giros y ciudades | `FAQ`, `SECTORS` y `CITIES` en `assets/js/views.js` |
 | Dibujo de las tarjetas | `assets/js/cards.js` |

@@ -26,11 +26,12 @@
   <link rel="preload" href="/assets/fonts/Outfit-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/assets/css/takto.css">
   <link rel="stylesheet" href="/assets/css/storefront.css">
+  <link rel="stylesheet" href="/assets/css/video.css">
   {{JSONLD}}
 </head>
 <body class="storefront">
   <a class="skip-link" href="#productos">Saltar al catálogo</a>
-  <div class="announcement">De Guadalajara a todo México <span>Envío gratis desde {{FREE}} piezas ↗</span></div>
+  <div class="announcement">Recoge gratis en Guadalajara <span>Envío a todo México · gratis desde {{FREE}} piezas</span></div>
   <header class="header" id="header">
     <div class="container">
       <a class="logo" href="/" aria-label="TAKTO, tarjetas NFC"><span data-mark></span>TAKTO</a>
@@ -76,6 +77,34 @@
       </div>
     </section>
     <div class="benefit-bar container"><span><b>01</b> Listas para usar</span><span><b>02</b> Personaliza tu conexión</span><span><b>03</b> Menudeo y mayoreo</span><span><b>04</b> Hechas para tu negocio</span></div>
+
+    <!-- Video corto: qué es NFC (tools/video-nfc/render.js) -->
+    <section class="video-nfc" id="que-es-nfc" aria-labelledby="video-nfc-title">
+      <div class="container video-nfc-layout">
+        <div class="video-nfc-copy">
+          <span class="eyebrow">¿QUÉ ES NFC?</span>
+          <h2 id="video-nfc-title">Míralo en 24 segundos.</h2>
+          <p class="lead">La tarjeta tiene un chip NFC. Acercas el celular y se abre tu reseña de Google, tu Instagram o tu WhatsApp.</p>
+          <ul class="video-nfc-points">
+            <li>Sin apps y sin escanear</li>
+            <li>Sin batería: no se descarga</li>
+            <li>Funciona con iPhone y Android</li>
+          </ul>
+          <button class="btn btn-primary video-nfc-sound" type="button" data-video-sound aria-controls="video-nfc"><span aria-hidden="true">▶</span> Ver con sonido</button>
+        </div>
+        <figure class="video-nfc-frame">
+          <video id="video-nfc" data-nfc-video muted playsinline controls preload="metadata" poster="/assets/img/marca/que-es-nfc-poster.jpg" aria-label="Video: qué es una tarjeta NFC de TAKTO y cómo funciona" aria-describedby="video-nfc-guion">
+            <source src="/assets/img/marca/que-es-nfc-web.mp4" type="video/mp4">
+          </video>
+          <figcaption>
+            <details>
+              <summary>Leer lo que dice el video</summary>
+              <p id="video-nfc-guion">¿Ves esta tarjeta? Tiene un chip NFC. Acerca tu celular… y listo: se abre tu reseña de Google, tu Instagram o tu WhatsApp. Sin apps, sin escanear y sin batería. Funciona con iPhone y Android. Recógela gratis en Guadalajara, o te la enviamos a todo México. TAKTO: un toque y conectas.</p>
+            </details>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
 
     <!-- Productos -->
     <section class="section products-section" id="productos">
@@ -145,5 +174,6 @@
   <script src="/assets/js/views.js"></script>
   <script src="/assets/js/app.js"></script>
   <script src="/assets/js/storefront.js"></script>
+  <script src="/assets/js/video.js" defer></script>
 </body>
 </html>

@@ -25,18 +25,51 @@
   }
 
   // ---------- Estado (se recuerda en este navegador) ----------
-  var state = { sel: {}, pick: {}, custom: {}, cart: [], delivery: C.delivery[0].id, customer: {} };
+  var state = { sel: {}, pick: {}, custom: {}, cart: [], delivery: C.defaultDelivery, customer: {}, program: null };
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || "null");
     if (saved && typeof saved === "object") Object.assign(state, saved);
   } catch (e) {}
   if (!Array.isArray(state.cart)) state.cart = [];
   if (!state.custom || typeof state.custom !== "object") state.custom = {};
+  if (!state.customer || typeof state.customer !== "object") state.customer = {};
+  if (!C.delivery.some(function (d) { return d.id === state.delivery; })) state.delivery = C.defaultDelivery;
+  // "¿Qué quieres que abra tu tarjeta?": same = todas igual; all = destino común; lines = destino por línea del carrito.
+  if (!state.program || typeof state.program !== "object") {
+    state.program = { same: false, all: { dest: "", link: "" }, lines: {} };
+    // Compatibilidad: el campo viejo "links" pasa a "Todas igual".
+    if (state.customer.links) {
+      state.program.same = true;
+      state.program.all = { dest: "otro", link: state.customer.links };
+    }
+  }
+  if (!state.program.all) state.program.all = { dest: "", link: "" };
+  if (!state.program.lines || typeof state.program.lines !== "object") state.program.lines = {};
+  delete state.customer.links;
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
   }
+  function lineKey(l) {
+    return l.product + "|" + l.variant + "|" + (l.text || "");
+  }
+  // Destino de una línea del carrito (o el común si eligió "Todas igual").
+  function progFor(l) {
+    if (state.program.same) return state.program.all;
+    var k = lineKey(l);
+    if (!state.program.lines[k]) state.program.lines[k] = { dest: C.suggestTarget(l.product, l.variant), link: "" };
+    return state.program.lines[k];
+  }
+  function cartItems() {
+    return state.cart.map(function (l) {
+      var pr = progFor(l);
+      return { product: l.product, variant: l.variant, qty: l.qty, text: l.text, dest: pr.dest, link: pr.link };
+    });
+  }
+  function isPickup() {
+    return !!C.getDelivery(state.delivery).pickup;
+  }
   function currentQuote() {
-    return C.quote(state.cart, state.delivery);
+    return C.quote(cartItems(), state.delivery);
   }
   function selected(p) {
     return C.getVariant(p, state.sel[p.id]) || p.variants[0];
@@ -152,16 +185,69 @@
       '<input id="o-' + name + '" name="' + name + '" type="' + type + '" value="' + esc(state.customer[name] || "") + '" ' + (attrs || "") + "></div>";
   }
 
+  // Bloque "¿Qué quieres que abra tu tarjeta?": un destino por línea, o uno para todas.
+  function progRow(id, title, pr) {
+    var t = C.getTarget(pr.dest);
+    var needsLink = t && t.id !== "luego";
+    return '<div class="prog-row">' +
+      (title ? '<label class="prog-title" for="p-dest-' + id + '">' + esc(title) + "</label>" : "") +
+      '<select id="p-dest-' + id + '" data-prog-dest="' + id + '"' + (title ? "" : ' aria-label="Qué abre la tarjeta"') + ">" +
+      '<option value="">Elige qué abre</option>' +
+      C.programTargets.map(function (x) {
+        return '<option value="' + x.id + '"' + (t && t.id === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>";
+      }).join("") + "</select>" +
+      (needsLink
+        ? '<input type="text" maxlength="300" id="p-link-' + id + '" data-prog-link="' + id + '" value="' + esc(pr.link || "") + '" placeholder="' + esc(t.placeholder) + '" aria-label="' + esc(t.name) + ': enlace, usuario o datos">'
+        : "") +
+      (t ? '<small class="prog-help">' + esc(t.help) + (needsLink ? " Si no lo tienes a la mano, te lo pedimos por WhatsApp." : "") + "</small>" : "") +
+      "</div>";
+  }
+
+  function programBlock() {
+    var html = '<div class="d-block prog"><span class="lbl">¿Qué quieres que abra tu tarjeta?</span>' +
+      '<p class="prog-intro">Dinos a dónde la programamos y llega lista para usarse. Puedes cambiarlo después.</p>';
+    if (state.cart.length > 1) {
+      html += '<label class="prog-same"><input type="checkbox" data-prog-same' + (state.program.same ? " checked" : "") + "> Todas igual</label>";
+    }
+    if (state.program.same || state.cart.length === 1) {
+      var only = state.cart.length === 1 && !state.program.same;
+      html += progRow(only ? 0 : "all", "", only ? progFor(state.cart[0]) : state.program.all);
+    } else {
+      html += state.cart.map(function (l, i) {
+        var p = C.getProduct(l.product), v = p && C.getVariant(p, l.variant);
+        if (!p || !v) return "";
+        return progRow(i, p.cartName + " · " + v.name + (l.text ? " · " + l.text : ""), progFor(l));
+      }).join("");
+    }
+    return html + "</div>";
+  }
+
+  function deliveryBlock(q) {
+    return '<div class="d-block"><span class="lbl">Entrega</span>' + C.delivery.map(function (d) {
+      var price = d.pickup ? "Sin costo" : q.qty >= C.freeShippingFrom ? "Gratis" : money(d.cost);
+      return '<label class="radio"><input type="radio" name="delivery" value="' + d.id + '"' + (state.delivery === d.id ? " checked" : "") + ">" +
+        "<span><strong>" + esc(d.name) + "</strong><small>" + esc(d.pickup ? d.detail : d.detail + " · llega a tu domicilio") + "</small></span><em>" + price + "</em></label>";
+    }).join("") +
+      (isPickup() ? '<p class="d-note pickup-note">Solo ' + esc(C.pickup.zone) + ": " + esc(C.pickup.cities.join(", ")) + ". Pagas aquí y pasas por tu pedido.</p>" : "") +
+      "</div>";
+  }
+
   function renderOrder() {
     var q = currentQuote(), body = $("#drawer-body");
     if (!q.qty) {
       body.innerHTML = '<div class="empty-msg"><p>Tu carrito está vacío.</p><a class="btn btn-primary" href="#productos" data-close-order>Ver tarjetas</a></div>';
       return;
     }
+    // Quita destinos de líneas que ya no están en el carrito.
+    var keys = state.cart.map(lineKey);
+    Object.keys(state.program.lines).forEach(function (k) { if (keys.indexOf(k) < 0) delete state.program.lines[k]; });
+    var pickup = isPickup();
     var remaining = Math.max(0, C.freeShippingFrom - q.qty);
-    var html = '<div class="shipping-progress" role="status"><span>' +
-      (remaining ? 'Agrega ' + remaining + (remaining === 1 ? ' tarjeta más' : ' tarjetas más') + ' y tu envío es gratis.' : 'Tu pedido ya tiene envío gratis.') +
-      '</span><progress max="' + C.freeShippingFrom + '" value="' + Math.min(q.qty, C.freeShippingFrom) + '" aria-label="Avance para envío gratis"></progress></div>';
+    var html = pickup
+      ? '<div class="shipping-progress" role="status"><span>Recoges en Guadalajara: sin costo de envío.</span></div>'
+      : '<div class="shipping-progress" role="status"><span>' +
+        (remaining ? 'Agrega ' + remaining + (remaining === 1 ? ' tarjeta más' : ' tarjetas más') + ' y tu envío es gratis.' : 'Tu pedido ya tiene envío gratis.') +
+        '</span><progress max="' + C.freeShippingFrom + '" value="' + Math.min(q.qty, C.freeShippingFrom) + '" aria-label="Avance para envío gratis"></progress></div>';
     html += q.groups.map(function (g) {
       return '<div class="d-group">' + g.lines.map(function (l) {
           var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text; });
@@ -178,21 +264,27 @@
         "</div>";
     }).join("");
 
-    html += '<form id="order-form" novalidate><div class="d-block"><span class="lbl">Envío</span><div class="form-grid">' +
+    html += deliveryBlock(q) + programBlock();
+
+    html += '<form id="order-form" novalidate><div class="d-block"><span class="lbl">' + (pickup ? "Tus datos" : "Tus datos y envío") + '</span><div class="form-grid">' +
       field("name", "Nombre", "text", true, 'autocomplete="name" required') +
       field("phone", "WhatsApp", "tel", true, 'autocomplete="tel" inputmode="tel" pattern="[0-9 +]{10,16}" required') +
-      field("street", "Calle y número", "text", true, 'autocomplete="address-line1" required') +
-      field("zip", "Código postal", "text", false, 'inputmode="numeric" pattern="[0-9]{5}" autocomplete="postal-code" required') +
-      field("city", "Ciudad", "text", false, 'autocomplete="address-level2" required') +
-      field("state", "Estado", "text", true, 'autocomplete="address-level1" required') +
-      field("links", "Enlace para programarlas (opcional)", "text", true, 'placeholder="Tu link de Google, Instagram o WhatsApp"') +
-      "</div></div>" +
+      (pickup
+        ? ""
+        : field("street", "Calle, número y colonia", "text", true, 'autocomplete="address-line1" required') +
+          field("zip", "Código postal", "text", false, 'inputmode="numeric" pattern="[0-9]{5}" autocomplete="postal-code" required') +
+          field("city", "Ciudad", "text", false, 'autocomplete="address-level2" required') +
+          field("state", "Estado", "text", true, 'autocomplete="address-level1" required')) +
+      "</div>" +
+      (pickup ? '<p class="d-note">Te escribimos a este WhatsApp para coordinar punto y hora de entrega en Guadalajara.</p>' : "") +
+      "</div>" +
       '<div class="d-block"><div class="sum-rows" style="margin:0 0 12px">' +
       "<div><span>" + q.qty + (q.qty === 1 ? " pieza" : " piezas") + "</span><strong>" + money(q.subtotal) + "</strong></div>" +
-      "<div><span>Envío</span><strong>" + (q.shipping ? money(q.shipping) : "Gratis") + "</strong></div></div>" +
+      "<div><span>" + (pickup ? "Recoger en Guadalajara" : "Envío") + "</span><strong>" + (pickup ? "Sin costo" : q.shipping ? money(q.shipping) : "Gratis") + "</strong></div></div>" +
       '<div class="sum-total"><span>Total</span><strong>' + money(q.total) + "</strong></div>" +
-      '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp">Pagar ' + money(q.total) + "</button>" +
+      '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp">Pagar ' + money(q.total) + " con Mercado Pago</button>" +
       '<button class="btn btn-line btn-block" type="submit" data-pay="wa">Pedir por WhatsApp</button></div>' +
+      '<p class="form-note">Tarjeta, OXXO, transferencia o saldo de Mercado Pago. Pago seguro.</p>' +
       '<p class="form-error" id="order-error" hidden></p></div></form>';
     body.innerHTML = html;
   }
@@ -201,6 +293,7 @@
     var form = $("#order-form");
     if (!form) return state.customer;
     $$("input", form).forEach(function (el) { if (el.name) state.customer[el.name] = el.value.trim(); });
+    delete state.customer.links;
     save();
     return state.customer;
   }
@@ -212,11 +305,16 @@
           return "  • " + l.qty + " × " + l.variant.name + (l.product.custom ? (l.text ? " · nombre: " + l.text : " · en blanco") : "");
         }).join("\n");
     }).join("\n");
-    var where = c.street + ", CP " + c.zip + ", " + c.city + ", " + c.state;
+    var all = [];
+    q.groups.forEach(function (g) { all = all.concat(g.lines); });
+    var program = C.programSummary(all).map(function (t) { return "  • " + t; }).join("\n");
+    var delivery = q.delivery.pickup
+      ? "Entrega: Recoger en Guadalajara (sin costo de envío). ¿Dónde y a qué hora paso?"
+      : "Envío a: " + c.street + ", CP " + c.zip + ", " + c.city + ", " + c.state;
     return "Hola, quiero hacer este pedido de " + C.brand.name + ":\n\n" + lines +
-      "\n\nSubtotal: " + money(q.subtotal) + "\nEnvío: " + (q.shipping ? money(q.shipping) : "Gratis") + "\nTotal: " + money(q.total) +
-      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\nEnvío: " + where +
-      (c.links ? "\nProgramar con: " + c.links : "");
+      "\n\nQué abre cada tarjeta:\n" + program +
+      "\n\nSubtotal: " + money(q.subtotal) + "\n" + (q.delivery.pickup ? "Recoger en Guadalajara: sin costo" : "Envío: " + (q.shipping ? money(q.shipping) : "Gratis")) + "\nTotal: " + money(q.total) +
+      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\n" + delivery;
   }
 
   function submitOrder(e) {
@@ -243,7 +341,7 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: state.cart.map(function (l) { return { product: l.product, variant: l.variant, qty: l.qty, text: l.text }; }),
+        items: cartItems(),
         delivery: state.delivery,
         customer: c,
       }),
@@ -254,7 +352,7 @@
       .then(function (j) { location.href = j.init_point; })
       .catch(function (ex) {
         btn.disabled = false;
-        btn.textContent = "Pagar " + money(q.total);
+        btn.textContent = "Pagar " + money(q.total) + " con Mercado Pago";
         err.textContent = "No se pudo abrir Mercado Pago (" + ex.message + "). Puedes pedir por WhatsApp.";
         err.hidden = false;
       });
@@ -327,13 +425,55 @@
     renderPick(C.getProduct(id));
   });
 
+  // Destino común ("all") o de la línea i del carrito.
+  function progTarget(id) {
+    if (id === "all") return state.program.all;
+    return state.cart[+id] ? progFor(state.cart[+id]) : null;
+  }
+
   drawer.addEventListener("change", function (e) {
-    if (e.target.dataset.line !== undefined) {
+    var d = e.target.dataset;
+    if (d.line !== undefined) {
       readCustomer();
-      setLine(+e.target.dataset.line, Math.max(1, parseInt(e.target.value, 10) || 1));
+      setLine(+d.line, Math.max(1, parseInt(e.target.value, 10) || 1));
+    } else if (e.target.name === "delivery") {
+      readCustomer();
+      state.delivery = e.target.value;
+      save();
+      renderOrder();
+      var r = $('input[name="delivery"]:checked', drawer);
+      if (r) r.focus();
+    } else if (d.progSame !== undefined) {
+      readCustomer();
+      // Al juntar, parte del destino de la primera tarjeta.
+      if (e.target.checked && !state.program.all.dest && state.cart[0]) {
+        var first = progFor(state.cart[0]);
+        state.program.all = { dest: first.dest, link: first.link };
+      }
+      state.program.same = e.target.checked;
+      save();
+      renderOrder();
+      var box = $("[data-prog-same]", drawer);
+      if (box) box.focus();
+    } else if (d.progDest !== undefined) {
+      readCustomer();
+      var pr = progTarget(d.progDest);
+      if (!pr) return;
+      pr.dest = e.target.value;
+      save();
+      renderOrder();
+      var next = $('[data-prog-link="' + d.progDest + '"]', drawer) || $('[data-prog-dest="' + d.progDest + '"]', drawer);
+      if (next) next.focus();
     }
   });
-  drawer.addEventListener("input", function (e) { if (e.target.closest("#order-form")) readCustomer(); });
+  drawer.addEventListener("input", function (e) {
+    if (e.target.dataset.progLink !== undefined) {
+      var pr = progTarget(e.target.dataset.progLink);
+      if (pr) { pr.link = e.target.value.slice(0, 300); save(); }
+      return;
+    }
+    if (e.target.closest("#order-form")) readCustomer();
+  });
   drawer.addEventListener("submit", submitOrder);
 
   // ---------- Animaciones ----------

@@ -30,8 +30,6 @@ module.exports = async function handler(req, res) {
     res.setHeader("Allow", "GET, POST");
     return res.status(405).json({ error: "Método no permitido" });
   }
-  if (!token) return res.status(500).json({ error: "falta configurar MP_ACCESS_TOKEN en Vercel" });
-
   let body = req.body || {};
   if (typeof body === "string") {
     try {
@@ -41,10 +39,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const customer = body.customer || {};
+  const customer = body.customer && typeof body.customer === "object" ? body.customer : {};
   let items;
   let meta;
   let shipping;
+  let address = [customer.street, customer.zip, customer.city, customer.state].map((v) => clean(v, 120)).filter(Boolean).join(", ");
 
   if (body.store === "pay") {
     const q = P.quote(body.package, body.qty, body.delivery);
@@ -53,26 +52,35 @@ module.exports = async function handler(req, res) {
     shipping = { amount: q.shipping, name: q.delivery.name };
     meta = { store: "pay", package: q.pkg.name, delivery: q.delivery.name, machine: clean(customer.machine, 120) };
   } else {
+    // Máximo 40 líneas; destino y enlace de cada tarjeta se limpian en C.quote.
     const q = C.quote(Array.isArray(body.items) ? body.items.slice(0, 40) : [], body.delivery);
     if (q.error) return res.status(400).json({ error: q.error });
+    const pickup = !!q.delivery.pickup;
+    if (pickup) {
+      address = C.delivery.filter((d) => d.pickup)[0].name + " (" + C.pickup.zone + ")";
+    } else if (!clean(customer.street, 120) || !/^\d{5}$/.test(clean(customer.zip, 10)) || !clean(customer.city, 120) || !clean(customer.state, 120)) {
+      return res.status(400).json({ error: "Falta la dirección de envío (calle, código postal de 5 dígitos, ciudad y estado)." });
+    }
     items = [];
     q.groups.forEach((g) => {
       g.lines.forEach((l) => {
         items.push({
           id: `${g.product.id}-${l.variant.id}`,
-          title: `${g.product.name} · ${l.variant.name}${g.product.custom ? (l.text ? ` · nombre: ${l.text}` : " · en blanco") : ""}`.slice(0, 250),
+          title: `${g.product.name} · ${l.variant.name}${g.product.custom ? (l.text ? ` · nombre: ${l.text}` : " · en blanco") : ""}${pickup ? ` · ${q.delivery.name}` : ""}`.slice(0, 250),
           quantity: l.qty,
           unit_price: g.unit,
           currency_id: C.brand.currency,
         });
       });
     });
-    shipping = { amount: q.shipping, name: q.delivery.name };
+    // Recoger nunca cobra envío, aunque cambie el catálogo.
+    shipping = { amount: pickup ? 0 : q.shipping, name: q.delivery.name };
     meta = {
       store: "tarjetas",
-      delivery: q.delivery.name,
+      delivery: pickup ? `${q.delivery.name}: sin costo, coordinar punto y hora por WhatsApp` : q.delivery.name,
       pricing: q.groups.map((g) => `${g.product.name}: ${g.qty} pzas ${g.wholesale ? "mayoreo" : "menudeo"} a ${g.unit}`).join(" | "),
       names: q.groups.flatMap((g) => g.lines.filter((l) => l.text).map((l) => `${g.product.name} ${l.variant.name}: ${l.text}`)).join(" | ").slice(0, 900),
+      programming: C.programSummary(q.groups.flatMap((g) => g.lines)).join(" | ").slice(0, 2000),
     };
   }
   if (shipping.amount) {
@@ -97,11 +105,14 @@ module.exports = async function handler(req, res) {
       customer: {
         name: clean(customer.name, 80),
         phone: clean(customer.phone, 20),
-        address: [customer.street, customer.zip, customer.city, customer.state].map((v) => clean(v, 120)).filter(Boolean).join(", "),
+        address,
+        // Campo viejo "links" (carritos guardados antes del apartado de programación).
         links: clean(customer.links, 1000),
       },
     },
   };
+
+  if (!token) return res.status(500).json({ error: "falta configurar MP_ACCESS_TOKEN en Vercel" });
 
   try {
     const mp = await fetch("https://api.mercadopago.com/checkout/preferences", {

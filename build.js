@@ -51,7 +51,7 @@ function productsLd(pageUrl) {
     "@context": "https://schema.org",
     "@type": "Product",
     name: p.name,
-    description: p.short + " " + p.material + " con chip NFC NTAG213. Menudeo desde 1 pieza y mayoreo desde " + C.wholesaleFrom + " piezas.",
+    description: p.short + " " + p.material + " con chip NFC NTAG213. Menudeo desde 1 pieza y mayoreo desde " + C.minWholesale(p) + " piezas.",
     sku: "TAKTO-" + p.id.toUpperCase(),
     brand: { "@type": "Brand", name: C.brand.name },
     material: p.material,
@@ -131,16 +131,20 @@ function build() {
   // Una página por ciudad
   for (const c of V.CITIES) {
     const url = SITE + "/tarjetas-nfc/" + c.slug + "/";
+    // Zona metropolitana de Guadalajara: también se puede recoger sin costo de envío.
+    const metro = C.pickup.cities.includes(c.name);
     const local =
       '<section class="section light local" id="local"><div class="container local-box">' +
       "<h2>Tarjetas NFC en " + esc(c.name) + ", " + esc(c.state) + "</h2>" +
       '<ul class="local-facts">' +
       "<li><strong>" + esc(c.days) + "</strong><span>Entrega</span></li>" +
-      "<li><strong>Gratis</strong><span>Envío desde " + C.freeShippingFrom + " piezas</span></li>" +
+      (metro
+        ? "<li><strong>Gratis</strong><span>Recoge en Guadalajara</span></li>"
+        : "<li><strong>Gratis</strong><span>Envío desde " + C.freeShippingFrom + " piezas</span></li>") +
       "<li><strong>" + C.formatMoney(minWholesale) + "</strong><span>Mayoreo desde " + C.wholesaleFrom + "</span></li></ul>" +
       '<p class="muted">' + esc(c.focus) + "</p></div></section>";
     const faq = [
-      { q: "¿Hacen envíos de tarjetas NFC a " + c.name + "?", a: "Sí. Enviamos a " + c.name + ", " + c.state + " en " + c.days + ". El envío es gratis desde " + C.freeShippingFrom + " piezas." },
+      { q: "¿Hacen envíos de tarjetas NFC a " + c.name + "?", a: "Sí. Enviamos a " + c.name + ", " + c.state + " en " + c.days + ". El envío es gratis desde " + C.freeShippingFrom + " piezas." + (metro ? " También puedes pagar en línea y recoger sin costo de envío en Guadalajara; te escribimos por WhatsApp para coordinar punto y hora." : "") },
       { q: "¿Puedo revender tarjetas NFC en " + c.name + "?", a: "Sí. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo y te damos el video para configurarlas para cada cliente." },
     ];
     fs.mkdirSync(path.join(OUT, "tarjetas-nfc", c.slug), { recursive: true });
