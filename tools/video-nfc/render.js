@@ -33,9 +33,9 @@ const FPS = 30;
 const args = process.argv.slice(2);
 const only = (args.find((a) => a.startsWith("--only=")) || "").split("=")[1];
 
-// Voz: Angélica, voz mexicana femenina de la biblioteca pública de ElevenLabs (comerciales y redes).
-// Voz anterior: Andres (u36BhA6zuwclwVyAT1Bi).
-const VOICE_ID = process.env.VOICE_ID || "twZzvyYIl5ntDHC1Vatv";
+// Voz: José (locutor, mexicano), la que el dueño agregó a su biblioteca de ElevenLabs.
+// Otro José de la biblioteca (formal): LU0vACP2vTCsged003Jk. Antes: Andres (u36BhA6zuwclwVyAT1Bi), Angélica (twZzvyYIl5ntDHC1Vatv).
+const VOICE_ID = process.env.VOICE_ID || "y2ijeTfmnXjzheHO6zeN";
 const MODEL_ID = "eleven_multilingual_v2";
 
 const FORMATS = {

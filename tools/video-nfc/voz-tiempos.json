@@ -1,262 +1,262 @@
 {
- "voice_id": "twZzvyYIl5ntDHC1Vatv",
+ "voice_id": "y2ijeTfmnXjzheHO6zeN",
  "model_id": "eleven_multilingual_v2",
  "text": "¿Ves esta tarjeta? Tiene un chip NFC. Acerca tu celular… y listo: se abre tu reseña de Google, tu Instagram o tu WhatsApp. Sin apps, sin escanear y sin batería. Funciona con iPhone y Android. Recógela gratis en Guadalajara, o te la enviamos a todo México. TAKTO: un toque y conectas.",
  "words": [
   {
    "w": "¿Ves",
    "start": 0,
-   "end": 0.325
+   "end": 0.221
   },
   {
    "w": "esta",
-   "start": 0.418,
-   "end": 0.604
+   "start": 0.267,
+   "end": 0.395
   },
   {
    "w": "tarjeta?",
-   "start": 0.662,
-   "end": 1.324
+   "start": 0.441,
+   "end": 0.987
   },
   {
    "w": "Tiene",
-   "start": 1.405,
-   "end": 1.904
+   "start": 1.138,
+   "end": 1.335
   },
   {
    "w": "un",
-   "start": 2.02,
-   "end": 2.148
+   "start": 1.37,
+   "end": 1.416
   },
   {
    "w": "chip",
-   "start": 2.218,
-   "end": 2.485
+   "start": 1.451,
+   "end": 1.66
   },
   {
    "w": "NFC.",
-   "start": 2.601,
-   "end": 3.553
+   "start": 1.718,
+   "end": 2.241
   },
   {
    "w": "Acerca",
-   "start": 3.669,
-   "end": 4.203
+   "start": 2.392,
+   "end": 2.705
   },
   {
    "w": "tu",
-   "start": 4.249,
-   "end": 4.331
+   "start": 2.752,
+   "end": 2.821
   },
   {
    "w": "celular…",
-   "start": 4.377,
-   "end": 4.981
+   "start": 2.844,
+   "end": 3.367
   },
   {
    "w": "y",
-   "start": 5.016,
-   "end": 5.132
+   "start": 3.692,
+   "end": 3.75
   },
   {
    "w": "listo:",
-   "start": 5.248,
-   "end": 5.782
+   "start": 3.831,
+   "end": 4.331
   },
   {
    "w": "se",
-   "start": 5.898,
-   "end": 6.13
+   "start": 4.574,
+   "end": 4.702
   },
   {
    "w": "abre",
-   "start": 6.2,
-   "end": 6.42
+   "start": 4.748,
+   "end": 4.923
   },
   {
    "w": "tu",
-   "start": 6.467,
-   "end": 6.548
+   "start": 4.969,
+   "end": 5.05
   },
   {
    "w": "reseña",
-   "start": 6.606,
-   "end": 7.117
+   "start": 5.12,
+   "end": 5.41
   },
   {
    "w": "de",
-   "start": 7.233,
-   "end": 7.372
+   "start": 5.457,
+   "end": 5.515
   },
   {
    "w": "Google,",
-   "start": 7.454,
-   "end": 7.883
+   "start": 5.561,
+   "end": 5.991
   },
   {
    "w": "tu",
-   "start": 7.918,
-   "end": 8.046
+   "start": 6.06,
+   "end": 6.188
   },
   {
    "w": "Instagram",
-   "start": 8.162,
-   "end": 8.684
+   "start": 6.269,
+   "end": 6.734
   },
   {
    "w": "o",
-   "start": 8.8,
-   "end": 8.916
+   "start": 6.85,
+   "end": 6.966
   },
   {
    "w": "tu",
-   "start": 8.998,
-   "end": 9.125
+   "start": 7.024,
+   "end": 7.129
   },
   {
    "w": "WhatsApp.",
-   "start": 9.218,
-   "end": 9.822
+   "start": 7.175,
+   "end": 7.697
   },
   {
    "w": "Sin",
-   "start": 9.88,
-   "end": 10.136
+   "start": 7.755,
+   "end": 8.034
   },
   {
    "w": "apps,",
-   "start": 10.228,
-   "end": 10.519
+   "start": 8.104,
+   "end": 8.44
   },
   {
    "w": "sin",
-   "start": 10.577,
-   "end": 10.786
+   "start": 8.522,
+   "end": 8.707
   },
   {
    "w": "escanear",
-   "start": 10.832,
-   "end": 11.32
+   "start": 8.754,
+   "end": 9.276
   },
   {
    "w": "y",
-   "start": 11.436,
-   "end": 11.517
+   "start": 9.555,
+   "end": 9.636
   },
   {
    "w": "sin",
-   "start": 11.61,
-   "end": 11.749
+   "start": 9.718,
+   "end": 9.845
   },
   {
    "w": "batería.",
-   "start": 11.796,
-   "end": 12.481
+   "start": 9.892,
+   "end": 10.565
   },
   {
    "w": "Funciona",
-   "start": 12.55,
-   "end": 13.073
+   "start": 10.809,
+   "end": 11.215
   },
   {
    "w": "con",
-   "start": 13.131,
-   "end": 13.282
+   "start": 11.262,
+   "end": 11.401
   },
   {
    "w": "iPhone",
-   "start": 13.398,
-   "end": 13.735
+   "start": 11.471,
+   "end": 11.854
   },
   {
    "w": "y",
-   "start": 13.816,
-   "end": 13.932
+   "start": 11.97,
+   "end": 12.063
   },
   {
    "w": "Android.",
-   "start": 14.048,
-   "end": 14.536
+   "start": 12.179,
+   "end": 12.771
   },
   {
    "w": "Recógela",
-   "start": 14.71,
-   "end": 15.348
+   "start": 13.015,
+   "end": 13.421
   },
   {
    "w": "gratis",
-   "start": 15.395,
-   "end": 15.859
+   "start": 13.456,
+   "end": 13.746
   },
   {
    "w": "en",
-   "start": 15.975,
-   "end": 16.126
+   "start": 13.793,
+   "end": 13.839
   },
   {
    "w": "Guadalajara,",
-   "start": 16.196,
-   "end": 17.078
+   "start": 13.874,
+   "end": 14.652
   },
   {
    "w": "o",
-   "start": 17.148,
-   "end": 17.229
+   "start": 14.861,
+   "end": 14.942
   },
   {
    "w": "te",
-   "start": 17.299,
-   "end": 17.38
+   "start": 15,
+   "end": 15.058
   },
   {
    "w": "la",
-   "start": 17.427,
-   "end": 17.485
+   "start": 15.093,
+   "end": 15.139
   },
   {
    "w": "enviamos",
-   "start": 17.508,
-   "end": 18.007
+   "start": 15.163,
+   "end": 15.581
   },
   {
    "w": "a",
-   "start": 18.123,
-   "end": 18.204
+   "start": 15.65,
+   "end": 15.673
   },
   {
    "w": "todo",
-   "start": 18.321,
-   "end": 18.622
+   "start": 15.732,
+   "end": 15.917
   },
   {
    "w": "México.",
-   "start": 18.68,
-   "end": 19.296
+   "start": 15.964,
+   "end": 16.66
   },
   {
    "w": "TAKTO:",
-   "start": 19.412,
-   "end": 20.213
+   "start": 16.939,
+   "end": 17.601
   },
   {
    "w": "un",
-   "start": 20.329,
-   "end": 20.515
+   "start": 17.845,
+   "end": 18.019
   },
   {
    "w": "toque",
-   "start": 20.584,
-   "end": 21.002
+   "start": 18.146,
+   "end": 18.576
   },
   {
    "w": "y",
-   "start": 21.119,
-   "end": 21.211
+   "start": 18.622,
+   "end": 18.646
   },
   {
    "w": "conectas.",
-   "start": 21.328,
-   "end": 22.477
+   "start": 18.762,
+   "end": 19.83
   }
  ]
 }
