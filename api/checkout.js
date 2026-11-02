@@ -21,10 +21,33 @@ module.exports = async function handler(req, res) {
 
   // Abrir /api/checkout en el navegador muestra si el cobro está listo (sin mostrar la clave).
   if (req.method === "GET") {
-    return res.status(200).json({
+    const status = {
       mercadoPago: token ? "configurado" : "falta la variable MP_ACCESS_TOKEN en Vercel",
       modo: token.startsWith("TEST-") ? "prueba" : token.startsWith("APP_USR-") ? "producción" : token ? "clave con formato desconocido" : "sin clave",
-    });
+      // Versión publicada (commit de GitHub) para saber si Vercel ya tiene los últimos cambios.
+      version: (process.env.VERCEL_GIT_COMMIT_SHA || "local").slice(0, 7),
+      rama: process.env.VERCEL_GIT_COMMIT_REF || "",
+    };
+    if (token) {
+      // Prueba real de la clave contra Mercado Pago (no cobra nada).
+      try {
+        const r = await fetch("https://api.mercadopago.com/users/me", { headers: { Authorization: `Bearer ${token}` } });
+        const me = await r.json().catch(() => ({}));
+        if (r.ok) {
+          status.claveValida = true;
+          status.cuenta = me.nickname || me.id || "";
+          // Las cuentas de prueba nuevas también usan APP_USR-; se reconocen por la etiqueta test_user.
+          if (Array.isArray(me.tags) && me.tags.includes("test_user")) status.modo = "prueba (cuenta de prueba)";
+        } else {
+          status.claveValida = false;
+          status.error = r.status === 401 ? "Mercado Pago rechazó la clave: cópiala de nuevo" : "Mercado Pago respondió " + r.status;
+        }
+      } catch (e) {
+        status.claveValida = null;
+        status.error = "No se pudo conectar con Mercado Pago";
+      }
+    }
+    return res.status(200).json(status);
   }
   if (req.method !== "POST") {
     res.setHeader("Allow", "GET, POST");
