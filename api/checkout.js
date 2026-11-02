@@ -60,7 +60,7 @@ module.exports = async function handler(req, res) {
       g.lines.forEach((l) => {
         items.push({
           id: `${g.product.id}-${l.variant.id}`,
-          title: `${g.product.name} · ${l.variant.name}${l.text ? ` · "${l.text}"` : ""}${l.logo ? " · con logo" : ""}`.slice(0, 250),
+          title: `${g.product.name} · ${l.variant.name}${g.product.custom ? (l.text ? ` · nombre: ${l.text}` : " · en blanco") : ""}`.slice(0, 250),
           quantity: l.qty,
           unit_price: g.unit,
           currency_id: C.brand.currency,
@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
       store: "tarjetas",
       delivery: q.delivery.name,
       pricing: q.groups.map((g) => `${g.product.name}: ${g.qty} pzas ${g.wholesale ? "mayoreo" : "menudeo"} a ${g.unit}`).join(" | "),
-      custom: q.groups.flatMap((g) => g.lines.filter((l) => l.text || l.logo).map((l) => `${g.product.name} ${l.variant.name}: ${l.text || ""}${l.logo ? " [logo por WhatsApp]" : ""}`)).join(" | ").slice(0, 900),
+      names: q.groups.flatMap((g) => g.lines.filter((l) => l.text).map((l) => `${g.product.name} ${l.variant.name}: ${l.text}`)).join(" | ").slice(0, 900),
     };
   }
   if (shipping.amount) {

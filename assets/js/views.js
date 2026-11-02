@@ -89,13 +89,14 @@
     var v = C.getVariant(p, variantId) || p.variants[0];
     var n = pick || 1, min = C.minWholesale(p), ws = n >= min;
     custom = custom || {};
+    var named = custom.mode === "name";
     var wsPrice = p.pack ? money(p.wholesale * p.pack) : money(p.wholesale);
     var wsLabel = p.pack ? "Paquete de " + p.pack : "Mayoreo " + min + "+";
     return '<article class="product shape-' + p.shape + '" id="' + p.id + '" data-product="' + p.id + '">' +
-      '<div class="product-media"' + (p.custom ? ' data-drop="' + p.id + '"' : "") + '><div class="tilt"><div class="flip">' +
-      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id, custom) + "</div>" +
+      '<div class="product-media"><div class="tilt"><div class="flip">' +
+      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id, named ? { text: custom.text } : null) + "</div>" +
       '<div class="face back' + (photoFor(p, v) ? " photo" : "") + '" data-face="back">' + backFace(p, v) + "</div></div></div>" +
-      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + (p.custom ? '<span class="drop-hint">Suelta tu logo aquí</span>' : "") + "</div>" +
+      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + "" + "</div>" +
       '<div class="product-body">' +
       '<p class="kicker">NFC · ' + esc(p.materialShort) + "</p>" +
       "<h3>" + esc(p.name.replace("Tarjeta NFC ", "Tarjeta ").replace("Tarjetas NFC ", "Tarjetas ")) + "</h3>" +
@@ -104,10 +105,11 @@
         return '<button type="button" class="variant" data-variant="' + p.id + ":" + x.id + '" aria-pressed="' + (x.id === v.id) + '" title="' + esc(x.name) + '">' + CARDS.swatch(p.id, x.id) + "<span>" + esc(x.name) + "</span></button>";
       }).join("") + "</div>" +
       (p.custom
-        ? '<div class="customize"><input type="text" maxlength="60" data-text="' + p.id + '" value="' + esc(custom.text || "") + '" placeholder="Escribe tu nombre, empresa o frase" aria-label="Texto de la tarjeta">' +
-          '<span class="count" data-count-for="' + p.id + '">' + (custom.text || "").length + "/60</span>" +
-          '<div class="logo-row"><label class="logo-btn">' + (custom.logo ? "Cambiar logo" : "Subir logo") + '<input type="file" accept="image/*" data-logo="' + p.id + '" hidden></label>' +
-          (custom.logo ? '<button type="button" class="logo-clear" data-logo-clear="' + p.id + '">Quitar logo</button>' : '<small>o arrástralo a la tarjeta</small>') + "</div></div>"
+        ? '<div class="customize"><div class="mode-pick" role="radiogroup" aria-label="Personalización">' +
+          '<button type="button" role="radio" data-mode="' + p.id + ':blank" aria-checked="' + !named + '">En blanco</button>' +
+          '<button type="button" role="radio" data-mode="' + p.id + ':name" aria-checked="' + named + '">Con nombre</button></div>' +
+          (named ? '<div class="name-field"><input type="text" maxlength="40" data-text="' + p.id + '" value="' + esc(custom.text || "") + '" placeholder="Escribe el nombre" aria-label="Nombre en la tarjeta">' +
+            '<span class="count" data-count-for="' + p.id + '">' + (custom.text || "").length + "/40</span></div>" : "") + "</div>"
         : "") +
       '<div class="two-prices" role="radiogroup" aria-label="Precio">' +
       '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo · pieza</small></button>" +

@@ -71,7 +71,7 @@
       id: "lisa",
       cartName: "Lisa de plástico",
       name: "Tarjeta NFC lisa de plástico",
-      short: "Negra o blanca. Ponle tu texto o tu logo.",
+      short: "Negra o blanca. En blanco o con tu nombre.",
       photos: { negra: "lisa.jpg", blanca: "lisa.jpg" },
       custom: true,
       material: "Plástico mate",
@@ -93,7 +93,7 @@
       id: "metal",
       cartName: "Metálica",
       name: "Tarjeta NFC metálica",
-      short: "Programada a tu web, app, tienda, menú o redes. Ponle tu nombre o logo.",
+      short: "Programada a tu web, app, tienda, menú o redes. En blanco o con tu nombre.",
       photos: { negra: "metal.jpg", plata: "metal.jpg", dorada: "metal.jpg" },
       custom: true,
       material: "Metal (acero inoxidable)",
@@ -113,7 +113,7 @@
       id: "papel",
       cartName: "Papel negro",
       name: "Tarjeta NFC de papel negro",
-      short: "Ligera y mate. Ponle tu texto o tu logo.",
+      short: "Ligera y mate. En blanco o con tu nombre.",
       photos: { negra: "papel.jpg" },
       custom: true,
       material: "Papel negro grueso",
@@ -174,7 +174,7 @@
       var v = p && getVariant(p, it.variant);
       var n = Math.max(0, Math.min(999, parseInt(it.qty, 10) || 0));
       if (!p || !v || !n) return;
-      lines.push({ product: p, variant: v, qty: n, text: String(it.text || "").slice(0, 60), logo: !!it.logo });
+      lines.push({ product: p, variant: v, qty: n, text: p.custom ? String(it.text || "").slice(0, 40) : "" });
       byProduct[p.id] = (byProduct[p.id] || 0) + n;
     });
 

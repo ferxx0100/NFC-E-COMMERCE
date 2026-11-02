@@ -12,7 +12,7 @@ Todo el material está en `assets/img/marca/`. Cambia `[link]` por tu link con e
 | --- | --- | --- |
 | `vertical-negocios.mp4` (20 s) | Dueños de negocio | ¿Tus clientes no te dejan reseña? 😅 Con esta tarjeta acercan el celular y se abre tu Google. Te llega programada. Desde $345 👉 [link] |
 | `vertical-revende.mp4` (20 s) | Revendedores | ¿Ingreso extra? 💼 Compras en $175 y vendes en $345. Mayoreo desde 20 piezas y te enseñamos a programarlas 👉 [link] |
-| `vertical-personaliza.mp4` (18 s) | Profesionistas | Tu tarjeta de presentación con NFC: escribe tu nombre o sube tu logo y la ves al instante. Metálica desde $450 👉 [link] |
+| `vertical-personaliza.mp4` (18 s) | Profesionistas | Tu tarjeta de presentación con NFC: en blanco o con tu nombre, y la ves al instante. Metálica desde $450 👉 [link] |
 | `reel-que-es-nfc.mp4` (36 s) | Todos | ¿Qué es NFC? Acercas el celular y se abre la reseña, el Instagram o el WhatsApp del negocio. Sin apps 👉 [link] |
 
 ## Historias fijas (con precio)

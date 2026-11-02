@@ -17,10 +17,10 @@ Página corta pensada para vender y para aparecer en Google:
 2. **Productos** (todos con chip NFC). Al pasar el mouse dan vuelta y muestran la **foto real** (`assets/img/productos/`). Dos precios, menudeo primero:
    - Reseñas de Google (plástico, negra o blanca): $345 · mayoreo $175 desde 20
    - Redes sociales (Instagram, WhatsApp, Facebook, TikTok): $345 · mayoreo $175 desde 20
-   - Lisa de plástico (negra o blanca): $68 · paquete de 10 por $399 · personalizable
-   - Metálica (negra, plata, dorada), programada a web, app, tienda, menú o redes: $450 · mayoreo $320 desde 20 · personalizable
-   - Papel negro: $199 · mayoreo $89 desde 20 · personalizable
-   - **Personalizables:** el cliente escribe hasta 60 caracteres o sube/arrastra su logo y lo ve en la tarjeta. El texto llega en el pedido; el logo se pide por WhatsApp después de pagar.
+   - Lisa de plástico (negra o blanca): $68 · paquete de 10 por $399 · en blanco o con nombre
+   - Metálica (negra, plata, dorada), programada a web, app, tienda, menú o redes: $450 · mayoreo $320 desde 20 · en blanco o con nombre
+   - Papel negro: $199 · mayoreo $89 desde 20 · en blanco o con nombre
+   - **Personalizables:** el cliente elige "En blanco" (por defecto) o "Con nombre" (hasta 40 caracteres) y ve el nombre en la tarjeta al instante. El nombre llega en el pedido.
 3. Cómo funciona NFC, qué te llevas, para quién, preguntas frecuentes y ciudades.
 
 Reglas: mayoreo desde 20 piezas de un mismo producto (se pueden mezclar diseños o colores) y envío gratis desde 3 piezas.

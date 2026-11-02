@@ -192,8 +192,8 @@
       } else {
         scenes = [
           '<div class="scene"><p class="big">Tu tarjeta<br>de presentación,<br><span class="muted">con NFC.</span></p></div>',
-          '<div class="scene"><p class="mid">Escribe tu nombre…</p><div class="solo-card" id="type-card"></div><p class="typing" id="type-text"></p></div>',
-          '<div class="scene"><p class="mid">…o sube tu logo.</p><div class="solo-card" id="logo-card"></div><p class="sub">Programada a tu web, menú, tienda o redes.</p></div>',
+          '<div class="scene"><p class="mid">Con tu nombre…</p><div class="solo-card" id="type-card"></div><p class="typing" id="type-text"></p></div>',
+          '<div class="scene"><p class="mid">…o pídela en blanco.</p><div class="solo-card" id="logo-card"></div><p class="sub">Programada a tu web, menú, tienda o redes.</p></div>',
           '<div class="scene"><p class="mid">Metálica</p><p class="big">' + C.formatMoney(mp.retail) + '</p><span class="pill">Negra · Plata · Dorada</span></div>',
           cta("Acércala.<br>Te conocen."),
         ];
@@ -265,7 +265,7 @@
           var lc = document.getElementById("logo-card");
           if (!lc.dataset.done) {
             lc.dataset.done = 1;
-            lc.innerHTML = CARDS.card("metal", "dorada", { text: "Estudio Nómada", logo: LOGO });
+            lc.innerHTML = CARDS.card("metal", "dorada");
           }
         }
       };

@@ -43,8 +43,13 @@
   }
 
   // ---------- Productos ----------
+  // Personalización: "blank" (en blanco, por defecto) o "name" (con nombre).
+  function choice(p) {
+    return (p.custom && state.custom[p.id]) || {};
+  }
   function custom(p) {
-    return p.custom ? state.custom[p.id] || {} : {};
+    var c = choice(p);
+    return c.mode === "name" ? { text: c.text || "" } : {};
   }
 
   function renderFront(p) {
@@ -60,35 +65,14 @@
     $$("[data-variant]", box).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.variant === p.id + ":" + v.id); });
   }
 
-  // Vuelve a armar toda la ficha (cuando cambia el logo).
+  // Vuelve a armar toda la ficha (al cambiar entre en blanco y con nombre).
   function renderProduct(p) {
     var box = $('[data-product="' + p.id + '"]');
-    box.outerHTML = VIEWS.product(p, selected(p).id, state.pick[p.id], custom(p));
+    box.outerHTML = VIEWS.product(p, selected(p).id, state.pick[p.id], choice(p));
     if (finePointer && !reduceMotion) {
       var m = $('[data-product="' + p.id + '"] .product-media');
       tilt(m, $(".tilt", m), 10);
     }
-  }
-
-  // Reduce el logo a 400 px para guardarlo en el navegador sin ocupar mucho.
-  function readLogo(file, pid) {
-    if (!file || !/^image\//.test(file.type)) return toast("El logo debe ser una imagen");
-    var reader = new FileReader();
-    reader.onload = function () {
-      var img = new Image();
-      img.onload = function () {
-        var k = Math.min(1, 400 / Math.max(img.width, img.height)), c = document.createElement("canvas");
-        c.width = Math.round(img.width * k);
-        c.height = Math.round(img.height * k);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        state.custom[pid] = Object.assign({}, state.custom[pid], { logo: c.toDataURL("image/png") });
-        save();
-        renderProduct(C.getProduct(pid));
-        toast("Logo listo ✓");
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
   }
 
   function renderPick(p) {
@@ -119,10 +103,16 @@
   // ---------- Carrito ----------
   function addToCart(pid) {
     var p = C.getProduct(pid), v = selected(p), n = state.pick[pid] || 1, cu = custom(p);
-    var text = (cu.text || "").trim(), logo = cu.logo || "";
-    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id && (l.text || "") === text && (l.logo || "") === logo; })[0];
+    var text = (cu.text || "").trim();
+    if (choice(p).mode === "name" && !text) {
+      toast("Escribe el nombre o elige En blanco");
+      var input = $('[data-text="' + pid + '"]');
+      if (input) input.focus();
+      return;
+    }
+    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id && (l.text || "") === text; })[0];
     if (line) line.qty = Math.min(999, line.qty + n);
-    else state.cart.push({ product: pid, variant: v.id, qty: n, text: text, logo: logo });
+    else state.cart.push({ product: pid, variant: v.id, qty: n, text: text });
     state.pick[pid] = 1;
     save();
     renderPick(p);
@@ -170,10 +160,10 @@
     }
     var html = q.groups.map(function (g) {
       return '<div class="d-group">' + g.lines.map(function (l) {
-          var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text && !!c.logo === l.logo; });
+          var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text; });
           var item = state.cart[i] || {};
-          var extra = (item.text ? "“" + item.text + "”" : "") + (item.logo ? (item.text ? " · " : "") + "con logo" : "");
-          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id, { text: item.text, logo: item.logo }) + "</div>" +
+          var extra = l.product.custom ? (item.text ? "Nombre: " + item.text : "En blanco") : "";
+          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id, { text: item.text }) + "</div>" +
             '<span class="d-name">' + esc(l.product.cartName) + "<small>" + esc(l.variant.name) + " · " + money(g.unit) + " c/u</small>" + (extra ? "<small>" + esc(extra) + "</small>" : "") + "</span>" +
             '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="1" max="999" inputmode="numeric" data-line="' + i + '" value="' + l.qty + '" aria-label="Cantidad"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div>' +
             '<button type="button" class="remove" data-remove="' + i + '" aria-label="Quitar del carrito">×</button></div>';
@@ -215,7 +205,7 @@
     var lines = q.groups.map(function (g) {
       return g.product.name + " (" + (g.wholesale ? "mayoreo" : "menudeo") + ", " + money(g.unit) + " c/u):\n" +
         g.lines.map(function (l) {
-          return "  • " + l.qty + " × " + l.variant.name + (l.text ? " · texto: " + l.text : "") + (l.logo ? " · con logo (te lo envío por aquí)" : "");
+          return "  • " + l.qty + " × " + l.variant.name + (l.product.custom ? (l.text ? " · nombre: " + l.text : " · en blanco") : "");
         }).join("\n");
     }).join("\n");
     var where = c.street + ", CP " + c.zip + ", " + c.city + ", " + c.state;
@@ -249,7 +239,7 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: state.cart.map(function (l) { return { product: l.product, variant: l.variant, qty: l.qty, text: l.text, logo: !!l.logo }; }),
+        items: state.cart.map(function (l) { return { product: l.product, variant: l.variant, qty: l.qty, text: l.text }; }),
         delivery: state.delivery,
         customer: c,
       }),
@@ -287,10 +277,12 @@
       state.pick[id] = Math.max(1, Math.min(999, (state.pick[id] || 1) + (d.pickInc ? 1 : -1)));
       renderPick(C.getProduct(id));
     } else if (d.add) addToCart(d.add);
-    else if (d.logoClear) {
-      state.custom[d.logoClear] = Object.assign({}, state.custom[d.logoClear], { logo: "" });
+    else if (d.mode) {
+      var mp = d.mode.split(":");
+      state.custom[mp[0]] = Object.assign({}, state.custom[mp[0]], { mode: mp[1] });
       save();
-      renderProduct(C.getProduct(d.logoClear));
+      renderProduct(C.getProduct(mp[0]));
+      if (mp[1] === "name") $('[data-text="' + mp[0] + '"]').focus();
     }
     else if (d.remove !== undefined) {
       readCustomer();
@@ -311,27 +303,6 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOrder(); });
 
   var products = $("#products");
-  products.addEventListener("change", function (e) {
-    if (e.target.dataset.logo) readLogo(e.target.files[0], e.target.dataset.logo);
-  });
-  // Arrastrar un logo sobre la tarjeta.
-  products.addEventListener("dragover", function (e) {
-    var zone = e.target.closest("[data-drop]");
-    if (!zone) return;
-    e.preventDefault();
-    zone.classList.add("dragging");
-  });
-  products.addEventListener("dragleave", function (e) {
-    var zone = e.target.closest("[data-drop]");
-    if (zone && !zone.contains(e.relatedTarget)) zone.classList.remove("dragging");
-  });
-  products.addEventListener("drop", function (e) {
-    var zone = e.target.closest("[data-drop]");
-    if (!zone) return;
-    e.preventDefault();
-    zone.classList.remove("dragging");
-    readLogo(e.dataTransfer.files[0], zone.dataset.drop);
-  });
   // En celular, tocar la tarjeta la voltea.
   products.addEventListener("click", function (e) {
     var media = e.target.closest(".product-media");
@@ -340,10 +311,10 @@
   products.addEventListener("input", function (e) {
     if (e.target.dataset.text) {
       var tid = e.target.dataset.text, tp = C.getProduct(tid);
-      state.custom[tid] = Object.assign({}, state.custom[tid], { text: e.target.value.slice(0, 60) });
+      state.custom[tid] = Object.assign({}, state.custom[tid], { text: e.target.value.slice(0, 40) });
       save();
       renderFront(tp);
-      $('[data-count-for="' + tid + '"]').textContent = e.target.value.length + "/60";
+      $('[data-count-for="' + tid + '"]').textContent = e.target.value.length + "/40";
       return;
     }
     var id = e.target.dataset.pick;
@@ -392,7 +363,7 @@
   $$("[data-wa]").forEach(function (el) { el.href = wa("Hola, quiero información de las tarjetas NFC " + C.brand.name); el.target = "_blank"; el.rel = "noopener"; });
 
   C.products.forEach(function (p) {
-    if (p.custom && (custom(p).text || custom(p).logo)) renderProduct(p);
+    if (p.custom && choice(p).mode === "name") renderProduct(p);
     else if (state.sel[p.id]) renderVariant(p);
     renderPick(p);
   });
