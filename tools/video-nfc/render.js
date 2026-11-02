@@ -33,8 +33,9 @@ const FPS = 30;
 const args = process.argv.slice(2);
 const only = (args.find((a) => a.startsWith("--only=")) || "").split("=")[1];
 
-// Voz: Andres, voz mexicana de la biblioteca de ElevenLabs (social media host).
-const VOICE_ID = process.env.VOICE_ID || "u36BhA6zuwclwVyAT1Bi";
+// Voz: Angélica, voz mexicana femenina de la biblioteca pública de ElevenLabs (comerciales y redes).
+// Voz anterior: Andres (u36BhA6zuwclwVyAT1Bi).
+const VOICE_ID = process.env.VOICE_ID || "twZzvyYIl5ntDHC1Vatv";
 const MODEL_ID = "eleven_multilingual_v2";
 
 const FORMATS = {
@@ -43,20 +44,22 @@ const FORMATS = {
 };
 
 function tts(text) {
+  // Se usa curl (respeta HTTPS_PROXY); el módulo https de Node no pasa por el proxy.
   const body = JSON.stringify({ text, model_id: MODEL_ID, voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.2, use_speaker_boost: true } });
   return new Promise((resolve, reject) => {
-    const req = https.request({
-      host: "api.elevenlabs.io",
-      path: "/v1/text-to-speech/" + VOICE_ID + "/with-timestamps?output_format=mp3_44100_128",
-      method: "POST",
-      headers: { "Content-Type": "application/json", "xi-api-key": process.env.ELEVENLABS_API_KEY || "x" },
-    }, (res) => {
-      let s = "";
-      res.on("data", (d) => (s += d));
-      res.on("end", () => (res.statusCode === 200 ? resolve(JSON.parse(s)) : reject(new Error("ElevenLabs " + res.statusCode + ": " + s.slice(0, 300)))));
+    const url = "https://api.elevenlabs.io/v1/text-to-speech/" + VOICE_ID + "/with-timestamps?output_format=mp3_44100_128";
+    const p = spawn("curl", ["-sS", "-m", "120", "-w", "\n%{http_code}", "-X", "POST", url,
+      "-H", "Content-Type: application/json", "-H", "xi-api-key: " + (process.env.ELEVENLABS_API_KEY || "x"), "--data-binary", "@-"]);
+    let s = "";
+    p.stdout.on("data", (d) => (s += d));
+    p.stderr.on("data", (d) => process.stderr.write(d));
+    p.on("error", reject);
+    p.on("close", () => {
+      const i = s.lastIndexOf("\n"), code = s.slice(i + 1).trim(), out = s.slice(0, i);
+      if (code === "200") resolve(JSON.parse(out));
+      else reject(new Error("ElevenLabs " + code + ": " + out.slice(0, 300)));
     });
-    req.on("error", reject);
-    req.end(body);
+    p.stdin.end(body);
   });
 }
 
