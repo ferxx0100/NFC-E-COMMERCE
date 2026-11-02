@@ -1,0 +1,397 @@
+{
+ "voice_id": "y2ijeTfmnXjzheHO6zeN",
+ "model_id": "eleven_multilingual_v2",
+ "text": "¿Qué es una tarjeta NFC? Tiene un chip adentro: acercas el celular y se abre tu enlace. Sin apps, sin batería, con iPhone y Android. Tenemos para reseñas de Google, Instagram, TikTok, WhatsApp y Facebook. En plástico, metal y papel negro. Desde sesenta y ocho pesos, o el paquete de diez en trescientos noventa y nueve. Te llega programada, cambias el enlace cuando quieras, y en Guadalajara la recoges sin costo de envío. TAKTO: un toque y conectas.",
+ "words": [
+  {
+   "w": "¿Qué",
+   "start": 0,
+   "end": 0.221
+  },
+  {
+   "w": "es",
+   "start": 0.267,
+   "end": 0.313
+  },
+  {
+   "w": "una",
+   "start": 0.383,
+   "end": 0.499
+  },
+  {
+   "w": "tarjeta",
+   "start": 0.546,
+   "end": 0.987
+  },
+  {
+   "w": "NFC?",
+   "start": 1.068,
+   "end": 1.672
+  },
+  {
+   "w": "Tiene",
+   "start": 2.043,
+   "end": 2.287
+  },
+  {
+   "w": "un",
+   "start": 2.322,
+   "end": 2.368
+  },
+  {
+   "w": "chip",
+   "start": 2.403,
+   "end": 2.566
+  },
+  {
+   "w": "adentro:",
+   "start": 2.612,
+   "end": 3.135
+  },
+  {
+   "w": "acercas",
+   "start": 3.379,
+   "end": 3.889
+  },
+  {
+   "w": "el",
+   "start": 3.959,
+   "end": 4.005
+  },
+  {
+   "w": "celular",
+   "start": 4.04,
+   "end": 4.47
+  },
+  {
+   "w": "y",
+   "start": 4.679,
+   "end": 4.772
+  },
+  {
+   "w": "se",
+   "start": 4.853,
+   "end": 4.946
+  },
+  {
+   "w": "abre",
+   "start": 4.981,
+   "end": 5.155
+  },
+  {
+   "w": "tu",
+   "start": 5.19,
+   "end": 5.283
+  },
+  {
+   "w": "enlace.",
+   "start": 5.317,
+   "end": 5.933
+  },
+  {
+   "w": "Sin",
+   "start": 6.049,
+   "end": 6.293
+  },
+  {
+   "w": "apps,",
+   "start": 6.362,
+   "end": 6.676
+  },
+  {
+   "w": "sin",
+   "start": 6.792,
+   "end": 7.012
+  },
+  {
+   "w": "batería,",
+   "start": 7.047,
+   "end": 7.732
+  },
+  {
+   "w": "con",
+   "start": 7.814,
+   "end": 8.022
+  },
+  {
+   "w": "iPhone",
+   "start": 8.081,
+   "end": 8.522
+  },
+  {
+   "w": "y",
+   "start": 8.731,
+   "end": 8.812
+  },
+  {
+   "w": "Android.",
+   "start": 8.928,
+   "end": 9.555
+  },
+  {
+   "w": "Tenemos",
+   "start": 9.799,
+   "end": 10.17
+  },
+  {
+   "w": "para",
+   "start": 10.228,
+   "end": 10.368
+  },
+  {
+   "w": "reseñas",
+   "start": 10.437,
+   "end": 10.797
+  },
+  {
+   "w": "de",
+   "start": 10.844,
+   "end": 10.902
+  },
+  {
+   "w": "Google,",
+   "start": 10.948,
+   "end": 11.401
+  },
+  {
+   "w": "Instagram,",
+   "start": 11.575,
+   "end": 12.353
+  },
+  {
+   "w": "TikTok,",
+   "start": 12.469,
+   "end": 13.27
+  },
+  {
+   "w": "WhatsApp",
+   "start": 13.433,
+   "end": 14.095
+  },
+  {
+   "w": "y",
+   "start": 14.327,
+   "end": 14.408
+  },
+  {
+   "w": "Facebook.",
+   "start": 14.524,
+   "end": 15.151
+  },
+  {
+   "w": "En",
+   "start": 15.534,
+   "end": 15.697
+  },
+  {
+   "w": "plástico,",
+   "start": 15.778,
+   "end": 16.567
+  },
+  {
+   "w": "metal",
+   "start": 16.742,
+   "end": 17.229
+  },
+  {
+   "w": "y",
+   "start": 17.345,
+   "end": 17.415
+  },
+  {
+   "w": "papel",
+   "start": 17.531,
+   "end": 17.821
+  },
+  {
+   "w": "negro.",
+   "start": 17.891,
+   "end": 18.402
+  },
+  {
+   "w": "Desde",
+   "start": 18.773,
+   "end": 19.075
+  },
+  {
+   "w": "sesenta",
+   "start": 19.133,
+   "end": 19.516
+  },
+  {
+   "w": "y",
+   "start": 19.574,
+   "end": 19.598
+  },
+  {
+   "w": "ocho",
+   "start": 19.644,
+   "end": 19.83
+  },
+  {
+   "w": "pesos,",
+   "start": 19.888,
+   "end": 20.434
+  },
+  {
+   "w": "o",
+   "start": 20.585,
+   "end": 20.643
+  },
+  {
+   "w": "el",
+   "start": 20.677,
+   "end": 20.724
+  },
+  {
+   "w": "paquete",
+   "start": 20.782,
+   "end": 21.107
+  },
+  {
+   "w": "de",
+   "start": 21.153,
+   "end": 21.223
+  },
+  {
+   "w": "diez",
+   "start": 21.281,
+   "end": 21.571
+  },
+  {
+   "w": "en",
+   "start": 21.664,
+   "end": 21.769
+  },
+  {
+   "w": "trescientos",
+   "start": 21.827,
+   "end": 22.372
+  },
+  {
+   "w": "noventa",
+   "start": 22.419,
+   "end": 22.744
+  },
+  {
+   "w": "y",
+   "start": 22.79,
+   "end": 22.814
+  },
+  {
+   "w": "nueve.",
+   "start": 22.848,
+   "end": 23.324
+  },
+  {
+   "w": "Te",
+   "start": 23.65,
+   "end": 23.766
+  },
+  {
+   "w": "llega",
+   "start": 23.789,
+   "end": 23.986
+  },
+  {
+   "w": "programada,",
+   "start": 24.021,
+   "end": 24.706
+  },
+  {
+   "w": "cambias",
+   "start": 24.822,
+   "end": 25.124
+  },
+  {
+   "w": "el",
+   "start": 25.17,
+   "end": 25.229
+  },
+  {
+   "w": "enlace",
+   "start": 25.263,
+   "end": 25.53
+  },
+  {
+   "w": "cuando",
+   "start": 25.577,
+   "end": 25.774
+  },
+  {
+   "w": "quieras,",
+   "start": 25.821,
+   "end": 26.355
+  },
+  {
+   "w": "y",
+   "start": 26.529,
+   "end": 26.598
+  },
+  {
+   "w": "en",
+   "start": 26.657,
+   "end": 26.703
+  },
+  {
+   "w": "Guadalajara",
+   "start": 26.749,
+   "end": 27.4
+  },
+  {
+   "w": "la",
+   "start": 27.574,
+   "end": 27.69
+  },
+  {
+   "w": "recoges",
+   "start": 27.759,
+   "end": 28.177
+  },
+  {
+   "w": "sin",
+   "start": 28.201,
+   "end": 28.41
+  },
+  {
+   "w": "costo",
+   "start": 28.491,
+   "end": 28.781
+  },
+  {
+   "w": "de",
+   "start": 28.828,
+   "end": 28.886
+  },
+  {
+   "w": "envío.",
+   "start": 28.909,
+   "end": 29.489
+  },
+  {
+   "w": "TAKTO:",
+   "start": 29.872,
+   "end": 30.581
+  },
+  {
+   "w": "un",
+   "start": 30.906,
+   "end": 31.08
+  },
+  {
+   "w": "toque",
+   "start": 31.196,
+   "end": 31.695
+  },
+  {
+   "w": "y",
+   "start": 32.02,
+   "end": 32.113
+  },
+  {
+   "w": "conectas.",
+   "start": 32.229,
+   "end": 33.205
+  }
+ ]
+}

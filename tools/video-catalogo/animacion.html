@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<title>TAKTO · Catálogo NFC (animación para video vertical)</title>
+<!--
+  Animación del video vertical "¿Qué es NFC? + catálogo con precios" (1080×1920).
+  La dibuja render.js cuadro por cuadro: llama a window.render(t) con el segundo del video y toma captura.
+  Los tiempos de cada escena salen de voz-tiempos.js (marcas de ElevenLabs por palabra, con pausas).
+  Zona segura de TikTok/Reels: nada importante en los 420 px de abajo ni en los 140 px de la derecha.
+  Para previsualizar en el navegador: animacion.html?play=1
+  Estilos, celular, ondas y subtítulos: los mismos de tools/video-nfc/animacion.html.
+-->
+<style>
+  @font-face { font-family: "Outfit"; src: url("../../assets/fonts/Outfit-Regular.ttf") format("truetype"); font-weight: 400; }
+  @font-face { font-family: "Outfit"; src: url("../../assets/fonts/Outfit-Bold.ttf") format("truetype"); font-weight: 700; }
+  /* Paleta de la tienda (storefront.css): verde TAKTO sobre crema. */
+  :root { --text: #183c30; --muted: #626b61; --surface: #efefe7; --line: rgba(24,60,48,.13); --blue: #3b82f6; --hi: #ffd84d; --wa: #25d366; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow: hidden; }
+  body { font-family: "Outfit", Arial, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(120% 80% at 50% 38%, #fdfdf9 0%, #f8f8f2 55%, #ebece2 100%); }
+  .abs { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+
+  /* Marca */
+  .brand { display: flex; align-items: center; gap: 14px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+  .brand svg { height: 1em; width: auto; }
+
+  /* Titulares */
+  .headline { text-align: center; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; white-space: nowrap; font-size: 92px; }
+  .headline small { display: block; font-size: .36em; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .55em; }
+  #hook { text-align: center; font-weight: 700; letter-spacing: -0.045em; line-height: .95; white-space: nowrap; font-size: 176px; }
+  #hook small { display: block; font-size: 34px; font-weight: 700; letter-spacing: .16em; color: var(--muted); margin-bottom: 26px; }
+  #hook em { font-style: normal; color: var(--blue); }
+
+  /* Tarjetas (PNG de assets/img/marca; las esquinas negras se recortan con border-radius) */
+  .card { filter: drop-shadow(0 26px 34px rgba(0,0,0,.26)) drop-shadow(0 5px 9px rgba(0,0,0,.14)); }
+  .card img { display: block; width: 100%; height: 100%; }
+  .chip-ring { position: absolute; border-radius: 50%; border: 7px solid var(--blue); }
+  .chip-tag { padding: 12px 26px; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700; white-space: nowrap; font-size: 44px; }
+  .label { font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; text-align: center; }
+
+  /* Ondas NFC */
+  .wave { position: absolute; border-radius: 50%; border: 5px solid var(--blue); }
+
+  /* Celular */
+  .phone { background: #111113; border-radius: 56px; padding: 12px; box-shadow: 0 40px 60px rgba(0,0,0,.28), inset 0 0 0 2px #2c2c30; font-size: 16px; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 45px; overflow: hidden; background: linear-gradient(160deg, #c9d6ff 0%, #e2e2f0 50%, #f7d9e3 100%); }
+  .island { position: absolute; top: 12px; left: 50%; width: 30%; height: 26px; margin-left: -15%; border-radius: 20px; background: #000; z-index: 5; }
+  .lock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: 70px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.15); }
+  .lock b { font-size: 76px; line-height: 1; letter-spacing: -0.03em; }
+  .lock span { font-size: 18px; opacity: .9; }
+  .banner { position: absolute; left: 10px; right: 10px; top: 48px; z-index: 6; display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 22px; background: rgba(255,255,255,.96); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+  .banner i { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--text); display: grid; place-items: center; }
+  .banner i svg { width: 26px; height: 26px; }
+  .banner span { font-size: 16px; line-height: 1.25; color: #3a3a40; }
+  .banner b { display: block; font-size: 17px; color: #111113; }
+  .app { position: absolute; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 64px 20px 20px; }
+  .app strong { font-size: 24px; letter-spacing: -0.02em; }
+  .app .sub { font-size: 16px; color: var(--muted); margin-top: 4px; }
+  .app .btn { margin-top: auto; width: 100%; padding: 14px; border-radius: 999px; font-weight: 700; font-size: 18px; color: #fff; }
+  .g-logo { font-size: 34px; font-weight: 700; letter-spacing: -0.03em; margin: 10px 0 18px; }
+  .g-place { width: 100%; height: 120px; border-radius: 18px; background: linear-gradient(135deg, #d9c2a3, #8a6a4d); margin-bottom: 16px; }
+  .g-stars { display: flex; gap: 6px; margin: 18px 0; font-size: 36px; line-height: 1; }
+  .g-stars i { font-style: normal; color: #dadce0; display: inline-block; }
+  .g-stars i.on { color: #fbbc04; }
+
+  /* Aviso grande "Etiqueta NFC" (como la notificación del iPhone, pero legible en el video) */
+  #alert { display: flex; gap: 22px; align-items: center; width: 660px; padding: 22px 26px; border-radius: 34px; background: rgba(255,255,255,.97); box-shadow: 0 20px 50px rgba(0,0,0,.22); }
+  #alert i { flex: none; width: 76px; height: 76px; border-radius: 20px; background: var(--text); display: grid; place-items: center; }
+  #alert i svg { width: 46px; height: 46px; }
+  #alert span { font-size: 30px; line-height: 1.2; color: #3a3a40; }
+  #alert b { display: block; font-size: 38px; color: #111113; letter-spacing: -0.01em; }
+
+  /* Insignias (beneficios y entrega) */
+  .badge { display: flex; align-items: center; gap: 22px; padding: 20px 34px 20px 22px; border-radius: 28px; background: #fff; border: 1px solid var(--line); box-shadow: 0 16px 40px rgba(0,0,0,.08); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; max-width: 860px; text-wrap: balance; }
+  .badge i { flex: none; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--text); display: grid; place-items: center; }
+  .badge i svg { width: 62%; height: 62%; }
+  .badge.ok i { background: #16a34a; }
+  .badge.no i { background: #c2410c; }
+
+  /* Lista de precios */
+  #prices { width: 860px; padding: 18px 22px; border-radius: 36px; background: #fff; border: 1px solid var(--line); box-shadow: 0 24px 60px rgba(0,0,0,.10); }
+  .row { display: flex; align-items: center; gap: 22px; height: 122px; padding: 0 18px 0 12px; border-radius: 24px; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row.on { background: #e8f3ec; border-top-color: transparent; }
+  .row.on + .row { border-top-color: transparent; }
+  .row .th { flex: none; width: 96px; height: 80px; display: grid; place-items: center; }
+  .row .th img { display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,.2)); }
+  .row .nm { flex: 1; font-size: 46px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+  .row .nm small { display: block; font-size: 26px; font-weight: 400; color: var(--muted); letter-spacing: 0; margin-top: 2px; }
+  .row .pr { flex: none; font-size: 66px; font-weight: 700; letter-spacing: -0.03em; }
+  .pill { display: inline-flex; align-items: center; gap: 16px; padding: 18px 34px; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700; white-space: nowrap; letter-spacing: -0.01em; }
+  .pill.wa { background: var(--wa); color: #08361d; }
+  .pill svg { width: 1.1em; height: 1.1em; }
+
+  /* Cierre */
+  .cta { text-align: center; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+  .cta small { display: block; font-size: .66em; font-weight: 400; color: var(--muted); letter-spacing: 0; margin-bottom: 10px; }
+
+  /* Subtítulos quemados: frase actual, palabras dichas en blanco y la palabra activa resaltada */
+  .subs { text-align: center; width: 880px; font-size: 58px; text-wrap: balance; }
+  .subs span { display: inline; padding: .12em .4em; border-radius: .3em; background: var(--text); color: rgba(255,255,255,.5); font-weight: 700; letter-spacing: -0.01em; line-height: 1.48; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .subs b { color: #fff; font-weight: 700; }
+  .subs b.now { color: var(--hi); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="abs headline" id="headline"></div>
+  <div class="abs" id="hook"><small id="hook-brand"></small>¿Qué es<br><em>NFC?</em></div>
+
+  <!-- Ondas, tarjeta y chip -->
+  <div class="abs" id="waves"></div>
+  <div class="abs card" id="card"><img id="card-img" alt=""><div class="chip-ring" id="chip-ring"></div></div>
+  <div class="abs chip-tag" id="chip-tag">Chip NFC</div>
+
+  <!-- Celular -->
+  <div class="abs phone" id="phone">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="lock"><b>9:41</b><span>lunes 2 de noviembre</span></div>
+      <div class="banner" id="banner"><i id="banner-icon"></i><span><b>Etiqueta NFC</b>Abrir en Google Maps</span></div>
+      <div class="app" id="app-google">
+        <div class="g-logo" id="g-word"></div>
+        <div class="g-place"></div>
+        <strong>Café La Esquina</strong>
+        <span class="sub">Califica tu experiencia</span>
+        <div class="g-stars" id="g-stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+        <span class="btn" style="background:#1a73e8">Publicar reseña</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="abs" id="alert"><i id="alert-icon"></i><span><b>Etiqueta NFC</b>Abrir en Google Maps</span></div>
+
+  <!-- Beneficios -->
+  <div class="abs badge no" id="b0" style="font-size:68px"><i></i>Sin apps</div>
+  <div class="abs badge no" id="b1" style="font-size:68px"><i></i>Sin batería</div>
+  <div class="abs badge ok" id="b2" style="font-size:68px"><i></i>iPhone y Android</div>
+
+  <!-- Diseños, materiales y precios: se llenan desde el script -->
+  <div class="abs" id="designs"></div>
+  <div class="abs" id="materials"></div>
+  <div class="abs" id="prices"></div>
+  <div class="abs pill" id="mayoreo" style="font-size:46px"></div>
+
+  <!-- Entrega -->
+  <div class="abs badge ok" id="d0" style="font-size:52px;width:820px"><i></i>Te llega programada</div>
+  <div class="abs badge" id="d1" style="font-size:52px;width:820px"><i></i>Cambias el enlace cuando quieras</div>
+  <div class="abs badge" id="d2" style="font-size:52px;width:820px"><i></i>Recoge gratis en Guadalajara</div>
+  <div class="abs badge" id="d3" style="font-size:52px;width:820px"><i></i>Envío a todo México</div>
+
+  <!-- Cierre -->
+  <div class="abs brand" id="logo" style="font-size:180px"></div>
+  <div class="abs headline" id="tagline" style="font-size:84px">Un toque y conectas.</div>
+  <div class="abs pill" id="comenta" style="font-size:68px">Comenta «NFC»</div>
+  <div class="abs cta" id="wa" style="font-size:70px"></div>
+
+  <div class="abs subs" id="subs"></div>
+</div>
+
+<script src="voz-tiempos.js"></script>
+<script src="../../assets/js/catalog.js"></script>
+<script src="../../assets/js/cards.js"></script>
+<script>
+(function () {
+  var W = 1080, H = 1920;
+  var CX = 470;            // centro de la zona segura (se dejan 140 px a la derecha)
+  var SUBS_BOTTOM = 1478;  // los subtítulos terminan arriba de los 420 px de abajo
+  var OFFSET = 0.4;        // segundos de silencio antes de la voz
+  var TAIL = 3.2;          // segundos de cierre después de la última palabra
+  var C = window.CATALOG, K = window.CARDS;
+  var IMG = "../../assets/img/marca/";
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- Tarjetas PNG ----------
+  // Radio de las esquinas en px de la imagen original (fuera de él la imagen es negra).
+  var PNG = {
+    "google-negra": [810, 1284, 54], "redes-instagram": [810, 1284, 54], "redes-tiktok": [810, 1284, 54],
+    "redes-whatsapp": [810, 1284, 54], "redes-facebook": [810, 1284, 54],
+    "lisa-negra": [1284, 810, 50], "lisa-blanca": [1284, 810, 50],
+    "metal-dorada": [1284, 810, 45], "metal-plata": [1284, 810, 45], "metal-negra": [1284, 810, 45],
+    "papel-negra": [1284, 810, 26],
+  };
+  function cardImg(name, w) { // <img> de la tarjeta, ancho w en px
+    var d = PNG[name], h = w * d[1] / d[0], r = d[2] * w / d[0];
+    return '<img src="' + IMG + "tarjeta-" + name + '.png" style="width:' + w + "px;height:" + h + "px;border-radius:" + r + 'px" alt="">';
+  }
+  function cardH(name, w) { var d = PNG[name]; return w * d[1] / d[0]; }
+
+  // ---------- Íconos ----------
+  var WAVES_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M8 7c-2.5 3-2.5 7 0 10M12 9c-1.3 1.8-1.3 4.2 0 6M16 5c3.5 4 3.5 10 0 14"/></svg>';
+  var NO = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  var OK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  var EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+  var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  var TRUCK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 10h4l4 4v2h-8z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>';
+  var WA = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3z"/></svg>';
+
+  // ---------- Contenido ----------
+  var MARK = '<svg viewBox="-6 -21 30 42" aria-hidden="true">' + K.mark(0, 0, 1, "#183c30") + "</svg>";
+  $("logo").innerHTML = MARK + "TAKTO";
+  $("hook-brand").textContent = "TAKTO · " + C.brand.city.toUpperCase();
+  var GW = ["#4285F4", "#EA4335", "#FBBC05", "#4285F4", "#34A853", "#EA4335"];
+  $("g-word").innerHTML = "Google".split("").map(function (c, i) { return '<span style="color:' + GW[i] + '">' + c + "</span>"; }).join("");
+  $("banner-icon").innerHTML = WAVES_SVG;
+  $("alert-icon").innerHTML = WAVES_SVG;
+  $("b0").querySelector("i").innerHTML = NO;
+  $("b1").querySelector("i").innerHTML = NO;
+  $("b2").querySelector("i").innerHTML = OK;
+  $("d0").querySelector("i").innerHTML = OK;
+  $("d1").querySelector("i").innerHTML = EDIT;
+  $("d2").querySelector("i").innerHTML = PIN;
+  $("d3").querySelector("i").innerHTML = TRUCK;
+  var tel = C.brand.phoneDisplay.replace(/^\+52\s*/, "");
+  $("wa").innerHTML = "<small>o escríbenos por WhatsApp</small>" + '<span class="pill wa">' + WA + tel + "</span>";
+  var waves = $("waves");
+  for (var i = 0; i < 3; i++) waves.appendChild(document.createElement("div")).className = "wave";
+
+  // Tarjeta principal (gancho y escena del celular): reseñas de Google, negra.
+  var CW = 360, CH = cardH("google-negra", CW);
+  $("card").style.width = CW + "px"; $("card").style.height = CH + "px";
+  $("card-img").outerHTML = cardImg("google-negra", CW);
+  var ring = $("chip-ring"), RR = CW * 0.36;
+  ring.style.width = ring.style.height = RR + "px";
+  ring.style.left = (CW / 2 - RR / 2) + "px"; ring.style.top = (CH * 0.806 - RR / 2) + "px";
+  $("phone").style.width = "320px"; $("phone").style.height = "660px";
+
+  // Diseños: 5 tarjetas (3 arriba, 2 abajo) con su nombre.
+  var DW = 232, DH = cardH("google-negra", DW);
+  var DESIGNS = [
+    { img: "google-negra", name: "Reseñas Google", word: "reseñas", x: CX - 300, y: 505 },
+    { img: "redes-instagram", name: "Instagram", word: "Instagram", x: CX, y: 505 },
+    { img: "redes-tiktok", name: "TikTok", word: "TikTok", x: CX + 300, y: 505 },
+    { img: "redes-whatsapp", name: "WhatsApp", word: "WhatsApp", x: CX - 150, y: 990 },
+    { img: "redes-facebook", name: "Facebook", word: "Facebook", x: CX + 150, y: 990 },
+  ];
+  var designs = $("designs");
+  DESIGNS.forEach(function (d) {
+    d.el = document.createElement("div"); d.el.className = "abs card"; d.el.innerHTML = cardImg(d.img, DW);
+    d.lb = document.createElement("div"); d.lb.className = "abs label"; d.lb.style.fontSize = "38px"; d.lb.textContent = d.name;
+    designs.appendChild(d.el); designs.appendChild(d.lb);
+  });
+
+  // Materiales: cada fila con sus tarjetas en abanico y la etiqueta a la derecha.
+  var MW = 330;
+  var MATS = [
+    { name: "Plástico", sub: "Negra o blanca", word: "plástico", y: 500, cards: [["lisa-blanca", 60, 7], ["lisa-negra", -40, -5]] },
+    { name: "Metal", sub: "Dorada, plata o negra", word: "metal", y: 815, cards: [["metal-negra", 80, 9], ["metal-plata", 10, 1], ["metal-dorada", -60, -7]] },
+    { name: "Papel negro", sub: "Ligera y mate", word: "papel", y: 1130, cards: [["papel-negra", 0, -3]] },
+  ];
+  var materials = $("materials");
+  MATS.forEach(function (m) {
+    m.els = m.cards.map(function (c) {
+      var el = document.createElement("div"); el.className = "abs card"; el.innerHTML = cardImg(c[0], MW);
+      materials.appendChild(el); return el;
+    });
+    m.lb = document.createElement("div"); m.lb.className = "abs label"; m.lb.style.cssText = "font-size:58px;text-align:left";
+    m.lb.innerHTML = m.name + '<div style="font-size:28px;font-weight:400;color:#626b61;letter-spacing:0;margin-top:6px">' + m.sub + "</div>";
+    materials.appendChild(m.lb);
+  });
+
+  // Precios: de assets/js/catalog.js (no se escriben a mano).
+  var P = function (id) { return C.getProduct(id); };
+  var lisa = P("lisa");
+  var PRICE_ROWS = [
+    { th: ["lisa-negra", 92], name: lisa.cartName, price: lisa.retail, word: "sesenta" },
+    { th: ["lisa-blanca", 92], name: "Paquete de " + lisa.pack + " lisas", price: Math.round(lisa.wholesale * lisa.pack), word: "paquete" },
+    { th: ["papel-negra", 92], name: P("papel").cartName, price: P("papel").retail },
+    { th: ["google-negra", 50], name: P("google").cartName, price: P("google").retail },
+    { th: ["redes-instagram", 50], name: P("redes").cartName, price: P("redes").retail },
+    { th: ["metal-dorada", 92], name: P("metal").cartName, price: P("metal").retail },
+  ];
+  $("prices").innerHTML = PRICE_ROWS.map(function (r) {
+    return '<div class="row"><span class="th">' + cardImg(r.th[0], r.th[1]) + '</span><span class="nm">' + r.name + '</span><span class="pr">' + C.formatMoney(r.price) + "</span></div>";
+  }).join("");
+  var rowEls = $("prices").children;
+  $("mayoreo").textContent = "Mayoreo desde " + C.wholesaleFrom + " piezas";
+
+  // ---------- Tiempos de la voz ----------
+  var VO = window.VOICE || { words: [] };
+  var words = VO.words;
+  function at(word, from) { // segundo (del audio) en que empieza una palabra
+    for (var i = from || 0; i < words.length; i++) if (words[i].w.toLowerCase().indexOf(word.toLowerCase()) === 0) return words[i].start;
+    return 0;
+  }
+  var T = {
+    tiene: at("Tiene"), chip: at("chip"), acerca: at("acercas"), listo: at("y", 10), abre: at("se", 10),
+    sin: at("Sin"), sin2: at("sin", 18), con: at("con", 18),
+    tenemos: at("Tenemos"), en: at("En", 33), desde: at("Desde"), te: at("Te", 50),
+    cambias: at("cambias"), gdl: at("y", 60), envio: at("envío"), takto: at("TAKTO"), toque: at("toque"),
+    end: words.length ? words[words.length - 1].end : 36,
+  };
+  T.ding = T.listo;
+  DESIGNS.forEach(function (d) { d.t = at(d.word, 20); });
+  MATS.forEach(function (m) { m.t = at(m.word, 30); });
+  PRICE_ROWS.forEach(function (r) { r.t = r.word ? at(r.word, 40) : null; });
+
+  // Frases de subtítulos: corta en signos de puntuación o cuando ya no cabe en dos renglones.
+  var phrases = [], cur = [], chars = 0;
+  words.forEach(function (w, i) {
+    cur.push(w); chars += w.w.length + 1;
+    var next = words[i + 1];
+    var breakAfter = /[.?:…]$/.test(w.w) || (/,$/.test(w.w) && chars >= 12) || (next && chars + next.w.length > 54);
+    if (breakAfter || i === words.length - 1) { phrases.push(cur); cur = []; chars = 0; }
+  });
+
+  // ---------- Utilidades de animación ----------
+  function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function ease(x) { x = clamp(x); return 1 - Math.pow(1 - x, 3); }
+  function easeIO(x) { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+  function back(x) { x = clamp(x); var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); }
+  function p(t, a, d) { return clamp((t - a) / (d || 0.4)); } // progreso 0..1
+  function lerp(a, b, k) { return a + (b - a) * k; }
+  function place(el, x, y, s, r, o) {
+    el.style.transform = "translate(" + x + "px," + y + "px) translate(-50%,-50%) scale(" + (s == null ? 1 : s) + ") rotate(" + (r || 0) + "deg)";
+    el.style.opacity = o == null ? 1 : o;
+    el.style.visibility = o <= 0.001 ? "hidden" : "visible";
+  }
+  // Entra con rebote en a y sale (desvanece hacia arriba) en b.
+  function pop(el, x, y, t, a, b, rot, s0) {
+    var k = back(p(t, a, 0.45)), o = 1 - ease(p(t, b - 0.3, 0.3));
+    place(el, x, y + (1 - k) * 40 - (1 - o) * 30, (s0 == null ? 0.7 : s0) + (1 - (s0 == null ? 0.7 : s0)) * k, rot || 0, clamp(k * 1.6) * o);
+  }
+
+  // Titulares por escena: [desde, hasta, html, y]
+  var HEADS = [
+    [T.tiene, T.acerca, "<small>Adentro tiene</small>Un chip NFC", 300],
+    [T.acerca, T.abre, "<small>Paso 1</small>Acerca el celular", 300],
+    [T.abre, T.sin, "<small>Paso 2</small>Se abre tu enlace", 300],
+    [T.sin, T.tenemos, "<small>Así de fácil</small>Nada que instalar", 330],
+    [T.tenemos, T.en, "<small>Diseños</small>Para tu negocio", 200],
+    [T.en, T.desde, "<small>Materiales</small>Elige el tuyo", 230],
+    [T.desde, T.te, "<small>Catálogo TAKTO</small>Precios", 200],
+    [T.te, T.takto, "<small>Sin complicaciones</small>Lista para usar", 300],
+  ];
+  var lastHead = null;
+
+  window.DURATION = OFFSET + T.end + TAIL;
+  window.TIMES = T; window.OFFSET = OFFSET;
+
+  window.render = function (vt) {
+    var t = vt - OFFSET; // tiempo del audio
+
+    // ----- 1. Gancho: "¿Qué es NFC?" (visible desde el primer cuadro: sirve de portada)
+    var ho = 1 - ease(p(t, T.tiene - 0.3, 0.35));
+    place($("hook"), CX, 450 - (1 - ho) * 40, 1, 0, ho);
+
+    // Titular de escena
+    var hd = null;
+    HEADS.forEach(function (h) { if (t >= h[0] - 0.05 && t < h[1] - 0.05) hd = h; });
+    var hl = $("headline");
+    if (hd !== lastHead) { hl.innerHTML = hd ? hd[2] : ""; lastHead = hd; }
+    if (hd) {
+      var hk = ease(p(t, hd[0] - 0.05, 0.35)), hz = 1 - ease(p(t, hd[1] - 0.3, 0.25));
+      place(hl, CX, hd[3] + (1 - hk) * 30, 1, 0, Math.min(hk, hz));
+    } else place(hl, CX, 300, 1, 0, 0);
+
+    // ----- 1-2. Tarjeta: centrada en el gancho, se recorre a la izquierda cuando llega el celular, sale en "Sin apps"
+    var card = $("card");
+    var kmove = easeIO(p(t, T.acerca - 0.15, 0.6)), kout = easeIO(p(t, T.sin - 0.15, 0.45));
+    var cx = lerp(CX, 270, kmove), cy = lerp(1000, 940, kmove), cs = lerp(1.08, 0.92, kmove);
+    var tilt = lerp(-4, -8, kmove) + Math.sin(vt * 1.6) * 1.2;
+    place(card, cx - kout * 700, cy + Math.sin(vt * 2.1) * 6, cs, tilt, 1 - kout);
+    // Aro azul latiendo sobre el chip (desde el primer cuadro hasta que se acerca el celular)
+    var pulse = 1 - ease(p(t, T.acerca + 0.3, 0.3));
+    var ph = ((vt + 0.35) * 1.6) % 1;
+    ring.style.opacity = pulse * (1 - ph * 0.75);
+    ring.style.transform = "scale(" + (0.85 + ph * 0.5) + ")";
+    var tagk = back(p(t, T.chip - 0.1, 0.4)), tago = 1 - ease(p(t, T.acerca - 0.1, 0.25));
+    var chipY = cy - CH * cs / 2 + CH * cs * 0.806;
+    place($("chip-tag"), CX + 290, chipY - 10, 0.6 + 0.4 * tagk, 0, clamp(tagk) * tago);
+
+    // ----- 2. Celular se acerca → ondas → aviso "Etiqueta NFC" → se abre
+    var phone = $("phone");
+    var pin = easeIO(p(t, T.acerca - 0.05, 0.9)), pout = easeIO(p(t, T.sin - 0.15, 0.45));
+    var tap = Math.sin(clamp((t - (T.acerca + 0.85)) / 0.35) * Math.PI) * 18;
+    var PX = 650, PY = 900;
+    place(phone, PX + (1 - pin) * 700 + pout * 900 - tap, PY + (1 - pin) * 60, 1.15, lerp(18, 7, pin), pin > 0 ? 1 : 0);
+    var wv = Math.min(ease(p(t, T.acerca + 0.7, 0.2)), 1 - ease(p(t, T.sin - 0.4, 0.3)));
+    waves.style.transform = "translate(" + ((cx + PX) / 2 + 10) + "px," + (chipY - 40) + "px)";
+    Array.prototype.forEach.call(waves.children, function (w, i) {
+      var k = ((t * 1.2) + i / 3) % 1, r = 60 + k * 340;
+      w.style.width = w.style.height = r + "px";
+      w.style.left = w.style.top = (-r / 2) + "px";
+      w.style.opacity = wv * (1 - k) * 0.9;
+    });
+    var bk = Math.min(ease(p(t, T.listo - 0.05, 0.25)), 1 - ease(p(t, T.abre + 0.25, 0.25)));
+    var banner = $("banner");
+    banner.style.opacity = bk * 0; // el aviso se muestra en grande (#alert), no dentro del celular
+    banner.style.transform = "translateY(" + (-(1 - bk) * 40) + "px)";
+    var ak = Math.min(back(p(t, T.listo - 0.05, 0.4)), 1 - ease(p(t, T.abre + 0.7, 0.3)));
+    place($("alert"), CX, 480 - (1 - clamp(ak)) * 40, 0.85 + 0.15 * ak, 0, clamp(ak * 1.5));
+    var ag = ease(p(t, T.abre, 0.3));
+    $("app-google").style.opacity = ag;
+    $("app-google").style.transform = "scale(" + lerp(0.92, 1, ag) + ")";
+    var stars = $("g-stars").children;
+    for (var s = 0; s < 5; s++) stars[s].className = t > T.abre + 0.35 + s * 0.1 ? "on" : "";
+
+    // ----- 3. Sin apps · Sin batería · iPhone y Android
+    pop($("b0"), CX, 660, t, T.sin, T.tenemos);
+    pop($("b1"), CX, 890, t, T.sin2 - 0.05, T.tenemos);
+    pop($("b2"), CX, 1120, t, T.con, T.tenemos);
+
+    // ----- 4. Diseños: aparecen uno por uno con la voz
+    DESIGNS.forEach(function (d, i) {
+      var k = back(p(t, d.t - 0.12, 0.45)), o = 1 - ease(p(t, T.en - 0.35, 0.35));
+      var next = i + 1 < DESIGNS.length ? DESIGNS[i + 1].t : d.t + 0.9;
+      var hi = t >= d.t - 0.12 && t < next - 0.12 ? 1 : 0; // la que se está diciendo, un poco más grande
+      var sc = (0.6 + 0.4 * k) * (1 + 0.05 * hi);
+      place(d.el, d.x, d.y + (1 - k) * 60, sc, (i % 2 ? 3 : -3), clamp(k * 1.6) * o);
+      place(d.lb, d.x, d.y + DH / 2 + 46, 1, 0, clamp(ease(p(t, d.t, 0.3))) * o);
+      d.lb.style.color = hi ? "#1a73e8" : "#183c30";
+    });
+
+    // ----- 5. Materiales
+    MATS.forEach(function (m) {
+      var k = back(p(t, m.t - 0.12, 0.45)), o = 1 - ease(p(t, T.desde - 0.35, 0.35));
+      m.els.forEach(function (el, j) {
+        var c = m.cards[j];
+        place(el, 290 + c[1] * k - (1 - k) * 120, m.y, 0.8 + 0.2 * k, c[2] * k, clamp(k * 1.6) * o);
+      });
+      var lk = ease(p(t, m.t, 0.35));
+      m.lb.style.transform = "translate(" + (560 + (1 - lk) * 40) + "px," + m.y + "px) translate(0,-50%)";
+      m.lb.style.opacity = lk * o;
+      m.lb.style.visibility = lk * o > 0 ? "visible" : "hidden";
+    });
+
+    // ----- 6. Lista de precios (se queda hasta "Te llega")
+    var pk = ease(p(t, T.desde - 0.1, 0.4)), po = 1 - ease(p(t, T.te - 0.3, 0.3));
+    var prices = $("prices"), PH = prices.offsetHeight;
+    place(prices, CX, 340 + PH / 2 + (1 - pk) * 50, 0.94 + 0.06 * pk, 0, pk * po);
+    PRICE_ROWS.forEach(function (r, i) {
+      var rk = ease(p(t, T.desde + i * 0.14, 0.35));
+      var el = rowEls[i];
+      el.style.opacity = rk;
+      el.style.transform = "translateX(" + (1 - rk) * 40 + "px)";
+      var on = (i === 0 && t >= PRICE_ROWS[0].t - 0.1 && t < PRICE_ROWS[1].t - 0.1) || (i === 1 && t >= PRICE_ROWS[1].t - 0.1 && t < T.te);
+      el.className = "row" + (on ? " on" : "");
+    });
+    var mk = back(p(t, PRICE_ROWS[1].t + 0.9, 0.45));
+    place($("mayoreo"), CX, 340 + PH + 76, 0.7 + 0.3 * mk, 0, clamp(mk * 1.6) * po);
+
+    // ----- 7. Entrega
+    var dt = [T.te, T.cambias, T.gdl, T.envio - 0.1], dy = [540, 740, 940, 1120];
+    for (var d = 0; d < 4; d++) pop($("d" + d), CX, dy[d], t, dt[d], T.takto);
+
+    // ----- 8. Cierre
+    var kl = back(p(t, T.takto - 0.05, 0.6));
+    place($("logo"), CX, 520, 0.6 + 0.4 * kl, 0, clamp(kl * 1.5));
+    var kt = ease(p(t, T.toque - 0.3, 0.4));
+    place($("tagline"), CX, 700 + (1 - kt) * 30, 1, 0, kt);
+    var kc = back(p(t, T.end + 0.05, 0.45));
+    place($("comenta"), CX, 930, 0.7 + 0.3 * kc, 0, clamp(kc * 1.6));
+    var kw = back(p(t, T.end + 0.45, 0.45));
+    place($("wa"), CX, 1135 + (1 - kw) * 30, 0.8 + 0.2 * kw, 0, clamp(kw * 1.6));
+
+    // Subtítulos: frase actual, palabras dichas en blanco y la activa en amarillo
+    var subs = $("subs");
+    var ph2 = null;
+    for (var j = 0; j < phrases.length; j++) {
+      var a = phrases[j][0].start, z = j + 1 < phrases.length ? phrases[j + 1][0].start : T.end + 0.6;
+      if (t >= a - 0.05 && t < z) ph2 = phrases[j];
+    }
+    if (ph2) {
+      subs.innerHTML = "<span>" + ph2.map(function (w, n) {
+        var nx = ph2[n + 1];
+        var now = t >= w.start - 0.02 && (nx ? t < nx.start - 0.02 : t < w.end + 0.25);
+        return t >= w.start - 0.02 ? "<b" + (now ? ' class="now"' : "") + ">" + w.w + "</b>" : w.w;
+      }).join(" ") + "</span>";
+      subs.style.transform = "translate(" + (CX - 440) + "px," + (SUBS_BOTTOM - subs.offsetHeight) + "px)";
+      subs.style.opacity = 1;
+    } else subs.style.opacity = 0;
+  };
+
+  // Espera la tipografía y las imágenes antes del primer cuadro.
+  var imgs = Array.prototype.map.call(document.images, function (im) {
+    return im.complete ? Promise.resolve() : new Promise(function (r) { im.onload = im.onerror = r; });
+  });
+  window.ready = Promise.all([document.fonts ? document.fonts.ready : Promise.resolve()].concat(imgs)).then(function () { window.render(0); return true; });
+  if (new URLSearchParams(location.search).get("play")) {
+    var t0 = performance.now();
+    (function loop() { var t = (performance.now() - t0) / 1000; window.render(t % window.DURATION); requestAnimationFrame(loop); })();
+  }
+})();
+</script>
+</body>
+</html>
