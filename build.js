@@ -120,9 +120,9 @@ function build() {
     url: home,
     title: "Tarjetas NFC para Reseñas de Google | Menudeo y Mayoreo | TAKTO",
     description: "Tarjetas NFC de plástico, metálicas y de papel para reseñas de Google, Instagram, WhatsApp, TikTok y Facebook. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.formatMoney(minWholesale) + ". Envíos a todo México.",
-    eyebrow: "Plástico · Metal · Papel",
-    h1: h1Lines("Tarjetas NFC.", "Acerca el celular y listo."),
-    lead: "Tarjetas con chip NFC para Google, Instagram y WhatsApp. Te llegan programadas.",
+    eyebrow: "CONEXIONES REALES. UN SOLO TOQUE.",
+    h1: h1Lines("Menos pasos.", "Más conexiones."),
+    lead: "Tu negocio, a un toque de distancia. Tarjetas NFC para compartir lo que haces, sumar reseñas y hacer que te recuerden.",
     city: null,
     ld: [organization(), { "@context": "https://schema.org", "@type": "WebSite", name: C.brand.name, url: home, inLanguage: "es-MX" }, ...productsLd(home), faqLd()],
   }));

@@ -25,12 +25,16 @@
   <link rel="preload" href="/assets/fonts/Outfit-Bold.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="/assets/fonts/Outfit-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/assets/css/takto.css">
+  <link rel="stylesheet" href="/assets/css/storefront.css">
   {{JSONLD}}
 </head>
-<body>
+<body class="storefront">
+  <a class="skip-link" href="#productos">Saltar al catálogo</a>
+  <div class="announcement">De Guadalajara a todo México <span>Envío gratis desde {{FREE}} piezas ↗</span></div>
   <header class="header" id="header">
     <div class="container">
       <a class="logo" href="/" aria-label="TAKTO, tarjetas NFC"><span data-mark></span>TAKTO</a>
+      <nav class="store-nav" aria-label="Principal"><a href="#productos">La colección</a><a href="#nfc">Cómo funciona</a><a href="#mayoreo">Mayoreo</a><a href="/pay/">TAKTO Pay ↗</a></nav>
       <div class="header-actions">
         <a class="btn btn-line" data-wa href="https://wa.me/{{WHATSAPP}}">WhatsApp</a>
         <button class="bag" type="button" data-open-order aria-label="Ver carrito">
@@ -49,9 +53,12 @@
           <span class="eyebrow fade-up">{{EYEBROW}}</span>
           <h1>{{H1}}</h1>
           <p class="lead fade-up d1">{{LEAD}}</p>
-          <a class="btn btn-primary fade-up d2" href="#productos">Ver tarjetas</a>
+          <div class="hero-cta"><a class="btn btn-primary" href="#productos">Encuentra tu tarjeta <span aria-hidden="true">↗</span></a><a class="hero-link" href="#nfc">Un toque. Así funciona <span aria-hidden="true">↓</span></a></div>
+          <div class="hero-note"><span class="status-dot"></span>Sin apps. Sin baterías. Sin complicaciones.</div>
         </div>
         <div class="nfc-stage" id="stage">
+          <div class="stage-caption"><span>DISEÑADAS PARA CONECTAR</span><span>NFC / 01</span></div>
+          <span class="stage-word" aria-hidden="true">toca.</span>
           <div class="nfc-scene" id="hero-tilt" aria-hidden="true">
             <div class="nfc-card"><div id="hero-card"></div></div>
             <div class="nfc-burst"><i></i><i></i><i></i></div>
@@ -64,21 +71,25 @@
               </div>
             </div>
           </div>
+          <div class="stage-bottom"><span>Un pequeño objeto.<br>Muchas puertas abiertas.</span><a href="#productos" aria-label="Explorar la colección">↘</a></div>
         </div>
       </div>
     </section>
+    <div class="benefit-bar container"><span><b>01</b> Listas para usar</span><span><b>02</b> Personaliza tu conexión</span><span><b>03</b> Menudeo y mayoreo</span><span><b>04</b> Hechas para tu negocio</span></div>
 
     <!-- Productos -->
     <section class="section products-section" id="productos">
       <div class="container">
         <div class="products-head">
-          <h2>Tarjetas NFC</h2>
-          <p>Menudeo desde 1 pieza · Mayoreo desde {{WHOLESALE}} · Envío gratis desde {{FREE}}</p>
+          <div><span class="eyebrow">LA COLECCIÓN / NFC</span><h2>Tu siguiente<br>buena conexión.</h2></div>
+          <p>Más reseñas. Más contactos. Más posibilidades.<br>Elige qué pasa cuando alguien se acerca.</p>
         </div>
+        <div class="catalog-toolbar"><div class="catalog-filters" role="group" aria-label="Filtrar tarjetas"><button type="button" data-filter="all" aria-pressed="true">Todas <span>05</span></button><button type="button" data-filter="business" aria-pressed="false">Para tu negocio</button><button type="button" data-filter="custom" aria-pressed="false">Personalizables</button></div><span class="catalog-count" role="status" data-catalog-count>5 diseños · precios en MXN</span></div>
         <div class="products" id="products"><!--@products--></div>
       </div>
     </section>
 
+    <section class="wholesale-section" id="mayoreo"><div class="container wholesale-layout"><div><span class="eyebrow">BUENAS CONEXIONES. MEJORES NEGOCIOS.</span><h2>Pequeño formato.<br>Gran oportunidad.</h2><p>Para tu equipo, tus clientes o tu próximo negocio. Desde {{WHOLESALE}} piezas de un mismo producto accedes al precio de mayoreo. Combina colores y diseños.</p><a class="btn btn-primary" href="https://wa.me/{{WHATSAPP}}" data-wa>Hablemos de tu proyecto ↗</a></div><div class="wholesale-object"><span class="object-label">TU MARCA. TU ENLACE. TU TAKTO.</span><div class="editorial-card"><span>TAKTO ↗</span><strong>Mucho gusto.<br>Sigamos en<br>contacto.</strong><span>NFC — ACERCA TU CELULAR</span></div><span class="object-caption">Personalízala con tu nombre.</span></div></div></section>
     <!--@local-->
 
     <!-- Qué es NFC y cómo se entregan -->
@@ -96,7 +107,7 @@
     <!-- Preguntas -->
     <section class="section" id="faq">
       <div class="container">
-        <h2 class="center-title">Preguntas</h2>
+        <div class="faq-heading"><span class="eyebrow">TODO CLARO, DESDE EL PRINCIPIO</span><h2>Qué bueno<br>que preguntas.</h2><p>Lo que necesitas saber antes de dar el primer toque.</p></div>
         <div class="faq"><!--@faq--></div>
       </div>
     </section>
@@ -114,7 +125,7 @@
     <div class="container">
       <div><a class="logo" href="/"><span data-mark></span>TAKTO</a><p style="margin:12px 0 0">Tarjetas NFC · Guadalajara, Jalisco<br>WhatsApp <a href="https://wa.me/{{WHATSAPP}}" data-wa>{{PHONE}}</a></p></div>
       <div class="footer-links"><a href="/#productos">Tarjetas</a><a href="/#faq">Preguntas</a><a href="/pay/">Cobro para máquinas</a></div>
-      <p class="legal">Google, Instagram, WhatsApp, TikTok y Facebook son marcas de sus dueños. TAKTO no está afiliado a ellos.</p>
+      <div class="footer-statement">El siguiente paso<br>empieza con un toque<span>↗</span></div><p class="legal">Google, Instagram, WhatsApp, TikTok y Facebook son marcas de sus dueños. TAKTO no está afiliado a ellos.</p>
     </div>
   </footer>
 
@@ -133,5 +144,6 @@
   <script src="/assets/js/cards.js"></script>
   <script src="/assets/js/views.js"></script>
   <script src="/assets/js/app.js"></script>
+  <script src="/assets/js/storefront.js"></script>
 </body>
 </html>

@@ -158,7 +158,11 @@
       body.innerHTML = '<div class="empty-msg"><p>Tu carrito está vacío.</p><a class="btn btn-primary" href="#productos" data-close-order>Ver tarjetas</a></div>';
       return;
     }
-    var html = q.groups.map(function (g) {
+    var remaining = Math.max(0, C.freeShippingFrom - q.qty);
+    var html = '<div class="shipping-progress" role="status"><span>' +
+      (remaining ? 'Agrega ' + remaining + (remaining === 1 ? ' tarjeta más' : ' tarjetas más') + ' y tu envío es gratis.' : 'Tu pedido ya tiene envío gratis.') +
+      '</span><progress max="' + C.freeShippingFrom + '" value="' + Math.min(q.qty, C.freeShippingFrom) + '" aria-label="Avance para envío gratis"></progress></div>';
+    html += q.groups.map(function (g) {
       return '<div class="d-group">' + g.lines.map(function (l) {
           var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text; });
           var item = state.cart[i] || {};
