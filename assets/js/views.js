@@ -15,25 +15,32 @@
   }
 
   var ship = C.getDelivery("envio");
-  // Mínimo de mayoreo general y excepciones (p. ej. la tarjeta lisa desde 10).
-  var wsNote = C.wholesaleFrom + " piezas de un mismo producto" + C.products.filter(function (p) { return C.minWholesale(p) !== C.wholesaleFrom; }).map(function (p) { return " (" + C.minWholesale(p) + " en la " + p.cartName.toLowerCase() + ")"; }).join("");
   var pick = C.pickup;
+  var G = C.getProduct("google"), LISA = C.getProduct("lisa"), METAL = C.getProduct("metal"), PAPEL = C.getProduct("papel");
+  // Precio más bajo por pieza suelta (sin contar los paquetes).
+  var fromPrice = Math.min.apply(null, C.products.filter(function (p) { return !p.packOf; }).map(function (p) { return p.retail; }));
+  var priceList =
+    "Reseñas de Google y redes sociales: " + C.priceRule(G) +
+    " Lisa de plástico: " + C.priceRule(LISA) +
+    " Metálica: " + C.priceRule(METAL) +
+    " Cartón negro: " + C.priceRule(PAPEL).replace(/^P/, "p");
+  var setup = "Nosotros te las configuramos con tu enlace, o si prefieres te mandamos un video corto para que las configures tú.";
   var FAQ = [
     { q: "¿Qué es una tarjeta NFC?", a: "Una tarjeta con un chip. Acercas el celular y se abre lo que tú quieras: tus reseñas de Google, Instagram, WhatsApp, tu menú o tu contacto. Sin escanear nada y sin apps." },
-    { q: "¿Todas las tarjetas son NFC?", a: "Sí. Todas llevan chip NFC original, en plástico, metal o papel." },
+    { q: "¿Todas las tarjetas son NFC?", a: "Sí. Todas llevan chip NFC original, en plástico, metal o cartón." },
     { q: "¿Funcionan con iPhone y Android?", a: "Sí. iPhone XS o más nuevo la lee sin apps, solo acercándolo. En Android basta con tener el NFC encendido (Ajustes → Conexiones → NFC)." },
     { q: "¿Y si el celular de mi cliente no tiene NFC?", a: "La gran mayoría de los celulares desde 2018 tienen NFC. Si alguno no lo tiene, le compartes el mismo enlace por WhatsApp." },
-    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(Math.min.apply(null, C.products.map(function (p) { return p.retail; }))) + " por pieza. Desde " + wsNote + " pagas precio de mayoreo." },
+    { q: "¿Cuánto cuesta una tarjeta NFC?", a: "Desde " + money(fromPrice) + " por pieza. " + priceList },
     { q: "¿Cómo pago?", a: "Aquí mismo en la página con Mercado Pago: tarjeta de crédito o débito, efectivo en OXXO, transferencia SPEI o saldo de Mercado Pago. Es pago seguro: nosotros nunca vemos los datos de tu tarjeta." },
     { q: "¿Puedo recoger en Guadalajara sin pagar envío?", a: "Sí. Elige «Recoger en Guadalajara» en el carrito: pagas en línea y pasas por tu pedido sin costo de envío. Te escribimos por WhatsApp para coordinar punto y hora. Aplica en " + pick.cities.join(", ") + "." },
-    { q: "¿Hacen envíos a toda la República?", a: "Sí. El envío cuesta " + money(ship.cost) + " y es gratis desde " + C.freeShippingFrom + " piezas." },
+    { q: "¿Hacen envíos a toda la República?", a: "Sí. El envío cuesta " + money(ship.cost) + " y es gratis desde " + C.freeShippingFrom + " tarjetas en tu pedido (un paquete de cartón ya trae " + PAPEL.packOf + ", así que va con envío gratis)." },
     { q: "¿En cuánto tiempo la recibo?", a: "Las tarjetas en existencia salen en 24 horas. Las que dicen «Bajo pedido» se fabrican en 7 a 12 días hábiles. El envío tarda de 2 a 5 días hábiles según tu ciudad." },
-    { q: "¿Llegan programadas?", a: "Sí. En el carrito eliges qué abre cada tarjeta (Google, Instagram, WhatsApp, tu web o tu contacto) y nos pasas el enlace. Si aún no lo sabes, te mandamos un video para programarla tú." },
+    { q: "¿Llegan programadas?", a: "Sí. " + setup + " En el carrito eliges qué abre cada tarjeta (Google, Instagram, WhatsApp, tu web o tu contacto) y nos pasas el enlace; si aún no lo sabes, te lo pedimos por WhatsApp." },
     { q: "¿Cómo saco mi enlace de reseñas de Google?", a: "Entra a tu Perfil de Negocio de Google, toca «Pedir reseñas» y copia el enlace. Si no lo encuentras, te ayudamos por WhatsApp." },
     { q: "¿Puedo programarlas yo mismo?", a: "Sí. Con una app gratuita para escribir NFC (por ejemplo NFC Tools, en iPhone y Android) pegas tu enlace y acercas la tarjeta. Te mandamos un video corto con los pasos." },
     { q: "¿Puedo cambiar el enlace después?", a: "Sí, las veces que quieras." },
-    { q: "¿Pueden llevar mi nombre o logo?", a: "Las lisas, metálicas y de papel pueden ir en blanco o con tu nombre (hasta 40 caracteres). Para logo o diseño propio, escríbenos por WhatsApp." },
-    { q: "¿Venden mayoreo?", a: "Sí. Desde " + wsNote + " pagas precio de mayoreo y puedes mezclar diseños o colores. Ideal para revender." },
+    { q: "¿Pueden llevar mi nombre o logo?", a: "La lisa de plástico va en blanco o con tu nombre (hasta 40 caracteres). La metálica y el paquete de cartón negro van en blanco, con tu nombre o con tu logo; en el cartón aplica a las " + PAPEL.packOf + " tarjetas del paquete. Si eliges logo, puedes subirlo para ver cómo queda y después de pagar nos lo mandas por WhatsApp (PNG o PDF)." },
+    { q: "¿Venden mayoreo?", a: "Sí. En reseñas de Google y redes sociales pagas " + money(G.wholesale) + " c/u desde " + C.minWholesale(G) + " piezas de un mismo producto, y puedes mezclar diseños o colores. La lisa de plástico tiene paquete de " + LISA.pack + " por " + money(LISA.wholesale * LISA.pack) + " y el cartón negro se vende en paquete de " + PAPEL.packOf + " por " + money(PAPEL.retail) + ". La metálica tiene un solo precio: " + money(METAL.retail) + ". Ideal para revender." },
     { q: "¿Necesitan batería o se gastan?", a: "No. El chip no usa batería: toma energía del celular al acercarlo. Dura años con uso normal." },
     { q: "¿La tarjeta guarda datos de quien la toca?", a: "No. Solo tiene guardado tu enlace. No lee ni guarda información del celular de tus clientes." },
     { q: "¿Y si mi tarjeta no funciona?", a: "Te la reemplazamos sin costo. Escríbenos por WhatsApp con tu número de pedido." },
@@ -100,20 +107,69 @@
     return src ? '<img src="' + src + '" alt="Foto real: ' + esc(p.name + " " + v.name) + '" loading="lazy"><span>Foto real</span>' : root.CARDS.back(p.id, v.id);
   }
 
-  // Tarjeta de producto: da vuelta al pasar el mouse, colores, dos precios, cantidad y botón.
+  var MODES = { blank: "En blanco", name: "Con nombre", logo: "Con logo" };
+
+  // Personalización elegida, validada contra el producto: { mode, text, logo }.
+  function customMode(p, custom) {
+    custom = custom || {};
+    return C.allowsMode(p, custom.mode) ? custom.mode : "blank";
+  }
+
+  // Lo que se dibuja en el frente: el nombre, el logo subido o "TU LOGO" de muestra.
+  function cardOpts(p, custom) {
+    var mode = customMode(p, custom);
+    if (mode === "name") return { text: custom.text || "" };
+    if (mode === "logo") return custom.logo ? { logo: custom.logo } : { text: "TU LOGO" };
+    return null;
+  }
+
+  // Bloque de personalización: En blanco / Con nombre / Con logo.
+  function customize(p, custom) {
+    var mode = customMode(p, custom), modes = p.customModes || ["blank", "name"];
+    var html = '<div class="customize"><div class="mode-pick' + (modes.length > 2 ? " three" : "") + '" role="radiogroup" aria-label="Personalización">' +
+      modes.map(function (m) {
+        return '<button type="button" role="radio" data-mode="' + p.id + ":" + m + '" aria-checked="' + (m === mode) + '">' + MODES[m] + "</button>";
+      }).join("") + "</div>";
+    if (mode === "name") {
+      html += '<div class="name-field"><input type="text" maxlength="40" data-text="' + p.id + '" value="' + esc(custom.text || "") + '" placeholder="Escribe el nombre" aria-label="Nombre en la tarjeta">' +
+        '<span class="count" data-count-for="' + p.id + '">' + (custom.text || "").length + "/40</span></div>" +
+        (p.packOf ? '<p class="custom-note">El mismo nombre en las ' + p.packOf + " tarjetas del paquete.</p>" : "");
+    } else if (mode === "logo") {
+      html += '<div class="logo-field"><div class="logo-row"><label class="logo-btn">' + (custom.logo ? "Cambiar logo" : "Ver mi logo en la tarjeta") +
+        '<input type="file" accept="image/*" data-logo="' + p.id + '" hidden></label>' +
+        (custom.logo ? '<button type="button" class="logo-clear" data-logo-clear="' + p.id + '">Quitar</button>' : "<small>Opcional · solo se ve aquí</small>") + "</div>" +
+        '<p class="custom-note logo-note"><strong>Después de pagar nos mandas tu logo por WhatsApp (PNG o PDF).</strong>' +
+        (p.packOf ? " Va en las " + p.packOf + " tarjetas del paquete." : "") + "</p></div>";
+    }
+    return html + "</div>";
+  }
+
+  // Precios de la ficha: dos botones (menudeo / mayoreo o paquete) o un solo precio.
+  function prices(p, n) {
+    if (!C.hasWholesale(p)) {
+      return '<div class="one-price"><strong>' + money(p.retail) + "</strong><small>" +
+        (p.packOf ? "Paquete de " + p.packOf + " tarjetas · " + money(p.retail / p.packOf) + " c/u" : "Por pieza · un solo precio") + "</small></div>";
+    }
+    var min = C.minWholesale(p), ws = n >= min;
+    var wsPrice = p.pack ? money(p.wholesale * p.pack) : money(p.wholesale);
+    var wsLabel = p.pack ? "Paquete de " + p.pack : "Mayoreo " + min + "+ · c/u";
+    return '<div class="two-prices" role="radiogroup" aria-label="Precio">' +
+      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo · pieza</small></button>" +
+      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><strong>' + wsPrice + "</strong><small>" + wsLabel + "</small></button></div>";
+  }
+
+  // Tarjeta de producto: da vuelta al pasar el mouse, colores, precios, cantidad y botón.
   function product(p, variantId, pick, custom) {
     var CARDS = root.CARDS;
     var v = C.getVariant(p, variantId) || p.variants[0];
-    var n = pick || 1, min = C.minWholesale(p), ws = n >= min;
+    var n = pick || 1;
     custom = custom || {};
-    var named = custom.mode === "name";
-    var wsPrice = p.pack ? money(p.wholesale * p.pack) : money(p.wholesale);
-    var wsLabel = p.pack ? "Paquete de " + p.pack : "Mayoreo " + min + "+";
-    return '<article class="product shape-' + p.shape + '" id="' + p.id + '" data-product="' + p.id + '">' +
+    var unitName = p.packOf ? "Paquetes" : "Cantidad";
+    return '<article class="product shape-' + p.shape + (p.packOf ? " is-pack" : "") + '" id="' + p.id + '" data-product="' + p.id + '">' +
       '<div class="product-media"><div class="tilt"><div class="flip">' +
-      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id, named ? { text: custom.text } : null) + "</div>" +
+      '<div class="face front" data-face="front">' + CARDS.card(p.id, v.id, cardOpts(p, custom)) + "</div>" +
       '<div class="face back' + (photoFor(p, v) ? " photo" : "") + '" data-face="back">' + backFace(p, v) + "</div></div></div>" +
-      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + "" + "</div>" +
+      (p.stock ? "" : '<span class="soon">Bajo pedido</span>') + (p.packOf ? '<span class="pack-badge">×' + p.packOf + " tarjetas</span>" : "") + "</div>" +
       '<div class="product-body">' +
       '<p class="kicker">NFC · ' + esc(p.materialShort) + "</p>" +
       "<h3>" + esc(p.name.replace("Tarjeta NFC ", "Tarjeta ").replace("Tarjetas NFC ", "Tarjetas ")) + "</h3>" +
@@ -121,26 +177,27 @@
       '<div class="variants" role="group" aria-label="' + esc(p.variantLabel) + '">' + p.variants.map(function (x) {
         return '<button type="button" class="variant" data-variant="' + p.id + ":" + x.id + '" aria-pressed="' + (x.id === v.id) + '" title="' + esc(x.name) + '">' + CARDS.swatch(p.id, x.id) + "<span>" + esc(x.name) + "</span></button>";
       }).join("") + "</div>" +
-      (p.custom
-        ? '<div class="customize"><div class="mode-pick" role="radiogroup" aria-label="Personalización">' +
-          '<button type="button" role="radio" data-mode="' + p.id + ':blank" aria-checked="' + !named + '">En blanco</button>' +
-          '<button type="button" role="radio" data-mode="' + p.id + ':name" aria-checked="' + named + '">Con nombre</button></div>' +
-          (named ? '<div class="name-field"><input type="text" maxlength="40" data-text="' + p.id + '" value="' + esc(custom.text || "") + '" placeholder="Escribe el nombre" aria-label="Nombre en la tarjeta">' +
-            '<span class="count" data-count-for="' + p.id + '">' + (custom.text || "").length + "/40</span></div>" : "") + "</div>"
-        : "") +
-      '<div class="two-prices" role="radiogroup" aria-label="Precio">' +
-      '<button type="button" role="radio" data-tier="retail" data-pid="' + p.id + '" aria-checked="' + !ws + '"><strong>' + money(p.retail) + "</strong><small>Menudeo · pieza</small></button>" +
-      '<button type="button" role="radio" data-tier="wholesale" data-pid="' + p.id + '" aria-checked="' + ws + '"><strong>' + wsPrice + "</strong><small>" + wsLabel + "</small></button></div>" +
+      (p.custom ? customize(p, custom) : "") +
+      prices(p, n) +
       '<div class="buy"><div class="stepper"><button type="button" data-pick-dec="' + p.id + '" aria-label="Menos">−</button>' +
-      '<input type="number" min="1" max="999" inputmode="numeric" data-pick="' + p.id + '" value="' + n + '" aria-label="Cantidad"><button type="button" data-pick-inc="' + p.id + '" aria-label="Más">+</button></div>' +
-      '<button type="button" class="btn btn-primary" data-add="' + p.id + '">Agregar al carrito</button></div>' +
+      '<input type="number" min="1" max="999" inputmode="numeric" data-pick="' + p.id + '" value="' + n + '" aria-label="' + unitName + '"><button type="button" data-pick-inc="' + p.id + '" aria-label="Más">+</button></div>' +
+      '<button type="button" class="btn btn-primary" data-add="' + p.id + '">' + (p.packOf ? "Agregar paquete" : "Agregar al carrito") + "</button></div>" +
       '<p class="pick-note" data-pick-note="' + p.id + '">' + pickNote(p, n) + "</p>" +
       "</div></article>";
   }
 
+  // "3 piezas · $597", "10 piezas · $399 (paquete de 10)", "2 paquetes (200 tarjetas) · $998".
   function pickNote(p, n) {
-    var ws = n >= C.minWholesale(p), unit = ws ? p.wholesale : p.retail;
-    return n + (n === 1 ? " pieza" : " piezas") + " · " + money(Math.round(unit * n * 100) / 100) + (ws ? " (mayoreo)" : "");
+    var unit = C.unitPrice(p, n), ws = C.hasWholesale(p) && n >= C.minWholesale(p);
+    var total = money(Math.round(unit * n * 100) / 100);
+    if (p.packOf) return C.unitLabel(p, n) + " (" + (n * p.packOf).toLocaleString("es-MX") + " tarjetas) · " + total;
+    var note = C.unitLabel(p, n) + " · " + total;
+    if (ws) return note + (p.pack ? " (precio de paquete)" : " (mayoreo)");
+    if (C.hasWholesale(p)) {
+      var miss = C.minWholesale(p) - n;
+      return note + " · con " + miss + " más pagas " + money(p.wholesale) + " c/u";
+    }
+    return note;
   }
 
   function products(sel, picks) {
@@ -171,7 +228,7 @@
     }).join("");
   }
 
-  var views = { backFace: backFace, photoFor: photoFor, FAQ: FAQ, SECTORS: SECTORS, CITIES: CITIES, product: product, products: products, pickNote: pickNote, faq: faq, sectors: sectors, cityLinks: cityLinks, esc: esc };
+  var views = { backFace: backFace, photoFor: photoFor, FAQ: FAQ, SECTORS: SECTORS, CITIES: CITIES, product: product, products: products, pickNote: pickNote, customMode: customMode, cardOpts: cardOpts, faq: faq, sectors: sectors, cityLinks: cityLinks, esc: esc };
   if (typeof module !== "undefined" && module.exports) module.exports = views;
   else root.VIEWS = views;
 })(typeof window !== "undefined" ? window : this);

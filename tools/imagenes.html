@@ -127,7 +127,7 @@
         title = p.id === "google" ? "Reseñas de Google " + '<span class="hl">en un toque.</span>' : p.id === "redes" ? v.name + ' <span class="hl">en un toque.</span>' : p.name.replace("Tarjeta NFC ", "Tarjeta ") + '<br><span class="hl">con NFC.</span>';
       }
       html = '<div class="art post">' + brand + '<div class="tag">' + (p.stock ? "EN STOCK" : "BAJO PEDIDO") + "</div>" + visual +
-        '<div class="copy' + cls + '"><h2>' + title + "</h2><p>Tarjeta NFC · " + p.material + " · Desde " + C.formatMoney(p.retail) + "</p></div></div>";
+        '<div class="copy' + cls + '"><h2>' + title + "</h2><p>Tarjeta NFC · " + p.material + " · " + (p.packOf ? C.formatMoney(p.retail) + " el paquete de " + p.packOf : (C.hasWholesale(p) ? "Desde " : "") + C.formatMoney(p.retail)) + "</p></div></div>";
     } else if (art === "productos") {
       var vs = [["google", "negra"], ["redes", "instagram"], ["redes", "whatsapp"]], hs = [["metal", "dorada"], ["lisa", "negra"]];
       html = '<div class="art post">' + brand +
@@ -205,7 +205,9 @@
       var cardHtml = '<div class="card-' + sp.shape + '">' + CARDS.card(sp.id, sv.id, sp.custom ? { text: q.get("t") || "" } : null) + "</div>";
       var priceHtml = mode === "mayoreo"
         ? '<div class="prices"><div><span>Las compras en</span><strong>' + C.formatMoney(sp.wholesale) + '</strong></div><div class="win"><span>Las vendes en</span><strong>' + C.formatMoney(sp.retail) + "</strong></div></div>"
-        : '<div class="prices"><div class="win"><span>Menudeo</span><strong>' + C.formatMoney(sp.retail) + "</strong></div><div><span>" + (sp.pack ? "Paquete de " + sp.pack : "Mayoreo " + C.minWholesale(sp) + "+") + "</span><strong>" + C.formatMoney(sp.pack ? sp.wholesale * sp.pack : sp.wholesale) + "</strong></div></div>";
+        : !C.hasWholesale(sp)
+          ? '<div class="prices"><div class="win"><span>' + (sp.packOf ? "Paquete de " + sp.packOf : "Por pieza") + "</span><strong>" + C.formatMoney(sp.retail) + "</strong></div></div>"
+          : '<div class="prices"><div class="win"><span>Menudeo</span><strong>' + C.formatMoney(sp.retail) + "</strong></div><div><span>" + (sp.pack ? "Paquete de " + sp.pack : "Mayoreo " + C.minWholesale(sp) + "+") + "</span><strong>" + C.formatMoney(sp.pack ? sp.wholesale * sp.pack : sp.wholesale) + "</strong></div></div>";
       html = '<div class="art story">' + brand + '<span class="kick">Tarjeta NFC · ' + sp.materialShort + "</span>" +
         "<h2>" + (q.get("h") || sp.cartName) + "</h2>" + cardHtml + priceHtml + '<span class="go">Compra en el link</span></div>';
     } else if (art === "reel") {

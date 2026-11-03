@@ -27,11 +27,12 @@
   <link rel="stylesheet" href="/assets/css/takto.css">
   <link rel="stylesheet" href="/assets/css/storefront.css">
   <link rel="stylesheet" href="/assets/css/video.css">
+  <link rel="stylesheet" href="/assets/css/hero.css">
   {{JSONLD}}
 </head>
 <body class="storefront">
   <a class="skip-link" href="#productos">Saltar al catálogo</a>
-  <div class="announcement">Recoge gratis en Guadalajara <span>Envío a todo México · gratis desde {{FREE}} piezas</span></div>
+  <div class="announcement">Recoge gratis en Guadalajara <span>Envío a todo México · gratis desde {{FREE}} tarjetas</span></div>
   <header class="header" id="header">
     <div class="container">
       <a class="logo" href="/" aria-label="TAKTO, tarjetas NFC"><span data-mark></span>TAKTO</a>
@@ -47,64 +48,66 @@
   </header>
 
   <main id="top">
-    <!-- Portada: animación y frase corta -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero-copy">
-          <span class="eyebrow fade-up">{{EYEBROW}}</span>
-          <h1>{{H1}}</h1>
-          <p class="lead fade-up d1">{{LEAD}}</p>
-          <div class="hero-cta"><a class="btn btn-primary" href="#productos">Encuentra tu tarjeta <span aria-hidden="true">↗</span></a><a class="hero-link" href="#nfc">Un toque. Así funciona <span aria-hidden="true">↓</span></a></div>
-          <div class="hero-note"><span class="status-dot"></span>Sin apps. Sin baterías. Sin complicaciones.</div>
+    <!--
+      Portada: qué es una tarjeta NFC en 3 segundos.
+      La animación (tarjeta, celular, aviso "Etiqueta NFC" y app abierta) la llena app.js
+      (#hero-card, #phone-open, #banner-app, .nfc-burst, .phone, #stage, #hero-tilt);
+      hero.js sincroniza los pasos 1-2-3 y el letrero "Se abrió…". Estilos en hero.css.
+    -->
+    <section class="nh" id="nfc" aria-labelledby="nh-title">
+      <div class="nh-inner">
+        <div class="nh-copy">
+          <p class="nh-kicker"><span class="nh-kicker-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 7c-2.5 3-2.5 7 0 10M12 9c-1.3 1.8-1.3 4.2 0 6M16 5c3.5 4 3.5 10 0 14"/></svg></span>{{EYEBROW}}</p>
+          <h1 id="nh-title">{{H1}}</h1>
+          <p class="nh-lead">{{LEAD}}</p>
+          <ol class="nh-steps" aria-label="Cómo funciona una tarjeta NFC">
+            <li><b aria-hidden="true">1</b><span><strong>Acerca</strong> <span class="nh-sub">tu celular</span></span></li>
+            <li><b aria-hidden="true">2</b><span><strong>Se abre</strong> <span class="nh-sub">tu <em data-nh-app>Google</em></span></span></li>
+            <li><b aria-hidden="true">3</b><span><strong>Listo</strong> <span class="nh-sub"><em data-nh-result>te dejan reseña</em></span></span></li>
+          </ol>
+          <div class="nh-cta">
+            <a class="nh-btn" href="#productos">Ver tarjetas y precios <span aria-hidden="true">→</span></a>
+            <a class="nh-play" href="/assets/img/marca/que-es-nfc-web.mp4" data-video-open aria-haspopup="dialog"><span class="nh-play-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span>Ver video <small>22 s</small></span></a>
+          </div>
+          <ul class="nh-chips" aria-label="Ventajas">
+            <li>Sin apps</li><li>Sin batería</li><li>iPhone y Android</li>
+          </ul>
         </div>
-        <div class="nfc-stage" id="stage">
-          <div class="stage-caption"><span>DISEÑADAS PARA CONECTAR</span><span>NFC / 01</span></div>
-          <span class="stage-word" aria-hidden="true">toca.</span>
-          <div class="nfc-scene" id="hero-tilt" aria-hidden="true">
-            <div class="nfc-card"><div id="hero-card"></div></div>
-            <div class="nfc-burst"><i></i><i></i><i></i></div>
-            <span class="chip-tag">Chip NFC</span>
-            <div class="phone">
+
+        <div class="nh-stage" id="stage">
+          <div class="nh-scene" id="hero-tilt" role="img" aria-label="Animación: un celular se acerca a la tarjeta NFC, aparece el aviso Etiqueta NFC y se abre la página del negocio en Google, Instagram, WhatsApp, Facebook o TikTok.">
+            <span class="nh-rings" aria-hidden="true"></span>
+            <div class="nh-card" aria-hidden="true"><div id="hero-card"></div></div>
+            <div class="nfc-burst" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="nh-chip-tag" aria-hidden="true">Chip NFC adentro</span>
+            <div class="phone" aria-hidden="true">
               <div class="phone-screen">
                 <div class="scr scr-idle"><span class="scr-time">9:41</span><span class="scr-date">jueves 30 de octubre</span><span class="scr-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 7c-2.5 3-2.5 7 0 10M12 9c-1.3 1.8-1.3 4.2 0 6M16 5c3.5 4 3.5 10 0 14"/></svg>Acerca a la tarjeta</span></div>
                 <div class="scr-banner"><i></i><span><b>Etiqueta NFC</b>Abrir en <span id="banner-app">Google Maps</span></span></div>
                 <div class="scr scr-open" id="phone-open"></div>
               </div>
             </div>
+            <span class="nh-opened" aria-hidden="true"><i></i>Se abrió <b data-nh-opened>Google Maps</b></span>
           </div>
-          <div class="stage-bottom"><span>Un pequeño objeto.<br>Muchas puertas abiertas.</span><a href="#productos" aria-label="Explorar la colección">↘</a></div>
         </div>
       </div>
     </section>
     <div class="benefit-bar container"><span><b>01</b> Listas para usar</span><span><b>02</b> Personaliza tu conexión</span><span><b>03</b> Menudeo y mayoreo</span><span><b>04</b> Hechas para tu negocio</span></div>
 
-    <!-- Video corto: qué es NFC (tools/video-nfc/render.js) -->
-    <section class="video-nfc" id="que-es-nfc" aria-labelledby="video-nfc-title">
-      <div class="container video-nfc-layout">
-        <div class="video-nfc-copy">
-          <span class="eyebrow">¿QUÉ ES NFC?</span>
-          <h2 id="video-nfc-title">Míralo en 22 segundos.</h2>
-          <p class="lead">La tarjeta tiene un chip NFC. Acercas el celular y se abre tu reseña de Google, tu Instagram o tu WhatsApp.</p>
-          <ul class="video-nfc-points">
-            <li>Sin apps y sin escanear</li>
-            <li>Sin batería: no se descarga</li>
-            <li>Funciona con iPhone y Android</li>
-          </ul>
-          <button class="btn btn-primary video-nfc-sound" type="button" data-video-sound aria-controls="video-nfc"><span aria-hidden="true">▶</span> Ver con sonido</button>
+    <!-- Video "¿Qué es NFC?" (22 s, voz de José). Se abre desde el botón "Ver video" de la portada; video.js lo carga solo al abrirlo. -->
+    <dialog class="nh-video" id="nh-video" aria-labelledby="nh-video-title">
+      <div class="nh-video-box">
+        <div class="nh-video-head">
+          <h2 id="nh-video-title">¿Qué es NFC? <span>Míralo en 22 segundos</span></h2>
+          <button class="nh-video-close" type="button" data-video-close aria-label="Cerrar video">×</button>
         </div>
-        <figure class="video-nfc-frame">
-          <video id="video-nfc" data-nfc-video muted playsinline controls preload="metadata" poster="/assets/img/marca/que-es-nfc-poster.jpg" aria-label="Video: qué es una tarjeta NFC de TAKTO y cómo funciona" aria-describedby="video-nfc-guion">
-            <source src="/assets/img/marca/que-es-nfc-web.mp4" type="video/mp4">
-          </video>
-          <figcaption>
-            <details>
-              <summary>Leer lo que dice el video</summary>
-              <p id="video-nfc-guion">¿Ves esta tarjeta? Tiene un chip NFC. Acerca tu celular… y listo: se abre tu reseña de Google, tu Instagram o tu WhatsApp. Sin apps, sin escanear y sin batería. Funciona con iPhone y Android. Recógela gratis en Guadalajara, o te la enviamos a todo México. TAKTO: un toque y conectas.</p>
-            </details>
-          </figcaption>
-        </figure>
+        <video data-nfc-video playsinline controls preload="none" data-src="/assets/img/marca/que-es-nfc-web.mp4" data-poster="/assets/img/marca/que-es-nfc-poster.jpg" aria-label="Video: qué es una tarjeta NFC de TAKTO y cómo funciona" aria-describedby="nh-video-guion"></video>
+        <details>
+          <summary>Leer lo que dice el video</summary>
+          <p id="nh-video-guion">¿Ves esta tarjeta? Tiene un chip NFC. Acerca tu celular… y listo: se abre tu reseña de Google, tu Instagram o tu WhatsApp. Sin apps, sin escanear y sin batería. Funciona con iPhone y Android. Recógela gratis en Guadalajara, o te la enviamos a todo México. TAKTO: un toque y conectas.</p>
+        </details>
       </div>
-    </section>
+    </dialog>
 
     <!-- Productos -->
     <section class="section products-section" id="productos">
@@ -113,22 +116,23 @@
           <div><span class="eyebrow">LA COLECCIÓN / NFC</span><h2>Tu siguiente<br>buena conexión.</h2></div>
           <p>Más reseñas. Más contactos. Más posibilidades.<br>Elige qué pasa cuando alguien se acerca.</p>
         </div>
-        <div class="catalog-toolbar"><div class="catalog-filters" role="group" aria-label="Filtrar tarjetas"><button type="button" data-filter="all" aria-pressed="true">Todas <span>05</span></button><button type="button" data-filter="business" aria-pressed="false">Para tu negocio</button><button type="button" data-filter="custom" aria-pressed="false">Personalizables</button></div><span class="catalog-count" role="status" data-catalog-count>5 diseños · precios en MXN</span></div>
+        <div class="catalog-toolbar"><div class="catalog-filters" role="group" aria-label="Filtrar tarjetas"><button type="button" data-filter="all" aria-pressed="true">Todas <span>05</span></button><button type="button" data-filter="business" aria-pressed="false">Para tu negocio</button><button type="button" data-filter="custom" aria-pressed="false">Personalizables</button></div><span class="catalog-count" role="status" data-catalog-count>5 productos · precios en MXN</span></div>
         <div class="products" id="products"><!--@products--></div>
       </div>
     </section>
 
-    <section class="wholesale-section" id="mayoreo"><div class="container wholesale-layout"><div><span class="eyebrow">BUENAS CONEXIONES. MEJORES NEGOCIOS.</span><h2>Pequeño formato.<br>Gran oportunidad.</h2><p>Para tu equipo, tus clientes o tu próximo negocio. Desde {{WHOLESALE}} piezas de un mismo producto accedes al precio de mayoreo. Combina colores y diseños.</p><a class="btn btn-primary" href="https://wa.me/{{WHATSAPP}}" data-wa>Hablemos de tu proyecto ↗</a></div><div class="wholesale-object"><span class="object-label">TU MARCA. TU ENLACE. TU TAKTO.</span><div class="editorial-card"><span>TAKTO ↗</span><strong>Mucho gusto.<br>Sigamos en<br>contacto.</strong><span>NFC — ACERCA TU CELULAR</span></div><span class="object-caption">Personalízala con tu nombre.</span></div></div></section>
+    <section class="wholesale-section" id="mayoreo"><div class="container wholesale-layout"><div><span class="eyebrow">BUENAS CONEXIONES. MEJORES NEGOCIOS.</span><h2>Pequeño formato.<br>Gran oportunidad.</h2><p>Para tu equipo, tus clientes o tu próximo negocio. {{MAYOREO}}</p><a class="btn btn-primary" href="https://wa.me/{{WHATSAPP}}" data-wa>Hablemos de tu proyecto ↗</a></div><div class="wholesale-object"><span class="object-label">TU MARCA. TU ENLACE. TU TAKTO.</span><div class="editorial-card"><span>TAKTO ↗</span><strong>Mucho gusto.<br>Sigamos en<br>contacto.</strong><span>NFC — ACERCA TU CELULAR</span></div><span class="object-caption">Personalízala con tu nombre o logo.</span></div></div></section>
     <!--@local-->
 
-    <!-- Qué es NFC y cómo se entregan -->
-    <section class="section light" id="nfc">
+    <!-- Cómo te llegan (lo que es NFC ya está en la portada) -->
+    <section class="section light" id="entrega">
       <div class="container">
+        <h2 class="small-title">Así te llegan tus tarjetas</h2>
         <div class="how">
-          <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 7c-2.5 3-2.5 7 0 10M12 9c-1.3 1.8-1.3 4.2 0 6M16 5c3.5 4 3.5 10 0 14"/></svg></span><h3>¿Qué es NFC?</h3><p>Un chip en la tarjeta. Acercas el celular y se abre tu enlace. Sin apps.</p></div>
           <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><h3>Te llegan programadas</h3><p>Danos tu enlace al comprar y las enviamos listas.</p></div>
           <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg></span><h3>O te enseñamos en video</h3><p>Con tu compra recibes un video corto para programarlas tú.</p></div>
-          <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg></span><h3>Envío a todo México</h3><p>Gratis desde {{FREE}} piezas. Pago seguro con Mercado Pago.</p></div>
+          <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg></span><h3>Envío a todo México</h3><p>Gratis desde {{FREE}} tarjetas. Pago seguro con Mercado Pago.</p></div>
+          <div class="how-item"><span class="how-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><h3>Recoge en Guadalajara</h3><p>Paga en línea y recógelas sin costo de envío.</p></div>
         </div>
       </div>
     </section>
@@ -174,6 +178,7 @@
   <script src="/assets/js/views.js"></script>
   <script src="/assets/js/app.js"></script>
   <script src="/assets/js/storefront.js"></script>
+  <script src="/assets/js/hero.js" defer></script>
   <script src="/assets/js/video.js" defer></script>
 </body>
 </html>

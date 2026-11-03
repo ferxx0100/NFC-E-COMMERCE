@@ -1,0 +1,175 @@
+/*
+ * Portada "¿Qué es NFC?" (sección .nh de index.html).
+ * Explica en 3 segundos qué hace una tarjeta NFC: el celular se acerca, salta el aviso
+ * "Etiqueta NFC" y se abre Google, Instagram, WhatsApp, Facebook o TikTok.
+ * - Fondo verde de la marca con acento lima, tipografía Outfit (takto.css).
+ * - El ciclo dura 6 s y reutiliza los fotogramas de takto.css (tap, bannerIn, idleScr,
+ *   openScr, burst, star); aquí solo van la posición y los pasos 1-2-3 sincronizados.
+ * - prefers-reduced-motion: cuadro fijo con la app ya abierta, sin animaciones.
+ */
+.nh {
+  --nh-bg: #183c30;
+  --nh-deep: #0f2a21;
+  --nh-lime: #d5f36b;
+  --nh-cream: #f8f8f2;
+  --nh-soft: #c6d2c1;
+  --nh-line: rgba(248, 248, 242, 0.14);
+  --nh-app: #4285f4;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--nh-cream);
+  background:
+    radial-gradient(48% 62% at 76% 52%, rgba(213, 243, 107, 0.13), transparent 70%),
+    radial-gradient(90% 90% at 100% 0%, #24543f 0%, transparent 60%),
+    linear-gradient(180deg, var(--nh-bg) 0%, var(--nh-deep) 100%);
+}
+.nh-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 48px 48px 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  min-height: min(calc(100vh - 116px), 790px);
+}
+.nh-inner > * { min-width: 0; }
+
+/* ---------- Texto ---------- */
+.nh-kicker { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 22px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(213, 243, 107, 0.1); border: 1px solid rgba(213, 243, 107, 0.28); color: var(--nh-lime); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.2; }
+.nh-kicker-ic { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--nh-lime); color: var(--nh-bg); }
+.nh-kicker-ic svg { width: 16px; height: 16px; }
+.nh h1 { margin: 0; color: var(--nh-cream); font-weight: 400; font-size: clamp(3rem, 5.9vw, 6rem); line-height: 0.98; letter-spacing: -0.065em; }
+.nh h1 .line { display: block; overflow: hidden; padding-bottom: 0.08em; }
+.nh h1 .line span { display: block; transform: translateY(105%); animation: rise 1s var(--ease) forwards; }
+.nh h1 .line:nth-child(2) span { animation-delay: 0.1s; }
+.nh h1 .hl { color: var(--nh-lime); }
+.nh-lead { margin: 22px 0 0; max-width: 30em; font-size: 18px; line-height: 1.6; color: var(--nh-soft); }
+
+/* Pasos 1-2-3: se encienden al mismo tiempo que la animación. */
+.nh-steps { list-style: none; margin: 30px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 600px; }
+.nh-steps li { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--nh-line); background: rgba(248, 248, 242, 0.04); font-size: 14px; line-height: 1.3; color: var(--nh-soft); animation: nhStep1 6s infinite; }
+.nh-steps li:nth-child(2) { animation-name: nhStep2; }
+.nh-steps li:nth-child(3) { animation-name: nhStep3; }
+.nh-steps b { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); animation: inherit; animation-name: nhNum1; }
+.nh-steps li:nth-child(2) b { animation-name: nhNum2; }
+.nh-steps li:nth-child(3) b { animation-name: nhNum3; }
+.nh-steps strong { display: block; font-weight: 700; font-size: 16px; color: inherit; }
+.nh-steps em { font-style: normal; }
+
+.nh-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 30px; }
+.nh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 56px; padding: 0 28px; border-radius: 6px; background: var(--nh-lime); color: var(--nh-bg); font-size: 17px; font-weight: 700; text-decoration: none; letter-spacing: -0.01em; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22); transition: transform 0.3s var(--ease), background 0.2s; }
+.nh-btn:hover { transform: translateY(-2px); background: #e2fb86; }
+.nh-btn span { font-size: 1.1em; transition: transform 0.3s var(--ease); }
+.nh-btn:hover span { transform: translateX(3px); }
+.nh-play { display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 20px 0 10px; border-radius: 6px; border: 1px solid rgba(248, 248, 242, 0.32); color: var(--nh-cream); font-size: 16px; text-decoration: none; transition: border-color 0.2s, background 0.2s; }
+.nh-play:hover { border-color: var(--nh-cream); background: rgba(248, 248, 242, 0.06); }
+.nh-play-ic { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--nh-cream); color: var(--nh-bg); }
+.nh-play-ic svg { width: 16px; height: 16px; margin-left: 2px; }
+.nh-play small { font-size: 13px; color: var(--nh-soft); margin-left: 4px; }
+
+.nh-chips { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.nh-chips li { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--nh-cream); }
+.nh-chips li::before { content: ""; flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; background: var(--nh-lime) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183c30' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat; }
+
+/* ---------- Escena: tarjeta + celular ---------- */
+.nh-stage { position: relative; display: grid; place-items: center; }
+.nh-scene { position: relative; width: min(100%, 620px); aspect-ratio: 1 / 1; transition: transform 0.25s ease-out; }
+/* Anillos de fondo que salen del punto de contacto. */
+.nh-rings { position: absolute; left: 41%; top: 61%; width: 170%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: -1; pointer-events: none;
+  background: repeating-radial-gradient(circle, transparent 0 54px, rgba(213, 243, 107, 0.16) 55px 56px);
+  -webkit-mask: radial-gradient(circle, #000 12%, transparent 58%); mask: radial-gradient(circle, #000 12%, transparent 58%); }
+.nh-card { position: absolute; left: 7%; top: 5%; width: 44%; transform: rotate(-12deg); border-radius: 6.6% / 4.2%; overflow: hidden; box-shadow: 0 50px 60px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.nh-card .tk-card { width: 100%; }
+.nh .nfc-burst { position: absolute; left: 41%; top: 61%; width: 0; height: 0; z-index: 1; }
+.nh .nfc-burst i { left: -90px; top: -90px; width: 180px; height: 180px; border-width: 3px; }
+.nh .phone { left: 43%; top: 31%; width: 31%; z-index: 2; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.22), 30px 50px 60px rgba(0, 0, 0, 0.45); }
+.nh .scr-banner { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+
+.nh-chip-tag { position: absolute; left: -1%; top: 63%; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--nh-cream); color: var(--nh-bg); font-size: 14px; font-weight: 700; white-space: nowrap; box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3); animation: nhChip 6s var(--ease) infinite; }
+.nh-chip-tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--nh-lime); box-shadow: 0 0 0 3px var(--nh-bg); }
+.nh-chip-tag::after { content: ""; position: absolute; left: 100%; top: 50%; width: 34px; height: 2px; background: var(--nh-cream); }
+
+.nh-opened { position: absolute; right: 0; top: 13%; z-index: 3; display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px 10px 10px; border-radius: 999px; background: var(--nh-cream); color: var(--nh-bg); font-size: 16px; white-space: nowrap; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35); animation: nhOpened 6s var(--ease) infinite; }
+.nh-opened i { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: var(--nh-app) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 14px no-repeat; transition: background-color 0.3s; }
+.nh-opened b { font-weight: 700; margin-left: -4px; }
+
+/* Fuera de pantalla se pausa todo (los pasos y el celular siguen sincronizados). */
+.nh.is-paused *, .nh.is-paused *::before, .nh.is-paused *::after { animation-play-state: paused !important; }
+
+@keyframes nhStep1 { 0%, 29% { background: var(--nh-lime); border-color: var(--nh-lime); color: var(--nh-bg); } 32%, 100% { background: rgba(248, 248, 242, 0.04); border-color: var(--nh-line); color: var(--nh-soft); } }
+@keyframes nhStep2 { 0%, 29% { background: rgba(248, 248, 242, 0.04); border-color: var(--nh-line); color: var(--nh-soft); } 32%, 50% { background: var(--nh-lime); border-color: var(--nh-lime); color: var(--nh-bg); } 53%, 100% { background: rgba(248, 248, 242, 0.04); border-color: var(--nh-line); color: var(--nh-soft); } }
+@keyframes nhStep3 { 0%, 50% { background: rgba(248, 248, 242, 0.04); border-color: var(--nh-line); color: var(--nh-soft); } 53%, 92% { background: var(--nh-lime); border-color: var(--nh-lime); color: var(--nh-bg); } 96%, 100% { background: rgba(248, 248, 242, 0.04); border-color: var(--nh-line); color: var(--nh-soft); } }
+@keyframes nhNum1 { 0%, 29% { background: var(--nh-bg); color: var(--nh-lime); } 32%, 100% { background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); } }
+@keyframes nhNum2 { 0%, 29% { background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); } 32%, 50% { background: var(--nh-bg); color: var(--nh-lime); } 53%, 100% { background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); } }
+@keyframes nhNum3 { 0%, 50% { background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); } 53%, 92% { background: var(--nh-bg); color: var(--nh-lime); } 96%, 100% { background: rgba(248, 248, 242, 0.12); color: var(--nh-cream); } }
+@keyframes nhChip { 0%, 4% { opacity: 0; transform: translateY(8px); } 9%, 30% { opacity: 1; transform: none; } 36%, 100% { opacity: 0; transform: translateY(-6px); } }
+@keyframes nhOpened { 0%, 45% { opacity: 0; transform: translateY(10px) scale(0.92); } 50%, 86% { opacity: 1; transform: none; } 92%, 100% { opacity: 0; transform: translateY(-8px); } }
+
+/* ---------- Tableta ---------- */
+@media (max-width: 1100px) {
+  .nh-inner { padding: 40px 28px 48px; gap: 24px; }
+  .nh-steps li { padding: 10px; gap: 8px; font-size: 13px; }
+  .nh-steps strong { font-size: 15px; }
+}
+@media (max-width: 900px) {
+  .nh-inner { grid-template-columns: 1fr; min-height: 0; padding: 36px 24px 44px; }
+  .nh-copy { display: contents; }
+  .nh-kicker { justify-self: start; }
+  .nh-stage { order: 3; margin: 8px 0 4px; }
+  .nh-steps { order: 4; max-width: none; margin-top: 8px; }
+  .nh-cta { order: 5; }
+  .nh-chips { order: 6; }
+  .nh-lead { order: 7; }
+  .nh-scene { width: min(100%, 520px); }
+}
+
+/* ---------- Celular: el mensaje completo cabe sin hacer scroll ---------- */
+@media (max-width: 600px) {
+  .nh-inner { padding: 18px 16px 30px; gap: 0; }
+  .nh-kicker { margin-bottom: 14px; font-size: 10px; letter-spacing: 0.12em; padding: 4px 12px 4px 4px; gap: 8px; }
+  .nh-kicker-ic { flex-basis: 22px; width: 22px; height: 22px; }
+  .nh-kicker-ic svg { width: 14px; height: 14px; }
+  .nh h1 { font-size: clamp(2.3rem, 10.6vw, 2.75rem); line-height: 1; letter-spacing: -0.06em; }
+  .nh-stage { margin: 0 -16px; }
+  .nh-scene { width: min(100%, 340px); margin: -6px auto -10px; }
+  .nh .nfc-burst i { left: -60px; top: -60px; width: 120px; height: 120px; border-width: 2px; }
+  .nh-chip-tag { font-size: 11px; padding: 6px 10px; gap: 6px; top: 72%; left: 1%; }
+  .nh-chip-tag::after { display: none; }
+  .nh-opened { font-size: 12px; padding: 6px 12px 6px 6px; gap: 8px; top: 10%; right: 2%; }
+  .nh-opened i { flex-basis: 20px; width: 20px; height: 20px; background-size: 11px; }
+  .nh-steps { gap: 6px; margin-top: 4px; }
+  .nh-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 4px 7px; padding: 9px 9px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.25; }
+  .nh-steps li > span { display: contents; }
+  .nh-steps b { width: 22px; height: 22px; font-size: 11px; }
+  .nh-steps strong { font-size: 15px; line-height: 22px; }
+  .nh-steps .nh-sub { grid-column: 1 / -1; }
+  .nh-cta { margin-top: 14px; gap: 8px; flex-wrap: nowrap; }
+  .nh-btn { flex: 1 1 auto; min-height: 52px; padding: 0 16px; font-size: 15px; gap: 10px; }
+  .nh-play { flex: 0 0 auto; min-height: 52px; padding: 0 14px 0 8px; font-size: 14px; gap: 8px; }
+  .nh-play-ic { flex-basis: 32px; width: 32px; height: 32px; }
+  .nh-play small { display: none; }
+  .nh-chips { margin-top: 14px; gap: 6px 14px; }
+  .nh-chips li { font-size: 13px; gap: 6px; }
+  .nh-chips li::before { flex-basis: 16px; width: 16px; height: 16px; background-size: 10px; }
+  .nh-lead { margin-top: 18px; font-size: 15px; }
+}
+@media (max-width: 360px) {
+  .nh-steps li { font-size: 11px; padding: 8px 7px; }
+  .nh-play span:last-child { display: none; }
+  .nh-play { padding: 0 10px; }
+}
+
+/* ---------- Menos movimiento: cuadro fijo con la app ya abierta ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .nh h1 .line span { transform: none; }
+  .nh .phone { transform: rotate(9deg); opacity: 1; }
+  .nh .scr-idle { opacity: 0; }
+  .nh .scr-open { display: flex; opacity: 1; }
+  .nh .scr-banner { display: none; }
+  .nh .nfc-burst { display: none; }
+  .nh-chip-tag { opacity: 1; }
+  .nh-opened { opacity: 1; }
+  .nh .app-stars i { color: #fbbc04; }
+}

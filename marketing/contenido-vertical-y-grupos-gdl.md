@@ -10,16 +10,16 @@ Todo el material está en `assets/img/marca/`. Cambia `[link]` por tu link con e
 
 | Archivo | Para quién | Texto para publicarlo |
 | --- | --- | --- |
-| `vertical-negocios.mp4` (20 s) | Dueños de negocio | ¿Tus clientes no te dejan reseña? 😅 Con esta tarjeta acercan el celular y se abre tu Google. Te llega programada. Desde $345 👉 [link] |
-| `vertical-revende.mp4` (20 s) | Revendedores | ¿Ingreso extra? 💼 Compras en $175 y vendes en $345. Mayoreo desde 20 piezas y te enseñamos a programarlas 👉 [link] |
-| `vertical-personaliza.mp4` (18 s) | Profesionistas | Tu tarjeta de presentación con NFC: en blanco o con tu nombre, y la ves al instante. Metálica desde $450 👉 [link] |
+| `vertical-negocios.mp4` (20 s) | Dueños de negocio | ¿Tus clientes no te dejan reseña? 😅 Con esta tarjeta acercan el celular y se abre tu Google. Te llega programada. Desde $199 👉 [link] |
+| `vertical-revende.mp4` (20 s) | Revendedores | ¿Ingreso extra? 💼 Compras en $99 y vendes en $199. Mayoreo desde 20 piezas y te enseñamos a programarlas 👉 [link] |
+| `vertical-personaliza.mp4` (18 s) | Profesionistas | Tu tarjeta de presentación con NFC: en blanco o con tu nombre, y la ves al instante. Metálica $399 con tu nombre o logo 👉 [link] |
 | `reel-que-es-nfc.mp4` (36 s) | Todos | ¿Qué es NFC? Acercas el celular y se abre la reseña, el Instagram o el WhatsApp del negocio. Sin apps 👉 [link] |
 
 ## Historias fijas (con precio)
 
-- `historia-google.jpg`: menudeo $345 / mayoreo $175.
-- `historia-mayoreo.jpg`: "compras en $175, vendes en $345".
-- `historia-metal.jpg`: metálica $450 / $320.
+- `historia-google.jpg`: ⚠️ tiene precios viejos ($345 / $175); los de ahora son $199 / $99.
+- `historia-mayoreo.jpg`: ⚠️ precios viejos; ahora "compras en $99, vendes en $199".
+- `historia-metal.jpg`: ⚠️ precios viejos; ahora metálica $399.
 
 En Instagram agrega la calcomanía de **enlace** con tu link. En WhatsApp, ponlas en tu estado con el link en el texto.
 

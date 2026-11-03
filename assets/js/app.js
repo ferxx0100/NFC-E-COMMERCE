@@ -3,7 +3,11 @@
   var C = window.CATALOG;
   var CARDS = window.CARDS;
   var VIEWS = window.VIEWS;
-  var KEY = "takto_state_v3";
+  // v4: el cartón negro pasó de piezas a paquetes de 100 (gracias.html lee esta misma clave).
+  var KEY = "takto_state_v4";
+  var OLD_KEY = "takto_state_v3";
+  // Logos más pesados que esto solo viven en memoria (no se guardan en el navegador).
+  var LOGO_MAX = 200 * 1024;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -28,9 +32,18 @@
   var state = { sel: {}, pick: {}, custom: {}, cart: [], delivery: C.defaultDelivery, customer: {}, program: null };
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (!saved) {
+      // Carrito de la versión anterior: el cartón negro se contaba por pieza, ahora por paquete; se quita para no cobrar de más.
+      saved = JSON.parse(localStorage.getItem(OLD_KEY) || "null");
+      if (saved && Array.isArray(saved.cart)) saved.cart = saved.cart.filter(function (l) { return l && l.product !== "papel"; });
+      if (saved && saved.pick) delete saved.pick.papel;
+    }
     if (saved && typeof saved === "object") Object.assign(state, saved);
   } catch (e) {}
   if (!Array.isArray(state.cart)) state.cart = [];
+  state.cart = state.cart.filter(function (l) { return l && C.getProduct(l.product) && l.qty > 0; });
+  if (!state.pick || typeof state.pick !== "object") state.pick = {};
+  if (!state.sel || typeof state.sel !== "object") state.sel = {};
   if (!state.custom || typeof state.custom !== "object") state.custom = {};
   if (!state.customer || typeof state.customer !== "object") state.customer = {};
   if (!C.delivery.some(function (d) { return d.id === state.delivery; })) state.delivery = C.defaultDelivery;
@@ -47,10 +60,17 @@
   if (!state.program.lines || typeof state.program.lines !== "object") state.program.lines = {};
   delete state.customer.links;
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {
+      // Sin espacio: se guarda todo menos las imágenes de logo.
+      try {
+        localStorage.setItem(KEY, JSON.stringify(state, function (k, v) { return k === "logo" && typeof v === "string" ? undefined : v; }));
+      } catch (e2) {}
+    }
   }
   function lineKey(l) {
-    return l.product + "|" + l.variant + "|" + (l.text || "");
+    return l.product + "|" + l.variant + "|" + (l.text || "") + (l.logo ? "|logo" : "");
   }
   // Destino de una línea del carrito (o el común si eligió "Todas igual").
   function progFor(l) {
@@ -62,7 +82,8 @@
   function cartItems() {
     return state.cart.map(function (l) {
       var pr = progFor(l);
-      return { product: l.product, variant: l.variant, qty: l.qty, text: l.text, dest: pr.dest, link: pr.link };
+      // Del logo solo viaja la marca "con logo": la imagen nunca sale del navegador.
+      return { product: l.product, variant: l.variant, qty: l.qty, text: l.text, logo: !!l.logo, dest: pr.dest, link: pr.link };
     });
   }
   function isPickup() {
@@ -76,13 +97,20 @@
   }
 
   // ---------- Productos ----------
-  // Personalización: "blank" (en blanco, por defecto) o "name" (con nombre).
+  // Logos subidos para la vista previa (también los que pesan mucho para guardarse).
+  var logoMem = {};
+  // Personalización: "blank" (en blanco, por defecto), "name" (con nombre) o "logo" (con logo).
   function choice(p) {
-    return (p.custom && state.custom[p.id]) || {};
+    if (!p.custom) return {};
+    var c = state.custom[p.id] || {};
+    return { mode: VIEWS.customMode(p, c), text: c.text || "", logo: logoMem[p.id] || c.logo || "" };
   }
+  // Lo que se dibuja en la tarjeta según la personalización.
   function custom(p) {
-    var c = choice(p);
-    return c.mode === "name" ? { text: c.text || "" } : {};
+    return VIEWS.cardOpts(p, choice(p)) || {};
+  }
+  function logoImage(pid) {
+    return logoMem[pid] || (state.custom[pid] && state.custom[pid].logo) || "";
   }
 
   function renderFront(p) {
@@ -98,7 +126,7 @@
     $$("[data-variant]", box).forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.variant === p.id + ":" + v.id); });
   }
 
-  // Vuelve a armar toda la ficha (al cambiar entre en blanco y con nombre).
+  // Vuelve a armar toda la ficha (al cambiar la personalización o el logo).
   function renderProduct(p) {
     var box = $('[data-product="' + p.id + '"]');
     box.outerHTML = VIEWS.product(p, selected(p).id, state.pick[p.id], choice(p));
@@ -106,6 +134,40 @@
       var m = $('[data-product="' + p.id + '"] .product-media');
       tilt(m, $(".tilt", m), 10);
     }
+  }
+
+  // Vista previa del logo: se reduce a 400 px. No se manda al servidor; se guarda en el navegador solo si pesa poco.
+  function readLogo(file, pid) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) {
+      toast("Para verlo aquí usa PNG o JPG. El PDF nos lo mandas por WhatsApp");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        var url = reader.result;
+        try {
+          var k = Math.min(1, 400 / Math.max(img.width || 400, img.height || 400)), c = document.createElement("canvas");
+          c.width = Math.max(1, Math.round((img.width || 400) * k));
+          c.height = Math.max(1, Math.round((img.height || 400) * k));
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          url = c.toDataURL("image/png");
+        } catch (e) {}
+        logoMem[pid] = url;
+        var cu = Object.assign({}, state.custom[pid], { mode: "logo" });
+        delete cu.logo;
+        if (url.length < LOGO_MAX) cu.logo = url;
+        state.custom[pid] = cu;
+        save();
+        renderProduct(C.getProduct(pid));
+        toast("Así se verá tu logo ✓");
+      };
+      img.onerror = function () { toast("No pudimos abrir esa imagen. Prueba con PNG o JPG"); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   function renderPick(p) {
@@ -125,34 +187,37 @@
   // ---------- Animación del celular en la portada ----------
   var heroSeq = [["google", "negra"], ["redes", "instagram"], ["redes", "whatsapp"], ["google", "blanca"], ["redes", "facebook"], ["redes", "tiktok"]];
   var heroIdx = 0;
+  // Tolera que falte cualquier pieza de la portada (se puede rediseñar sin romper la tienda).
   function renderHeroCard() {
     var k = heroSeq[heroIdx % heroSeq.length], v = C.getVariant(C.getProduct(k[0]), k[1]);
-    $("#hero-card").innerHTML = CARDS.card(k[0], k[1]);
-    $("#phone-open").innerHTML = CARDS.screen(v.screen);
-    $("#banner-app").textContent = CARDS.appName(v.screen);
-    $(".nfc-burst").style.setProperty("--burst", v.color);
+    var card = $("#hero-card"), open = $("#phone-open"), app = $("#banner-app"), burst = $(".nfc-burst");
+    if (card) card.innerHTML = CARDS.card(k[0], k[1]);
+    if (open) open.innerHTML = CARDS.screen(v.screen);
+    if (app) app.textContent = CARDS.appName(v.screen);
+    if (burst) burst.style.setProperty("--burst", v.color);
   }
 
   // ---------- Carrito ----------
   function addToCart(pid) {
-    var p = C.getProduct(pid), v = selected(p), n = state.pick[pid] || 1, cu = custom(p);
-    var text = (cu.text || "").trim();
-    if (choice(p).mode === "name" && !text) {
+    var p = C.getProduct(pid), v = selected(p), n = state.pick[pid] || 1, ch = choice(p);
+    var text = ch.mode === "name" ? String(ch.text || "").replace(/\s+/g, " ").trim().slice(0, 40) : "";
+    var logo = ch.mode === "logo";
+    if (ch.mode === "name" && !text) {
       toast("Escribe el nombre o elige En blanco");
       var input = $('[data-text="' + pid + '"]');
       if (input) input.focus();
       return;
     }
-    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id && (l.text || "") === text; })[0];
+    var line = state.cart.filter(function (l) { return l.product === pid && l.variant === v.id && (l.text || "") === text && !!l.logo === logo; })[0];
     if (line) line.qty = Math.min(999, line.qty + n);
-    else state.cart.push({ product: pid, variant: v.id, qty: n, text: text });
+    else state.cart.push(logo ? { product: pid, variant: v.id, qty: n, text: "", logo: true } : { product: pid, variant: v.id, qty: n, text: text });
     state.pick[pid] = 1;
     save();
     renderPick(p);
     renderCount();
     var bag = $(".bag");
-    if (bag.animate && !reduceMotion) bag.animate([{ transform: "scale(1)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }], { duration: 400 });
-    toast("Agregado al carrito ✓");
+    if (bag && bag.animate && !reduceMotion) bag.animate([{ transform: "scale(1)" }, { transform: "scale(1.2)" }, { transform: "scale(1)" }], { duration: 400 });
+    toast(logo ? "Agregado ✓ El logo lo mandas al pagar" : "Agregado al carrito ✓");
   }
 
   function setLine(i, qty) {
@@ -205,7 +270,9 @@
 
   function programBlock() {
     var html = '<div class="d-block prog"><span class="lbl">¿Qué quieres que abra tu tarjeta?</span>' +
-      '<p class="prog-intro">Dinos a dónde la programamos y llega lista para usarse. Puedes cambiarlo después.</p>';
+      '<p class="prog-notice" role="note"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>' +
+      "<span>Nosotros te las configuramos con tu enlace, o si prefieres te mandamos un video corto para que las configures tú.</span></p>" +
+      '<p class="prog-intro">Elige a dónde abre y llega lista para usarse. Puedes cambiarlo después.</p>';
     if (state.cart.length > 1) {
       html += '<label class="prog-same"><input type="checkbox" data-prog-same' + (state.program.same ? " checked" : "") + "> Todas igual</label>";
     }
@@ -216,7 +283,7 @@
       html += state.cart.map(function (l, i) {
         var p = C.getProduct(l.product), v = p && C.getVariant(p, l.variant);
         if (!p || !v) return "";
-        return progRow(i, p.cartName + " · " + v.name + (l.text ? " · " + l.text : ""), progFor(l));
+        return progRow(i, p.cartName + " · " + v.name + (l.text ? " · " + l.text : "") + (l.logo ? " · con logo" : ""), progFor(l));
       }).join("");
     }
     return html + "</div>";
@@ -224,7 +291,7 @@
 
   function deliveryBlock(q) {
     return '<div class="d-block"><span class="lbl">Entrega</span>' + C.delivery.map(function (d) {
-      var price = d.pickup ? "Sin costo" : q.qty >= C.freeShippingFrom ? "Gratis" : money(d.cost);
+      var price = d.pickup ? "Sin costo" : q.cards >= C.freeShippingFrom ? "Gratis" : money(d.cost);
       return '<label class="radio"><input type="radio" name="delivery" value="' + d.id + '"' + (state.delivery === d.id ? " checked" : "") + ">" +
         "<span><strong>" + esc(d.name) + "</strong><small>" + esc(d.pickup ? d.detail : d.detail + " · llega a tu domicilio") + "</small></span><em>" + price + "</em></label>";
     }).join("") +
@@ -242,27 +309,31 @@
     var keys = state.cart.map(lineKey);
     Object.keys(state.program.lines).forEach(function (k) { if (keys.indexOf(k) < 0) delete state.program.lines[k]; });
     var pickup = isPickup();
-    var remaining = Math.max(0, C.freeShippingFrom - q.qty);
+    // El envío gratis cuenta tarjetas reales (un paquete de cartón cuenta como 100).
+    var remaining = Math.max(0, C.freeShippingFrom - q.cards);
     var html = pickup
       ? '<div class="shipping-progress" role="status"><span>Recoges en Guadalajara: sin costo de envío.</span></div>'
       : '<div class="shipping-progress" role="status"><span>' +
         (remaining ? 'Agrega ' + remaining + (remaining === 1 ? ' tarjeta más' : ' tarjetas más') + ' y tu envío es gratis.' : 'Tu pedido ya tiene envío gratis.') +
-        '</span><progress max="' + C.freeShippingFrom + '" value="' + Math.min(q.qty, C.freeShippingFrom) + '" aria-label="Avance para envío gratis"></progress></div>';
+        '</span><progress max="' + C.freeShippingFrom + '" value="' + Math.min(q.cards, C.freeShippingFrom) + '" aria-label="Avance para envío gratis"></progress></div>';
+    var anyLogo = false;
     html += q.groups.map(function (g) {
+      var p = g.product;
       return '<div class="d-group">' + g.lines.map(function (l) {
-          var i = state.cart.findIndex(function (c) { return c.product === l.product.id && c.variant === l.variant.id && (c.text || "") === l.text; });
-          var item = state.cart[i] || {};
-          var extra = l.product.custom ? (item.text ? "Nombre: " + item.text : "En blanco") : "";
-          return '<div class="d-line"><div class="mini shape-' + l.product.shape + '">' + CARDS.card(l.product.id, l.variant.id, { text: item.text }) + "</div>" +
-            '<span class="d-name">' + esc(l.product.cartName) + "<small>" + esc(l.variant.name) + " · " + money(g.unit) + " c/u</small>" + (extra ? "<small>" + esc(extra) + "</small>" : "") + "</span>" +
-            '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="1" max="999" inputmode="numeric" data-line="' + i + '" value="' + l.qty + '" aria-label="Cantidad"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div>' +
+          var i = state.cart.findIndex(function (c) { return c.product === p.id && c.variant === l.variant.id && (c.text || "") === l.text && !!c.logo === l.logo; });
+          if (l.logo) anyLogo = true;
+          var extra = p.custom ? (l.logo ? "Con logo · lo mandas por WhatsApp" : l.text ? "Nombre: " + l.text : "En blanco") : "";
+          if (p.custom && p.packOf && (l.logo || l.text)) extra += " (en las " + p.packOf + ")";
+          var img = l.logo ? logoImage(p.id) : "";
+          var opts = l.logo ? (img ? { logo: img } : { text: "TU LOGO" }) : { text: l.text };
+          var price = p.packOf ? money(g.unit) + " · paquete de " + p.packOf : money(g.unit) + " c/u";
+          return '<div class="d-line"><div class="mini shape-' + p.shape + '">' + CARDS.card(p.id, l.variant.id, opts) + "</div>" +
+            '<span class="d-name">' + esc(p.cartName) + "<small>" + esc(l.variant.name) + " · " + price + "</small>" + (extra ? "<small>" + esc(extra) + "</small>" : "") + "</span>" +
+            '<div class="stepper"><button type="button" data-line-dec="' + i + '" aria-label="Menos">−</button><input type="number" min="1" max="999" inputmode="numeric" data-line="' + i + '" value="' + l.qty + '" aria-label="' + (p.packOf ? "Paquetes" : "Cantidad") + '"><button type="button" data-line-inc="' + i + '" aria-label="Más">+</button></div>' +
             '<button type="button" class="remove" data-remove="' + i + '" aria-label="Quitar del carrito">×</button></div>';
-        }).join("") +
-        (g.wholesale
-          ? '<p class="d-note ok">Precio de mayoreo aplicado</p>'
-          : '<p class="d-note">Con ' + g.missing + " más pagas " + money(g.product.wholesale) + " c/u (mayoreo)</p>") +
-        "</div>";
+        }).join("") + groupNote(g) + "</div>";
     }).join("");
+    if (anyLogo) html += '<p class="d-note logo-reminder" role="note"><strong>Con logo:</strong> después de pagar nos mandas tu logo por WhatsApp (PNG o PDF).</p>';
 
     html += deliveryBlock(q) + programBlock();
 
@@ -279,7 +350,7 @@
       (pickup ? '<p class="d-note">Te escribimos a este WhatsApp para coordinar punto y hora de entrega en Guadalajara.</p>' : "") +
       "</div>" +
       '<div class="d-block"><div class="sum-rows" style="margin:0 0 12px">' +
-      "<div><span>" + q.qty + (q.qty === 1 ? " pieza" : " piezas") + "</span><strong>" + money(q.subtotal) + "</strong></div>" +
+      "<div><span>" + q.cards.toLocaleString("es-MX") + (q.cards === 1 ? " tarjeta" : " tarjetas") + "</span><strong>" + money(q.subtotal) + "</strong></div>" +
       "<div><span>" + (pickup ? "Recoger en Guadalajara" : "Envío") + "</span><strong>" + (pickup ? "Sin costo" : q.shipping ? money(q.shipping) : "Gratis") + "</strong></div></div>" +
       '<div class="sum-total"><span>Total</span><strong>' + money(q.total) + "</strong></div>" +
       '<div class="pay"><button class="btn btn-primary btn-block" type="submit" data-pay="mp">Pagar ' + money(q.total) + " con Mercado Pago</button>" +
@@ -287,6 +358,18 @@
       '<p class="form-note">Tarjeta, OXXO, transferencia o saldo de Mercado Pago. Pago seguro.</p>' +
       '<p class="form-error" id="order-error" hidden></p></div></form>';
     body.innerHTML = html;
+  }
+
+  // Nota de precio debajo de cada producto del carrito.
+  function groupNote(g) {
+    var p = g.product;
+    if (p.packOf) return '<p class="d-note">' + C.unitLabel(p, g.qty) + " de " + p.packOf + " = " + g.cards.toLocaleString("es-MX") + " tarjetas</p>";
+    if (!g.hasWholesale) return "";
+    if (g.wholesale) {
+      return '<p class="d-note ok">' + (p.pack ? "Precio de paquete aplicado: " + money(p.wholesale) + " c/u" : "Precio de mayoreo aplicado") + "</p>";
+    }
+    return '<p class="d-note">Con ' + g.missing + " más pagas " + money(p.wholesale) + " c/u" +
+      (p.pack ? " (paquete de " + p.pack + " por " + money(p.wholesale * p.pack) + ")" : " (mayoreo)") + "</p>";
   }
 
   function readCustomer() {
@@ -299,10 +382,14 @@
   }
 
   function orderText(q, c) {
+    var anyLogo = false;
     var lines = q.groups.map(function (g) {
-      return g.product.name + " (" + (g.wholesale ? "mayoreo" : "menudeo") + ", " + money(g.unit) + " c/u):\n" +
+      return g.product.name + " (" + C.groupPriceLabel(g) + "):\n" +
         g.lines.map(function (l) {
-          return "  • " + l.qty + " × " + l.variant.name + (l.product.custom ? (l.text ? " · nombre: " + l.text : " · en blanco") : "");
+          if (l.logo) anyLogo = true;
+          var cu = C.customLabel(l);
+          var qty = g.product.packOf ? C.unitLabel(g.product, l.qty) + " (" + l.qty * g.product.packOf + " tarjetas)" : l.qty;
+          return "  • " + qty + " × " + l.variant.name + (cu ? " · " + cu : "");
         }).join("\n");
     }).join("\n");
     var all = [];
@@ -314,7 +401,8 @@
     return "Hola, quiero hacer este pedido de " + C.brand.name + ":\n\n" + lines +
       "\n\nQué abre cada tarjeta:\n" + program +
       "\n\nSubtotal: " + money(q.subtotal) + "\n" + (q.delivery.pickup ? "Recoger en Guadalajara: sin costo" : "Envío: " + (q.shipping ? money(q.shipping) : "Gratis")) + "\nTotal: " + money(q.total) +
-      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\n" + delivery;
+      "\n\nNombre: " + c.name + "\nWhatsApp: " + c.phone + "\n" + delivery +
+      (anyLogo ? "\n\nMi logo se los mando por aquí (PNG o PDF)." : "");
   }
 
   function submitOrder(e) {
@@ -384,7 +472,13 @@
       state.custom[mp[0]] = Object.assign({}, state.custom[mp[0]], { mode: mp[1] });
       save();
       renderProduct(C.getProduct(mp[0]));
-      if (mp[1] === "name") $('[data-text="' + mp[0] + '"]').focus();
+      var focus = mp[1] === "name" ? $('[data-text="' + mp[0] + '"]') : $('[data-mode="' + d.mode + '"]');
+      if (focus) focus.focus();
+    } else if (d.logoClear) {
+      delete logoMem[d.logoClear];
+      if (state.custom[d.logoClear]) delete state.custom[d.logoClear].logo;
+      save();
+      renderProduct(C.getProduct(d.logoClear));
     }
     else if (d.remove !== undefined) {
       readCustomer();
@@ -405,6 +499,12 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOrder(); });
 
   var products = $("#products");
+  products.addEventListener("change", function (e) {
+    if (e.target.dataset.logo) {
+      readLogo(e.target.files && e.target.files[0], e.target.dataset.logo);
+      e.target.value = "";
+    }
+  });
   // En celular, tocar la tarjeta la voltea.
   products.addEventListener("click", function (e) {
     var media = e.target.closest(".product-media");
@@ -507,7 +607,7 @@
   $$("[data-wa]").forEach(function (el) { el.href = wa("Hola, quiero información de las tarjetas NFC " + C.brand.name); el.target = "_blank"; el.rel = "noopener"; });
 
   C.products.forEach(function (p) {
-    if (p.custom && choice(p).mode === "name") renderProduct(p);
+    if (p.custom && choice(p).mode !== "blank") renderProduct(p);
     else if (state.sel[p.id]) renderVariant(p);
     renderPick(p);
   });
@@ -515,14 +615,15 @@
   renderHeroCard();
 
   // Cada vuelta de la animación muestra otra tarjeta.
-  $(".phone").addEventListener("animationiteration", function (e) {
+  var phone = $(".phone");
+  if (phone) phone.addEventListener("animationiteration", function (e) {
     if (e.target !== e.currentTarget) return;
     heroIdx++;
     renderHeroCard();
   });
 
   if (finePointer && !reduceMotion) {
-    tilt($("#stage"), $("#hero-tilt"), 10);
+    if ($("#stage") && $("#hero-tilt")) tilt($("#stage"), $("#hero-tilt"), 10);
     $$(".product-media").forEach(function (m) { tilt(m, $(".tilt", m), 14); });
   }
 })();

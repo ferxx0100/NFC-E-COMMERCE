@@ -23,8 +23,10 @@ const SITE = (
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : C.brand.url)
 ).replace(/\/$/, "");
 
-const minRetail = Math.min(...C.products.map((p) => p.retail));
-const minWholesale = Math.min(...C.products.map((p) => p.wholesale));
+// Precio más bajo por pieza suelta (los paquetes no cuentan) y mayoreo por pieza (reseñas y redes).
+const minRetail = Math.min(...C.products.filter((p) => !p.packOf).map((p) => p.retail));
+const minWholesale = Math.min(...C.products.filter((p) => C.hasWholesale(p) && !p.pack).map((p) => p.wholesale));
+const PACK = C.products.find((p) => p.packOf);
 
 function jsonld(objects) {
   return objects.map((o) => '<script type="application/ld+json">' + JSON.stringify(o).replace(/</g, "\\u003c") + "</script>").join("\n  ");
@@ -46,12 +48,13 @@ function organization() {
   };
 }
 
+// Producto con su regla de precio real: mayoreo (2 precios), precio único o paquete.
 function productsLd(pageUrl) {
   return C.products.map((p) => ({
     "@context": "https://schema.org",
     "@type": "Product",
     name: p.name,
-    description: p.short + " " + p.material + " con chip NFC NTAG213. Menudeo desde 1 pieza y mayoreo desde " + C.minWholesale(p) + " piezas.",
+    description: p.short + " " + p.material + " con chip NFC NTAG213. " + C.priceRule(p),
     sku: "TAKTO-" + p.id.toUpperCase(),
     brand: { "@type": "Brand", name: C.brand.name },
     material: p.material,
@@ -59,9 +62,9 @@ function productsLd(pageUrl) {
     offers: {
       "@type": "AggregateOffer",
       priceCurrency: C.brand.currency,
-      lowPrice: p.wholesale,
+      lowPrice: C.hasWholesale(p) ? p.wholesale : p.retail,
       highPrice: p.retail,
-      offerCount: 2,
+      offerCount: C.hasWholesale(p) ? 2 : 1,
       availability: p.stock ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
       url: pageUrl + "#" + p.id,
       seller: { "@id": SITE + "/#org" },
@@ -90,6 +93,11 @@ function render(template, page) {
     PHONE: C.brand.phoneDisplay,
     FREE: String(C.freeShippingFrom),
     WHOLESALE: String(C.wholesaleFrom),
+    MAYOREO: (function () {
+      var g = C.getProduct("google"), papel = C.products.filter(function (p) { return p.packOf; })[0];
+      return "Reseñas de Google y redes sociales a " + C.formatMoney(g.wholesale) + " c/u desde " + C.minWholesale(g) + " piezas; puedes mezclar diseños." +
+        (papel ? " Y " + papel.packOf + " tarjetas de cartón con tu nombre o logo por " + C.formatMoney(papel.retail) + "." : "");
+    })(),
     VERIFY: process.env.GOOGLE_SITE_VERIFICATION ? '<meta name="google-site-verification" content="' + esc(process.env.GOOGLE_SITE_VERIFICATION) + '">' : "",
   };
   for (const [k, v] of Object.entries(fields)) html = html.split("{{" + k + "}}").join(k === "VERIFY" ? v : esc(v));
@@ -119,10 +127,10 @@ function build() {
   fs.writeFileSync(path.join(OUT, "index.html"), render(template, {
     url: home,
     title: "Tarjetas NFC para Reseñas de Google | Menudeo y Mayoreo | TAKTO",
-    description: "Tarjetas NFC de plástico, metálicas y de papel para reseñas de Google, Instagram, WhatsApp, TikTok y Facebook. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.formatMoney(minWholesale) + ". Envíos a todo México.",
-    eyebrow: "CONEXIONES REALES. UN SOLO TOQUE.",
-    h1: h1Lines("Menos pasos.", "Más conexiones."),
-    lead: "Tu negocio, a un toque de distancia. Tarjetas NFC para compartir lo que haces, sumar reseñas y hacer que te recuerden.",
+    description: "Tarjetas NFC de plástico, metálicas y de cartón para reseñas de Google, Instagram, WhatsApp, TikTok y Facebook. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.formatMoney(minWholesale) + " y paquete de " + PACK.packOf + " por " + C.formatMoney(PACK.retail) + ". Envíos a todo México.",
+    eyebrow: "¿Qué es una tarjeta NFC?",
+    h1: h1Lines("Acerca tu celular.", "Se abre tu negocio."),
+    lead: "Una tarjeta con chip NFC: tu cliente la toca con su celular y se abre tu reseña de Google, tu Instagram, WhatsApp, TikTok o Facebook.",
     city: null,
     ld: [organization(), { "@context": "https://schema.org", "@type": "WebSite", name: C.brand.name, url: home, inLanguage: "es-MX" }, ...productsLd(home), faqLd()],
   }));
@@ -140,18 +148,18 @@ function build() {
       "<li><strong>" + esc(c.days) + "</strong><span>Entrega</span></li>" +
       (metro
         ? "<li><strong>Gratis</strong><span>Recoge en Guadalajara</span></li>"
-        : "<li><strong>Gratis</strong><span>Envío desde " + C.freeShippingFrom + " piezas</span></li>") +
+        : "<li><strong>Gratis</strong><span>Envío desde " + C.freeShippingFrom + " tarjetas</span></li>") +
       "<li><strong>" + C.formatMoney(minWholesale) + "</strong><span>Mayoreo desde " + C.wholesaleFrom + "</span></li></ul>" +
       '<p class="muted">' + esc(c.focus) + "</p></div></section>";
     const faq = [
-      { q: "¿Hacen envíos de tarjetas NFC a " + c.name + "?", a: "Sí. Enviamos a " + c.name + ", " + c.state + " en " + c.days + ". El envío es gratis desde " + C.freeShippingFrom + " piezas." + (metro ? " También puedes pagar en línea y recoger sin costo de envío en Guadalajara; te escribimos por WhatsApp para coordinar punto y hora." : "") },
-      { q: "¿Puedo revender tarjetas NFC en " + c.name + "?", a: "Sí. Desde " + C.wholesaleFrom + " piezas de un mismo producto pagas precio de mayoreo y te damos el video para configurarlas para cada cliente." },
+      { q: "¿Hacen envíos de tarjetas NFC a " + c.name + "?", a: "Sí. Enviamos a " + c.name + ", " + c.state + " en " + c.days + ". El envío es gratis desde " + C.freeShippingFrom + " tarjetas." + (metro ? " También puedes pagar en línea y recoger sin costo de envío en Guadalajara; te escribimos por WhatsApp para coordinar punto y hora." : "") },
+      { q: "¿Puedo revender tarjetas NFC en " + c.name + "?", a: "Sí. En reseñas de Google y redes sociales pagas " + C.formatMoney(minWholesale) + " c/u desde " + C.wholesaleFrom + " piezas de un mismo producto, y el cartón negro viene en paquete de " + PACK.packOf + " por " + C.formatMoney(PACK.retail) + ". Te damos el video para configurarlas para cada cliente." },
     ];
     fs.mkdirSync(path.join(OUT, "tarjetas-nfc", c.slug), { recursive: true });
     fs.writeFileSync(path.join(OUT, "tarjetas-nfc", c.slug, "index.html"), render(template, {
       url,
       title: "Tarjetas NFC en " + c.name + " | Reseñas de Google y Mayoreo | TAKTO",
-      description: "Venta de tarjetas NFC en " + c.name + ", " + c.state + ": reseñas de Google, Instagram, WhatsApp y tarjetas metálicas. Desde " + C.formatMoney(minRetail) + ", mayoreo desde " + C.wholesaleFrom + " piezas. Entrega en " + c.days + ".",
+      description: "Venta de tarjetas NFC en " + c.name + ", " + c.state + ": reseñas de Google, Instagram, WhatsApp y tarjetas metálicas. Desde " + C.formatMoney(minRetail) + ", mayoreo a " + C.formatMoney(minWholesale) + " desde " + C.wholesaleFrom + " piezas. Entrega en " + c.days + ".",
       eyebrow: "Tarjetas NFC · " + c.state,
       h1: h1Lines("Tarjetas NFC en " + esc(c.name) + ".", "Acerca el celular y listo."),
       lead: "Acerca el celular y se abre tu Google, Instagram o WhatsApp. Entrega en " + c.days + ".",

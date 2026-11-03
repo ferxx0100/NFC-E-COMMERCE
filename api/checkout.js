@@ -6,8 +6,9 @@
  *   MP_ACCESS_TOKEN  Access token de producción o de prueba de Mercado Pago.
  *   SITE_URL         URL pública de la tienda, p. ej. https://takto.mx
  *
- * Los precios (menudeo y mayoreo) se recalculan aquí con catalog.js y pay-catalog.js:
- * nunca se confía en lo que manda el navegador.
+ * Los precios (menudeo, mayoreo, precio único y paquetes) se recalculan aquí con catalog.js
+ * y pay-catalog.js: nunca se confía en lo que manda el navegador. Del logo solo llega la
+ * marca "con logo"; la imagen la manda el cliente por WhatsApp después de pagar.
  */
 const C = require("../assets/js/catalog.js");
 const P = require("../assets/js/pay-catalog.js");
@@ -87,9 +88,11 @@ module.exports = async function handler(req, res) {
     items = [];
     q.groups.forEach((g) => {
       g.lines.forEach((l) => {
+        const custom = C.customLabel(l);
         items.push({
           id: `${g.product.id}-${l.variant.id}`,
-          title: `${g.product.name} · ${l.variant.name}${g.product.custom ? (l.text ? ` · nombre: ${l.text}` : " · en blanco") : ""}${pickup ? ` · ${q.delivery.name}` : ""}`.slice(0, 250),
+          // quantity cuenta piezas, o paquetes de 100 en el cartón negro (el nombre ya dice "paquete de 100").
+          title: `${g.product.name} · ${l.variant.name}${custom ? ` · ${custom}` : ""}${pickup ? ` · ${q.delivery.name}` : ""}`.slice(0, 250),
           quantity: l.qty,
           unit_price: g.unit,
           currency_id: C.brand.currency,
@@ -101,8 +104,13 @@ module.exports = async function handler(req, res) {
     meta = {
       store: "tarjetas",
       delivery: pickup ? `${q.delivery.name}: sin costo, coordinar punto y hora por WhatsApp` : q.delivery.name,
-      pricing: q.groups.map((g) => `${g.product.name}: ${g.qty} pzas ${g.wholesale ? "mayoreo" : "menudeo"} a ${g.unit}`).join(" | "),
+      pricing: q.groups
+        .map((g) => `${g.product.name}: ${C.unitLabel(g.product, g.qty)}${g.product.packOf ? ` (${g.cards} tarjetas)` : ""} · ${C.groupPriceLabel(g)}`)
+        .join(" | ")
+        .slice(0, 900),
+      cards: q.cards,
       names: q.groups.flatMap((g) => g.lines.filter((l) => l.text).map((l) => `${g.product.name} ${l.variant.name}: ${l.text}`)).join(" | ").slice(0, 900),
+      logos: q.groups.flatMap((g) => g.lines.filter((l) => l.logo).map((l) => `${g.product.name} ${l.variant.name}: con logo (lo envía por WhatsApp)`)).join(" | ").slice(0, 900),
       programming: C.programSummary(q.groups.flatMap((g) => g.lines)).join(" | ").slice(0, 2000),
     };
   }

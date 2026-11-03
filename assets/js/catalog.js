@@ -20,12 +20,19 @@
 
   // Mayoreo desde esta cantidad de piezas de un mismo producto (se pueden mezclar diseños o colores).
   var wholesaleFrom = 20;
-  // Envío gratis desde esta cantidad de piezas en todo el pedido.
+  // Envío gratis desde esta cantidad de tarjetas en todo el pedido (un paquete de 100 cuenta como 100).
   var freeShippingFrom = 3;
 
   /*
-   * Productos, en el orden en que aparecen. Cada uno tiene dos precios por pieza:
-   * "retail" (menudeo, 1 a 19) y "wholesale" (mayoreo, desde 20).
+   * Productos, en el orden en que aparecen.
+   * - "retail": precio de una unidad (una pieza, o un paquete si el producto tiene "packOf").
+   * - "wholesale": precio por pieza de mayoreo desde "wholesaleFrom" (o 20) unidades.
+   *   null = un solo precio: no hay mayoreo y la página no muestra el selector menudeo/mayoreo.
+   * - "pack": solo para mostrar el mayoreo como paquete (la lisa: 10 × $39.90 = paquete de 10 por $399).
+   * - "packOf": el producto se vende por paquete; la cantidad del carrito cuenta paquetes
+   *   y cada paquete trae "packOf" tarjetas (para el envío gratis cuentan las tarjetas).
+   * - "customModes": personalización que se puede elegir ("blank" en blanco, "name" con nombre,
+   *   "logo" con logo: el cliente nos manda el logo por WhatsApp después de pagar).
    * "shape": "v" vertical (como las tarjetas de reseñas) o "h" horizontal (presentación).
    */
   var products = [
@@ -39,8 +46,8 @@
       materialShort: "Plástico",
       stock: true,
       shape: "v",
-      retail: 345,
-      wholesale: 175,
+      retail: 199,
+      wholesale: 99,
       variantLabel: "Color",
       variants: [
         { id: "negra", name: "Negra", screen: "google", color: "#4285F4" },
@@ -57,8 +64,8 @@
       materialShort: "Plástico",
       stock: true,
       shape: "v",
-      retail: 345,
-      wholesale: 175,
+      retail: 199,
+      wholesale: 99,
       variantLabel: "Red social",
       variants: [
         { id: "instagram", name: "Instagram", screen: "instagram", color: "#E1306C" },
@@ -74,11 +81,12 @@
       short: "Negra o blanca. En blanco o con tu nombre.",
       photos: { negra: "lisa.jpg", blanca: "lisa.jpg" },
       custom: true,
+      customModes: ["blank", "name"],
       material: "Plástico mate",
       materialShort: "Plástico",
       stock: true,
       shape: "h",
-      retail: 68,
+      retail: 49,
       // Paquete de 10 por $399.
       wholesale: 39.9,
       wholesaleFrom: 10,
@@ -93,15 +101,17 @@
       id: "metal",
       cartName: "Metálica",
       name: "Tarjeta NFC metálica",
-      short: "Programada a tu web, app, tienda, menú o redes. En blanco o con tu nombre.",
+      short: "Programada a tu web, app, tienda, menú o redes. En blanco, con tu nombre o con tu logo.",
       photos: { negra: "metal.jpg", plata: "metal.jpg", dorada: "metal.jpg" },
       custom: true,
+      customModes: ["blank", "name", "logo"],
       material: "Metal (acero inoxidable)",
       materialShort: "Metal",
       stock: false,
       shape: "h",
-      retail: 450,
-      wholesale: 320,
+      retail: 399,
+      // Un solo precio: sin mayoreo.
+      wholesale: null,
       variantLabel: "Color",
       variants: [
         { id: "negra", name: "Negra" },
@@ -111,17 +121,20 @@
     },
     {
       id: "papel",
-      cartName: "Papel negro",
-      name: "Tarjeta NFC de papel negro",
-      short: "Ligera y mate. En blanco o con tu nombre.",
+      cartName: "Cartón negro ×100",
+      name: "Tarjetas NFC de cartón negro (paquete de 100)",
+      short: "100 tarjetas ligeras y mate por paquete. En blanco, con tu nombre o con tu logo.",
       photos: { negra: "papel.jpg" },
       custom: true,
-      material: "Papel negro grueso",
-      materialShort: "Papel",
+      customModes: ["blank", "name", "logo"],
+      material: "Cartón negro grueso",
+      materialShort: "Cartón",
       stock: false,
       shape: "h",
-      retail: 199,
-      wholesale: 89,
+      // Se vende solo por paquete: 1 unidad = 1 paquete de 100 tarjetas.
+      retail: 499,
+      wholesale: null,
+      packOf: 100,
       variantLabel: "Color",
       variants: [{ id: "negra", name: "Negra" }],
     },
@@ -142,7 +155,7 @@
   // Opciones de entrega. "pickup": nunca cobra envío ni pide dirección. "address": pide dirección completa.
   var delivery = [
     { id: "recoger", name: "Recoger en Guadalajara", detail: pickup.note, cost: 0, pickup: true },
-    { id: "envio", name: "Envío a toda la República", detail: "Gratis desde " + freeShippingFrom + " piezas", cost: 99, address: true },
+    { id: "envio", name: "Envío a toda la República", detail: "Gratis desde " + freeShippingFrom + " tarjetas", cost: 99, address: true },
   ];
   var defaultDelivery = "envio";
 
@@ -191,18 +204,68 @@
     return "";
   }
 
-  // Desde cuántas piezas aplica el mayoreo en un producto.
-  function minWholesale(product) {
-    return product.wholesaleFrom || wholesaleFrom;
+  // ¿El producto tiene precio de mayoreo? (false = un solo precio).
+  function hasWholesale(product) {
+    return product.wholesale != null && product.wholesale < product.retail;
   }
 
-  // Precio por pieza según cuántas piezas de ese producto lleva el pedido.
+  // Desde cuántas unidades aplica el mayoreo en un producto (Infinity si no tiene mayoreo).
+  function minWholesale(product) {
+    return hasWholesale(product) ? product.wholesaleFrom || wholesaleFrom : Infinity;
+  }
+
+  // Precio por unidad (pieza o paquete) según cuántas unidades de ese producto lleva el pedido.
   function unitPrice(product, qty) {
-    return qty >= minWholesale(product) ? product.wholesale : product.retail;
+    return hasWholesale(product) && qty >= minWholesale(product) ? product.wholesale : product.retail;
+  }
+
+  // Tarjetas que trae una unidad del producto (1, o 100 en el paquete de cartón).
+  function cardsPer(product) {
+    return product.packOf || 1;
+  }
+
+  // "1 pieza", "3 piezas", "1 paquete", "2 paquetes".
+  function unitLabel(product, n) {
+    return n + (product.packOf ? (n === 1 ? " paquete" : " paquetes") : n === 1 ? " pieza" : " piezas");
+  }
+
+  // ¿Se puede elegir este modo de personalización ("blank", "name", "logo")?
+  function allowsMode(product, mode) {
+    return !!product.custom && (product.customModes || ["blank", "name"]).indexOf(mode) >= 0;
   }
 
   function cents(n) {
     return Math.round(n * 100) / 100;
+  }
+
+  // Regla de precio de cada producto en una frase (FAQ, datos para Google, README).
+  function priceRule(product) {
+    var m = formatMoney;
+    if (product.packOf) return "Paquete de " + product.packOf + " tarjetas por " + m(product.retail) + ".";
+    if (!hasWholesale(product)) return m(product.retail) + " por pieza, un solo precio.";
+    if (product.pack) {
+      return m(product.retail) + " por pieza o paquete de " + product.pack + " por " + m(cents(product.wholesale * product.pack)) +
+        " (" + m(product.wholesale) + " c/u desde " + minWholesale(product) + ").";
+    }
+    return m(product.retail) + " por pieza; " + m(product.wholesale) + " c/u desde " + minWholesale(product) + " piezas (se pueden mezclar diseños o colores).";
+  }
+
+  // Personalización de una línea del pedido, igual en Mercado Pago, WhatsApp y el carrito.
+  function customLabel(line) {
+    if (!line.product.custom) return "";
+    var out = [];
+    if (line.text) out.push("nombre: " + line.text);
+    if (line.logo) out.push("con logo (lo envía por WhatsApp)");
+    return out.length ? out.join(" · ") : "en blanco";
+  }
+
+  // Precio aplicado a un grupo de quote(): "mayoreo, $99 c/u", "$499 por paquete de 100"…
+  function groupPriceLabel(g) {
+    var p = g.product;
+    if (p.packOf) return formatMoney(g.unit) + " por paquete de " + p.packOf;
+    if (!hasWholesale(p)) return "precio único, " + formatMoney(g.unit) + " c/u";
+    if (p.pack) return (g.wholesale ? "precio de paquete" : "menudeo") + ", " + formatMoney(g.unit) + " c/u";
+    return (g.wholesale ? "mayoreo" : "menudeo") + ", " + formatMoney(g.unit) + " c/u";
   }
 
   /*
@@ -220,7 +283,9 @@
       var target = getTarget(it.dest);
       lines.push({
         product: p, variant: v, qty: n,
-        text: p.custom ? String(it.text || "").slice(0, 40) : "",
+        text: allowsMode(p, "name") ? String(it.text || "").replace(/\s+/g, " ").trim().slice(0, 40) : "",
+        // Solo una marca: la imagen del logo nunca viaja al servidor, el cliente la manda por WhatsApp.
+        logo: allowsMode(p, "logo") && it.logo === true,
         dest: target ? target.id : "",
         link: target && target.id !== "luego" ? String(it.link || "").replace(/\s+/g, " ").trim().slice(0, 300) : "",
       });
@@ -230,27 +295,33 @@
     var groups = [];
     var subtotal = 0;
     var qty = 0;
+    var cards = 0;
     products.forEach(function (p) {
       var n = byProduct[p.id];
       if (!n) return;
-      var unit = unitPrice(p, n), min = minWholesale(p);
+      var unit = unitPrice(p, n), ws = hasWholesale(p), min = minWholesale(p);
       groups.push({
         product: p,
+        // Unidades: piezas, o paquetes si el producto tiene packOf.
         qty: n,
+        cards: n * cardsPer(p),
         unit: unit,
         total: cents(unit * n),
-        wholesale: n >= min,
+        hasWholesale: ws,
+        wholesale: ws && n >= min,
         saving: cents((p.retail - unit) * n),
-        missing: n < min ? min - n : 0,
+        missing: ws && n < min ? min - n : 0,
         lines: lines.filter(function (l) { return l.product === p; }),
       });
       subtotal = cents(subtotal + unit * n);
       qty += n;
+      cards += n * cardsPer(p);
     });
 
     var d = getDelivery(deliveryId);
-    var shipping = d.pickup || !qty || qty >= freeShippingFrom ? 0 : d.cost;
-    return { groups: groups, qty: qty, subtotal: subtotal, delivery: d, shipping: shipping, total: subtotal + shipping, error: qty ? null : "Agrega al menos una tarjeta." };
+    // El envío gratis cuenta tarjetas reales: un paquete de 100 ya lo tiene.
+    var shipping = d.pickup || !cards || cards >= freeShippingFrom ? 0 : d.cost;
+    return { groups: groups, qty: qty, cards: cards, subtotal: subtotal, delivery: d, shipping: shipping, total: cents(subtotal + shipping), error: qty ? null : "Agrega al menos una tarjeta." };
   }
 
   /*
@@ -269,7 +340,8 @@
     var same = lines.length > 1 && lines.every(function (l) { return what(l) === first; });
     if (same) return ["Todas: " + first];
     return lines.map(function (l) {
-      return l.product.cartName + " " + l.variant.name + (l.text ? " (" + l.text + ")" : "") + " → " + what(l);
+      var c = [l.text, l.logo ? "con logo" : ""].filter(Boolean).join(", ");
+      return l.product.cartName + " " + l.variant.name + (c ? " (" + c + ")" : "") + " → " + what(l);
     });
   }
 
@@ -281,7 +353,9 @@
   var catalog = {
     brand: brand, products: products, delivery: delivery, defaultDelivery: defaultDelivery, pickup: pickup, programTargets: programTargets,
     wholesaleFrom: wholesaleFrom, freeShippingFrom: freeShippingFrom, leadTime: leadTime,
-    getProduct: getProduct, getVariant: getVariant, getDelivery: getDelivery, getTarget: getTarget, suggestTarget: suggestTarget, minWholesale: minWholesale, unitPrice: unitPrice, quote: quote, programSummary: programSummary, formatMoney: formatMoney,
+    getProduct: getProduct, getVariant: getVariant, getDelivery: getDelivery, getTarget: getTarget, suggestTarget: suggestTarget,
+    hasWholesale: hasWholesale, minWholesale: minWholesale, unitPrice: unitPrice, cardsPer: cardsPer, unitLabel: unitLabel, allowsMode: allowsMode,
+    priceRule: priceRule, customLabel: customLabel, groupPriceLabel: groupPriceLabel, quote: quote, programSummary: programSummary, formatMoney: formatMoney,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = catalog;

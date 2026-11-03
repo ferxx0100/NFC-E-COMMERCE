@@ -4,7 +4,7 @@ Objetivo: que la gente de Guadalajara y de todo México **entienda en 3 segundos
 
 - Web: `https://nfc-e-commerce.vercel.app` (cámbiala en todos los links cuando tengas dominio propio).
 - Material listo en `assets/img/marca/` (ver sección 12).
-- Precios (de `assets/js/catalog.js`): Google y Redes **$345** (mayoreo **$175** desde 20) · Lisa **$68** o **10 por $399** · Metálica **$450** (mayoreo $320) · Papel negro **$199** (mayoreo $89). Envío a todo México $99, **gratis desde 3 piezas**. Google, Redes y Lisa salen en 24 h; metálica y papel se fabrican en 7 a 12 días hábiles.
+- Precios (de `assets/js/catalog.js`, nov 2026): Google y Redes **$199** (mayoreo **$99** desde 20) · Lisa **$49** o **10 por $399** · Metálica **$399** con nombre o logo · Cartón negro **100 por $499** con nombre o logo. Envío a todo México $99, **gratis desde 3 piezas**. Google, Redes y Lisa salen en 24 h; metálica y cartón se fabrican en 7 a 12 días hábiles.
 - Gancho local: **en Guadalajara pasas por ella o te la entregamos sin costo de envío** (cuando la web ya tenga la opción "Recoger/entrega en Guadalajara").
 
 > Nota honesta: las reglas de música y del algoritmo cambian seguido. Lo que dice este documento viene de las ayudas oficiales de TikTok/Instagram y de guías de 2026 (fuentes al final). Antes de un video importante, revisa la sección de música de la app.
@@ -18,9 +18,9 @@ Objetivo: que la gente de Guadalajara y de todo México **entienda en 3 segundos
 
 **A quién le hablamos (en este orden):**
 
-1. **Negocios locales de GDL** (taquerías, cafeterías, barberías, estéticas, consultorios, gimnasios, tiendas): quieren **más reseñas en Google** y más seguidores. → Tarjeta Google / Redes $345.
-2. **Revendedores / ingreso extra** (todo México): compran a $175 y venden a $345, ganan $170 por tarjeta. → Mayoreo 20 piezas.
-3. **Profesionistas** (inmobiliarios, vendedores, abogados, doctores, creadores): tarjeta de presentación que no se tira. → Metálica $450, Lisa $68 / 10 por $399.
+1. **Negocios locales de GDL** (taquerías, cafeterías, barberías, estéticas, consultorios, gimnasios, tiendas): quieren **más reseñas en Google** y más seguidores. → Tarjeta Google / Redes $199.
+2. **Revendedores / ingreso extra** (todo México): compran a $99 y venden a $199, ganan $100 por tarjeta. → Mayoreo 20 piezas.
+3. **Profesionistas** (inmobiliarios, vendedores, abogados, doctores, creadores): tarjeta de presentación que no se tira. → Metálica $399 con logo, cartón 100 por $499, Lisa $49 / 10 por $399.
 
 **Por qué nosotros:** está en Guadalajara (recoges hoy), llega programada, funciona en iPhone y Android, pagas en la web con tarjeta u OXXO (Mercado Pago), y te ayudamos por WhatsApp.
 
@@ -30,7 +30,7 @@ Objetivo: que la gente de Guadalajara y de todo México **entienda en 3 segundos
 | --- | --- | --- | --- |
 | **A. "Mira lo que pasa" (demo NFC)** | 40 % | Que entiendan qué es NFC en 3 s. Es el que más se comparte. | Acercar el celular y que se abra Google, reto de tocar la tarjeta, reacción del cliente |
 | **B. Negocios reales de GDL** | 25 % | Confianza y búsquedas locales | Demo en una taquería de Chapultepec, barbería en Zapopan, antes/después de reseñas |
-| **C. Gana dinero revendiendo** | 20 % | Mayoreo, tráfico de todo México | "Compras en $175, vendes en $345", cómo programar en 1 minuto |
+| **C. Gana dinero revendiendo** | 20 % | Mayoreo, tráfico de todo México | "Compras en $99, vendes en $199", cómo programar en 1 minuto |
 | **D. Detrás de cámaras y dudas** | 15 % | Resolver objeciones y humanizar | Unboxing, empacando pedidos, "¿funciona en iPhone?", "¿necesita batería?" |
 
 ## 3. Música clave sin riesgo (lo más importante)
@@ -147,7 +147,7 @@ Cada plantilla sirve para Google, Instagram, WhatsApp, metálica… solo cambias
 | P6 | **Demo en negocio real de GDL** | "Taquería en [colonia], GDL" · el dueño habla 5 s · cliente toca · se abre Google · "¿y tu negocio?" |
 | P7 | **¿Sabías que…?** | "¿Sabías que tu celular lee chips sin apps?" · 1 dato · demo · CTA |
 | P8 | **Papel vs NFC** | Pantalla dividida: tarjeta de papel a la basura vs tarjeta NFC que abre tu WhatsApp · "¿Cuál te quedas?" |
-| P9 | **Revendedor gana $** | "Compré 20 en $3,500, vendí 20 en $6,900" (con números del catálogo) · cuentas en pantalla · "te enseño" |
+| P9 | **Revendedor gana $** | "Compré 20 en $1,980, vendí 20 en $3,980" (con números del catálogo) · cuentas en pantalla · "te enseño" |
 | P10 | **Pregunta del público** | Responder un comentario con video (función "Responder con video") · leer la pregunta · demo · CTA |
 
 **Formato fijo para todas:** vertical 9:16, 7 a 20 s, subtítulos grandes, primera toma con movimiento (mano acercando el celular), tu logo solo al final, sin marca de agua de otra app.
@@ -162,9 +162,9 @@ Sonido: CML = Commercial Music Library (TikTok) / Sound Collection (Facebook-Ins
 | 2 | A | "No toques esta tarjeta…" (y la tocan) | Se abre Google con 5 estrellas. "Así consiguen reseñas los negocios listos." | "NO toques esta tarjeta" | Efecto suspenso → pop | "Comenta RESEÑA y te paso el link" |
 | 3 | A | Tres tarjetas boca abajo | Reto P3: el espectador adivina cuál abre WhatsApp. | "¿Cuál abre WhatsApp? 1, 2 o 3" | Tendencia CML | "Comenta tu número" |
 | 4 | A | Celular sin internet, modo avión | "¿Necesita batería o internet? La tarjeta no. El cel sí para abrir la página." | "¿Necesita batería?" | VO + lo-fi | "Más dudas en el link" |
-| 5 | A | Tarjeta pegada en el mostrador | POV: "tu cliente pagó y en 2 s te dejó reseña". | "POV: ya no ruegas por reseñas" | Cumbia CML | "Desde $345 · link en perfil" |
+| 5 | A | Tarjeta pegada en el mostrador | POV: "tu cliente pagó y en 2 s te dejó reseña". | "POV: ya no ruegas por reseñas" | Cumbia CML | "Desde $199 · link en perfil" |
 | 6 | A | iPhone vs Android lado a lado | Los dos tocan, los dos abren. "Funciona en los dos." | "¿Funciona en iPhone?" | Efecto ding x2 | "Pídela en el link" |
-| 7 | A | "Tu tarjeta de presentación va a la basura" | P8 papel vs NFC. | "Papel 🗑️ vs NFC 📲" | Urbano instrumental | "Metálica $450 · link" |
+| 7 | A | "Tu tarjeta de presentación va a la basura" | P8 papel vs NFC. | "Papel 🗑️ vs NFC 📲" | Urbano instrumental | "Metálica $399 · link" |
 | 8 | A | Cliente con cara de duda | P4 reacción: "¿qué crees que pase?" | "Su cara cuando…" | Audio original | "Etiqueta a alguien que la necesita" |
 | 9 | A | Celular con funda gruesa | "¿Con funda? Sí funciona (fundas normales)." | "¿Con funda funciona?" | VO | "Link en perfil" |
 | 10 | A | Tarjeta de TikTok tocada → abre TikTok | "Tus clientes te siguen sin buscarte por nombre." | "Más seguidores sin buscarte" | Tendencia CML | "Comenta TIKTOK" |
@@ -176,15 +176,15 @@ Sonido: CML = Commercial Music Library (TikTok) / Sound Collection (Facebook-Ins
 | 16 | B | Consultorio, recepción | Doctor: "mis pacientes me dejan reseña antes de irse". | "Consultorios 🩺" | VO + acústico | "Link en perfil" |
 | 17 | B | "Fui a 5 negocios de GDL a enseñar esto" | Clip rápido de cada reacción. | "5 negocios, 5 reacciones" | Tendencia CML | "¿Paso a tu negocio? DM" |
 | 18 | B | Estética, espejo | Tarjeta de WhatsApp: "agenda su siguiente cita sin buscar tu número". | "Estéticas 💇‍♀️" | Cumbia | "Link en perfil" |
-| 19 | B | Inmobiliario entregando tarjeta metálica | "La tarjeta que nadie tira". | "Asesores inmobiliarios" | Lo-fi premium | "Metálica $450" |
+| 19 | B | Inmobiliario entregando tarjeta metálica | "La tarjeta que nadie tira". | "Asesores inmobiliarios" | Lo-fi premium | "Metálica $399" |
 | 20 | B | "Recógela hoy en Guadalajara" | Entrega en punto de GDL, sin envío. | "GDL: sin costo de envío" | Regional instrumental | "Pide en el link y pasa por ella" |
-| 21 | C | Billetes en la mesa (los tuyos) | P9: "20 tarjetas a $175 = $3,500. Vendidas a $345 = $6,900. Ganas $3,400." | Cuentas grandes | Urbano / cash register | "Comenta MAYOREO" |
+| 21 | C | Billetes en la mesa (los tuyos) | P9: "20 tarjetas a $99 = $1,980. Vendidas a $199 = $3,980. Ganas $2,000." | Cuentas grandes | Urbano / cash register | "Comenta MAYOREO" |
 | 22 | C | "Producto que nadie vende en tu ciudad" | Mapa de México, tu ciudad marcada. | "Negocio para revender 2026" | Tendencia CML | "Link de mayoreo" |
 | 23 | C | Programando una tarjeta en 1 minuto (cronómetro) | Mostrar el proceso real. | "Se programa en 1 min" | Electrónico | "Te enseñamos · link" |
 | 24 | C | "Cómo venderla a un negocio en 30 s" | Pitch: "¿cuántas reseñas tienes? Con esto, más." | "Tu pitch de venta" | VO | "Comenta MAYOREO" |
 | 25 | C | Caja con 20 tarjetas mezcladas | "Puedes mezclar Google, Instagram y WhatsApp en tus 20." | "Mezcla diseños" | Tendencia CML | "Link de mayoreo" |
 | 26 | D | Empacando pedidos de noche | "Pedidos de hoy: Monterrey, CDMX, Zapopan". | "Empacando pedidos 📦" | Lo-fi | "El tuyo sale en 24 h" |
-| 27 | D | Unboxing P5 de las metálicas | Dorada, plata, negra. | "Unboxing metálicas ✨" | Acústico | "Desde $450" |
+| 27 | D | Unboxing P5 de las metálicas | Dorada, plata, negra. | "Unboxing metálicas ✨" | Acústico | "$399 con tu logo" |
 | 28 | D | "Cómo pagar en la web en 30 s" | Grabación de pantalla: carrito → Mercado Pago → listo. | "Pagas con tarjeta u OXXO" | VO | "Link en perfil" |
 | 29 | D | "Las 5 preguntas que más me hacen" | Respuestas en 3 s cada una. | "FAQ tarjetas NFC" | VO + beat suave | "Más en la web" |
 | 30 | D | "Con tu nombre en 1 minuto" | Grabación de la web: escribes tu nombre y aparece en la tarjeta. | "Personalízala en la web" | Pop / ding | "Hazla tú en el link" |
@@ -253,7 +253,7 @@ Ya hay lista de búsquedas y reglas en `marketing/contenido-vertical-y-grupos-gd
 ### Marketplace (gratis)
 1. Desde tu perfil: **Vender → Artículo**. Categoría: Electrónica o Suministros de oficina.
 2. Una publicación por producto: "Tarjeta NFC reseñas Google – Guadalajara", "Tarjetas NFC mayoreo 20 pzas", "Tarjeta NFC metálica con tu nombre".
-3. Precio real ($345, $3,500 por 20, $450). Fotos: `post-google-negra.jpg`, `post-productos.jpg`, `post-metal.jpg` + **una foto real tuya con la tarjeta**.
+3. Precio real ($199, $1,980 por 20, metálica $399, cartón 100 por $499). Fotos: `post-google-negra.jpg`, `post-productos.jpg`, `post-metal.jpg` + **una foto real tuya con la tarjeta**.
 4. Ubicación: Guadalajara. Marca "Recoger en persona" y, si te lo permite, "Envío".
 5. Descripción:
    > Tarjeta NFC: tu cliente acerca el celular y se abre tu Google para dejarte reseña. Sin apps, iPhone y Android. Te llega programada.
@@ -289,14 +289,14 @@ Ya hay lista de búsquedas y reglas en `marketing/contenido-vertical-y-grupos-gd
 
 | Te escriben | Respondes |
 | --- | --- |
-| "Precio" / "info" | ¡Hola! 🙌 Google y redes $345, metálica $450, lisa 10 por $399. Aquí ves todo y pagas seguro con Mercado Pago: [link]. ¿De qué es tu negocio? |
+| "Precio" / "info" | ¡Hola! 🙌 Google y redes $199, metálica $399, lisa $49 o 10 por $399, cartón 100 por $499. Aquí ves todo y pagas seguro con Mercado Pago: [link]. ¿De qué es tu negocio? |
 | "¿Cómo funciona?" | Acercas el celular a la tarjeta y se abre tu link (Google, Instagram, WhatsApp…). Sin apps, en iPhone y Android. Mira este video de 30 s: [link] |
 | "¿Hacen envíos?" | Sí, a todo México: $99, gratis desde 3 piezas. Si estás en Guadalajara, pasas por ella sin costo de envío. Pide aquí: [link] |
 | "¿Estás en Guadalajara?" | ¡Sí! Puedes pedir y pagar en la web eligiendo recoger en GDL, sin envío: [link] |
-| "Mayoreo" | Desde 20 piezas de un mismo producto quedan a $175 c/u (las vendes en $345). Puedes mezclar Google, Instagram y WhatsApp. Pide aquí: [link] |
+| "Mayoreo" | Desde 20 piezas de un mismo producto quedan a $99 c/u (las vendes en $199). Puedes mezclar Google, Instagram y WhatsApp. Pide aquí: [link] |
 | "¿Funciona en iPhone?" | Sí, iPhone XS en adelante y la mayoría de Android con NFC. No necesitan app. |
 | "¿Es seguro pagar?" | El pago es con Mercado Pago (tarjeta, débito u OXXO); nosotros no vemos tus datos. Te llega confirmación. |
-| "Está caro" | Una sola reseña nueva ya te trae clientes. Y si llevas 10 lisas salen en $399. ¿Te digo cuál conviene a tu negocio? |
+| "Está caro" | Una sola reseña nueva ya te trae clientes. Y la lisa cuesta $49, o 100 de cartón con tu logo por $499. ¿Te digo cuál conviene a tu negocio? |
 | "¿Qué programo?" | Al pagar en la web hay un apartado para escribir qué quieres que abra (tu Google, Instagram, WhatsApp, web o menú). Si no sabes, mándanos el nombre de tu negocio y te ayudamos. |
 
 En TikTok usa **"Responder con video"** para las preguntas buenas: es contenido gratis (idea #12).

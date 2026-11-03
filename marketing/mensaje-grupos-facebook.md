@@ -24,19 +24,19 @@ Un chip dentro de la tarjeta. Acercas el celular y se abre tu enlace. Sin apps, 
 • Tu web, menú, tienda o tarjeta de contacto
 
 💳 MATERIALES Y PRECIOS
-• Lisa de plástico (negra o blanca): $68 · paquete de 10 por $399
-• Papel negro: $199
-• Reseñas de Google o redes sociales: $345
-• Metálica (negra, plata o dorada): $450
-👉 Mayoreo desde 20 piezas (Google y redes a $175 c/u)
+• Lisa de plástico (negra o blanca): $49 · paquete de 10 por $399
+• Cartón negro: paquete de 100 tarjetas por $499 (con tu nombre o logo)
+• Reseñas de Google o redes sociales: $199
+• Metálica (negra, plata o dorada): $399 (con tu nombre o logo)
+👉 Mayoreo: Google y redes a $99 c/u desde 20 piezas
 
 ❓ LO QUE SIEMPRE PREGUNTAN
 • ¿Sirve en cualquier celular? Sí: iPhone XS o más nuevo y Android con NFC encendido.
 • ¿Llega programada? Sí, nos dices qué quieres que abra y te llega lista.
 • ¿Puedo cambiar el enlace? Sí, las veces que quieras.
-• ¿Lleva mi nombre? La lisa, la metálica y la de papel, sí.
+• ¿Lleva mi nombre o logo? La metálica y la de cartón, nombre o logo; la lisa, nombre.
 • ¿Cómo pago? Mercado Pago: tarjeta, OXXO o transferencia.
-• ¿Cuándo la tengo? Las de plástico salen en 24 h. Metálica y papel: 7 a 12 días hábiles.
+• ¿Cuándo la tengo? Las de plástico salen en 24 h. Metálica y cartón: 7 a 12 días hábiles.
 
 📍 Guadalajara: la recoges sin costo de envío
 🚚 Resto de México: envío $99, gratis desde 3 piezas
@@ -50,9 +50,9 @@ https://wa.me/523511240636?text=Hola%2C%20vi%20tu%20publicaci%C3%B3n%20de%20las%
 ## Otras primeras líneas para rotar en cada grupo
 
 - Negocios: `¿Cuántas reseñas de Google tienes? Con esto tus clientes te califican en 5 segundos 👇`
-- Emprendedores: `Tu tarjeta de presentación ya no se tira: la acercan al celular y te guardan 📲`
-- Revendedores: `¿Ingreso extra? Compras en mayoreo a $175 y la vendes en $345 💼`
-- Compra-venta: `Tarjetas NFC en Guadalajara desde $68, recoges sin costo de envío 📍`
+- Emprendedores: `Tu tarjeta de presentación ya no se tira: 100 tarjetas NFC con tu logo por $499 📲`
+- Revendedores: `¿Ingreso extra? Compras en mayoreo a $99 y la vendes en $199 💼`
+- Compra-venta: `Tarjetas NFC en Guadalajara desde $49, recoges sin costo de envío 📍`
 
 ## Respuestas rápidas a los comentarios
 

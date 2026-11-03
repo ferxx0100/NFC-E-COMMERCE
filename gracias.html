@@ -24,25 +24,28 @@
       var q = new URLSearchParams(location.search);
       var status = q.get("status") || q.get("collection_status");
       var ref = (q.get("external_reference") || "").replace(/[^A-Z0-9-]/gi, "");
-      var wa = "https://wa.me/" + C.brand.whatsapp + "?text=" +
-        encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + ".");
       var el = document.getElementById("result");
       var isPay = ref.indexOf("TP-") === 0;
+      var KEY = "takto_state_v4";
+
+      // Entrega elegida en el carrito y si alguna tarjeta va con logo (se guarda en este navegador).
+      var pickup = false, logo = false;
+      try {
+        var saved = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem("takto_state_v3") || "{}");
+        pickup = !isPay && !!(C.getDelivery(saved.delivery) || {}).pickup;
+        logo = !isPay && Array.isArray(saved.cart) && saved.cart.some(function (l) { return l && l.logo; });
+      } catch (e) {}
+
+      var wa = "https://wa.me/" + C.brand.whatsapp + "?text=" +
+        encodeURIComponent("Hola, acabo de hacer mi pedido" + (ref ? " " + ref : "") + "." + (logo ? " Les mando mi logo (PNG o PDF)." : ""));
       var back = '<a class="btn btn-line" href="' + (isPay ? "/pay/" : "/") + '">Volver a ' + C.brand.name + (isPay ? " Pay" : "") + "</a>";
       var waBtn = '<a class="btn btn-wa" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>';
 
-      // Entrega elegida en el carrito (se guarda en este navegador).
-      var pickup = false;
-      try {
-        var saved = JSON.parse(localStorage.getItem("takto_state_v3") || "{}");
-        pickup = !isPay && !!(C.getDelivery(saved.delivery) || {}).pickup;
-      } catch (e) {}
-
       function clearOrder() {
         try {
-          var s = JSON.parse(localStorage.getItem("takto_state_v3") || "{}");
+          var s = JSON.parse(localStorage.getItem(KEY) || "{}");
           s.cart = [];
-          localStorage.setItem("takto_state_v3", JSON.stringify(s));
+          localStorage.setItem(KEY, JSON.stringify(s));
         } catch (e) {}
       }
 
@@ -55,12 +58,13 @@
             : pickup
               ? "Recoges en Guadalajara sin costo de envío. Te escribimos por WhatsApp para coordinar punto y hora, y confirmar qué abre cada tarjeta.</p>"
               : "Preparamos tu envío y te mandamos la guía por WhatsApp. También confirmamos qué abre cada tarjeta.</p>") +
+          (logo ? '<p class="lead" style="margin:12px auto 0"><strong>Mándanos tu logo por WhatsApp (PNG o PDF)</strong> para preparar tus tarjetas.</p>' : "") +
           '<div class="hero-cta">' + waBtn + back + "</div>";
       } else if (status === "pending" || status === "in_process") {
         clearOrder();
         el.innerHTML = '<span class="eyebrow">Pago pendiente</span><h2>Estamos esperando tu pago.</h2>' +
           '<p class="lead" style="margin:0 auto">Si pagaste en OXXO o por transferencia, puede tardar en acreditarse. Te avisamos en cuanto se confirme.</p>' +
-          '<div class="hero-cta">' + back + "</div>";
+          (logo ? '<p class="lead" style="margin:12px auto 0">Mientras, mándanos tu logo por WhatsApp (PNG o PDF).</p><div class="hero-cta">' + waBtn + back + "</div>" : '<div class="hero-cta">' + back + "</div>");
       } else {
         el.innerHTML = '<span class="eyebrow">Pago no completado</span><h2>No se hizo ningún cargo.</h2>' +
           '<p class="lead" style="margin:0 auto">Tu paquete sigue guardado. Puedes intentarlo de nuevo o pedir por WhatsApp.</p>' +

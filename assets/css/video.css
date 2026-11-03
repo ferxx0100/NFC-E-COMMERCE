@@ -1,37 +1,16 @@
 /*
- * Sección "¿Qué es NFC?" con el video corto de la portada.
- * Video: assets/img/marca/que-es-nfc-web.mp4 (se genera con tools/video-nfc/render.js).
+ * Ventana con el video "¿Qué es NFC?" (se abre desde la portada, ver assets/js/video.js).
+ * Video: assets/img/marca/que-es-nfc-web.mp4 (1080 × 1080, se genera con tools/video-nfc/render.js).
  */
-.video-nfc { padding: 72px 0; background: var(--surface, #f4f4f6); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.video-nfc-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; }
-.video-nfc-copy h2 { margin-bottom: 0.35em; }
-.video-nfc-copy .lead { margin-bottom: 20px; }
-.video-nfc-points { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 10px; }
-.video-nfc-points li { position: relative; padding-left: 30px; font-size: 1rem; }
-.video-nfc-points li::before { content: ""; position: absolute; left: 0; top: 0.3em; width: 18px; height: 18px; border-radius: 50%; background: var(--text) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat; }
-.video-nfc-sound { min-height: 56px; padding: 16px 30px; font-size: 1.0625rem; }
-.video-nfc-sound span { font-size: 0.85em; }
-.video-nfc-frame { margin: 0; min-width: 0; }
-.video-nfc-frame video { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 12px; background: #f8f8f2; box-shadow: 0 24px 60px rgba(24, 60, 48, 0.12); object-fit: cover; }
-.video-nfc-frame figcaption { margin-top: 12px; font-size: 0.875rem; color: var(--muted); }
-.video-nfc-frame summary { cursor: pointer; width: fit-content; }
-.video-nfc-frame details p { margin: 8px 0 0; line-height: 1.5; }
-
-@media (max-width: 800px) {
-  .video-nfc { padding: 48px 0; }
-  .video-nfc-layout { grid-template-columns: 1fr; gap: 24px; }
-  /* En celular: primero el titular, luego el video, luego el botón. */
-  .video-nfc-copy { display: contents; }
-  .video-nfc-copy .eyebrow, .video-nfc-copy h2 { order: 0; }
-  .video-nfc-copy .eyebrow { margin-bottom: 8px; }
-  .video-nfc-copy h2 { margin-bottom: 0; }
-  .video-nfc-frame { order: 1; }
-  .video-nfc-sound { order: 2; width: 100%; }
-  .video-nfc-copy .lead { order: 3; margin: 0; font-size: 1rem; }
-  .video-nfc-points { order: 4; margin: 0; }
-}
-@media (max-width: 600px) {
-  .video-nfc-layout { gap: 18px; }
-  .video-nfc-copy h2 { font-size: 2.1rem; }
-  .video-nfc-frame video { border-radius: 10px; }
-}
+.nh-video { width: min(560px, calc(100% - 32px)); max-width: none; max-height: calc(100% - 32px); padding: 0; border: 0; border-radius: 10px; background: #f8f8f2; color: #183c30; box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45); overflow: auto; }
+.nh-video::backdrop { background: rgba(9, 24, 18, 0.78); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.nh-video-box { padding: 14px 14px 16px; }
+.nh-video-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 2px 12px; }
+.nh-video-head h2 { margin: 0; font-size: 22px; line-height: 1.15; letter-spacing: -0.04em; }
+.nh-video-head h2 span { display: block; font-size: 13px; letter-spacing: 0; color: #626b61; margin-top: 2px; }
+.nh-video-close { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(24, 60, 48, 0.24); background: none; font-size: 24px; line-height: 1; cursor: pointer; }
+.nh-video-close:hover { background: #183c30; color: #fff; }
+.nh-video video { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 6px; background: #183c30; object-fit: cover; }
+.nh-video details { margin-top: 12px; font-size: 14px; color: #626b61; }
+.nh-video summary { cursor: pointer; width: fit-content; }
+.nh-video details p { margin: 8px 0 0; line-height: 1.5; }

@@ -7,13 +7,15 @@
       var visible = 0;
       document.querySelectorAll('[data-product]').forEach(function (article) {
         var product = window.CATALOG.getProduct(article.dataset.product);
+        if (!product) return;
+        // "Personalizables": lisa, metálica y cartón (nombre o logo). "Para tu negocio": reseñas y redes.
         var show = button.dataset.filter === 'all' ||
           (button.dataset.filter === 'custom' ? product.custom : !product.custom);
         article.hidden = !show;
         if (show) visible++;
       });
       filters.forEach(function (other) { other.setAttribute('aria-pressed', String(other === button)); });
-      count.textContent = visible + (visible === 1 ? ' diseño' : ' diseños') + ' · precios en MXN';
+      if (count) count.textContent = visible + (visible === 1 ? ' producto' : ' productos') + ' · precios en MXN';
     });
   });
   // Keep keyboard focus inside the cart and return it to the triggering control.
