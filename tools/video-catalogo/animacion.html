@@ -247,8 +247,8 @@
   var MW = 330;
   var MATS = [
     { name: "Plástico", sub: "Negra o blanca", word: "plástico", y: 500, cards: [["lisa-blanca", 60, 7], ["lisa-negra", -40, -5]] },
-    { name: "Metal", sub: "Dorada, plata o negra", word: "metal", y: 815, cards: [["metal-negra", 80, 9], ["metal-plata", 10, 1], ["metal-dorada", -60, -7]] },
-    { name: "Papel negro", sub: "Ligera y mate", word: "papel", y: 1130, cards: [["papel-negra", 0, -3]] },
+    { name: "Metal", sub: "Dorada, plata o negra · con logo", word: "metal", y: 815, cards: [["metal-negra", 80, 9], ["metal-plata", 10, 1], ["metal-dorada", -60, -7]] },
+    { name: "Cartón negro", sub: "Con tu nombre o logo", word: "cartón", y: 1130, cards: [["papel-negra", 0, -3]] },
   ];
   var materials = $("materials");
   MATS.forEach(function (m) {
@@ -265,9 +265,9 @@
   var P = function (id) { return C.getProduct(id); };
   var lisa = P("lisa");
   var PRICE_ROWS = [
-    { th: ["lisa-negra", 92], name: lisa.cartName, price: lisa.retail, word: "sesenta" },
-    { th: ["lisa-blanca", 92], name: "Paquete de " + lisa.pack + " lisas", price: Math.round(lisa.wholesale * lisa.pack), word: "paquete" },
-    { th: ["papel-negra", 92], name: P("papel").cartName, price: P("papel").retail },
+    { th: ["lisa-negra", 92], name: lisa.cartName, price: lisa.retail, word: "cuarenta" },
+    { th: ["lisa-blanca", 92], name: "Paquete de " + lisa.pack + " lisas", price: Math.round(lisa.wholesale * lisa.pack) },
+    { th: ["papel-negra", 92], name: P("papel").cartName, price: P("papel").retail, word: "cien" },
     { th: ["google-negra", 50], name: P("google").cartName, price: P("google").retail },
     { th: ["redes-instagram", 50], name: P("redes").cartName, price: P("redes").retail },
     { th: ["metal-dorada", 92], name: P("metal").cartName, price: P("metal").retail },
@@ -276,7 +276,7 @@
     return '<div class="row"><span class="th">' + cardImg(r.th[0], r.th[1]) + '</span><span class="nm">' + r.name + '</span><span class="pr">' + C.formatMoney(r.price) + "</span></div>";
   }).join("");
   var rowEls = $("prices").children;
-  $("mayoreo").textContent = "Mayoreo desde " + C.wholesaleFrom + " piezas";
+  $("mayoreo").textContent = "Google y redes: " + C.formatMoney(P("google").wholesale) + " desde " + C.minWholesale(P("google"));
 
   // ---------- Tiempos de la voz ----------
   var VO = window.VOICE || { words: [] };
@@ -436,10 +436,10 @@
       var el = rowEls[i];
       el.style.opacity = rk;
       el.style.transform = "translateX(" + (1 - rk) * 40 + "px)";
-      var on = (i === 0 && t >= PRICE_ROWS[0].t - 0.1 && t < PRICE_ROWS[1].t - 0.1) || (i === 1 && t >= PRICE_ROWS[1].t - 0.1 && t < T.te);
+      var on = (i === 0 && t >= PRICE_ROWS[0].t - 0.1 && t < PRICE_ROWS[2].t - 0.1) || (i === 2 && t >= PRICE_ROWS[2].t - 0.1 && t < T.te);
       el.className = "row" + (on ? " on" : "");
     });
-    var mk = back(p(t, PRICE_ROWS[1].t + 0.9, 0.45));
+    var mk = back(p(t, PRICE_ROWS[2].t + 0.9, 0.45));
     place($("mayoreo"), CX, 340 + PH + 76, 0.7 + 0.3 * mk, 0, clamp(mk * 1.6) * po);
 
     // ----- 7. Entrega
